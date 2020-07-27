@@ -1,0 +1,7 @@
+# ignore backup files
+*.pyc
+*~
+
+# obligatory, for mec
+.idea/
+.venv/
