@@ -1,97 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>SRCF Freshers' Fair - {% if page_title is defined %}: {{ page_title }}{% endif %}</title>
-    <link href="/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/_srcf/srcf-bs.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
-    <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
-    {% block head %}{% endblock %}
-  </head>
-  <body class="layout-footer">
-    <nav class="navbar navbar-expand-md navbar-light fixed-top">
-      <div class="container">
-        <h1 class="navbar-brand">
-          <a href="{{ DOMAIN_WEB }}/">
-            <img src="/_srcf/images/logo.svg">
-            <span>
-              <span class="text-danger">Student-Run</span>
-              <span class="text-primary">Computing Facility</span>
-            </span>
-          </a>
-        </h1>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('home.home') }}"><i class="fa fa-wrench"></i> Control Panel</a></li>
-          </ul>
-        </div>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>SRCF Freshers' Fair - {% if page_title is defined %}: {{ page_title }}{% endif %}</title>
+  <link href="https://srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://srcf.net/_srcf/srcf-bs.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+  <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
+  {% block head %}{% endblock %}
+</head>
+
+<body class="layout-footer">
+  <nav class="navbar navbar-expand-md navbar-light fixed-top">
+    <div class="container">
+      <h1 class="navbar-brand">
+        <a href="{{ DOMAIN_WEB }}/">
+          <img src="https://srcf.net/_srcf/images/logo.svg">
+          <span>
+            <span class="text-danger">Student-Run</span>
+            <span class="text-primary">Computing Facility</span>
+          </span>
+        </a>
+      </h1>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('home.home') }}"><i class="fa fa-wrench"></i>
+              Control Panel</a></li>
+        </ul>
       </div>
-    </nav>
-    <main role="main" class="container">
-      {%- if page_title is defined %}
-        <h2>
-          {%- if page_parent is defined %}
-            <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
-          {%- endif %}
-          {{ page_title }}
-          {%- if page_subtitle is defined %}
-            <small class="text-muted">{{ page_subtitle }}</small>
-          {%- endif %}
-        </h2>
+    </div>
+  </nav>
+  <main role="main" class="container">
+    {%- if page_title is defined %}
+    <h2>
+      {%- if page_parent is defined %}
+      <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
       {%- endif %}
-      {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        {% endfor %}
-      {% endwith %}
-      {% block body %}{% endblock %}
-    </main>
-    <div id="action-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="container">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div id="action-modal-content"></div>
-          </div>
+      {{ page_title }}
+      {%- if page_subtitle is defined %}
+      <small class="text-muted">{{ page_subtitle }}</small>
+      {%- endif %}
+    </h2>
+    {%- endif %}
+    {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </main>
+  <div id="action-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="container">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <div id="action-modal-content"></div>
         </div>
       </div>
     </div>
-    <footer class="footer">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">
-            <h5>x</h5>
-            <ul class="fa-ul">
-            </ul>
-          </div>
-          <div class="col-md-4">
-            <h5>x</h5>
-            <ul class="fa-ul">
-            </ul>
-          </div>
-          <div class="col-md-4">
-            <h5>x</h5>
-            <ul class="fa-ul">
-            </ul>
-          </div>
-        </div>
+  </div>
+  <footer class="footer">
+    <div class="container" style="display: flex;">
+      <div style="flex: 1 0 auto;" class="flex-item">
+        <a href="https://www.srcf.net/"><img src="https://www.srcf.net/images/poweredby-light.svg"
+            alt="Powered by the Student-Run Computing Facility (SRCF)"></a>
       </div>
-    </footer>
-    <script src="/_srcf/vendor/js/jquery.min.js"></script>
-    <script src="/_srcf/vendor/js/popper.min.js"></script>
-    <script src="/_srcf/vendor/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-  </body>
+      <div class="flex-item">
+        <p>The Student-Run Computing Facility is a registered society of Cambridge University</p>
+      </div>
+    </div>
+  </footer>
+  <script src="https://srcf.net/_srcf/vendor/js/jquery.min.js"></script>
+  <script src="https://srcf.net/_srcf/vendor/js/popper.min.js"></script>
+  <script src="https://srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
 </html>

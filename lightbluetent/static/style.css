@@ -67,3 +67,16 @@ ul.traceback li {
     border-top-right-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
 }
+
+.footer {
+  height: auto;    
+}
+
+footer > .container {
+    margin: 0px;
+    padding: 2rem;
+}
+
+.flex-item {
+    padding: 0 1rem 0 1rem;
+}

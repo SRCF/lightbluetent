@@ -1,6 +1,6 @@
 FROM python:3.8-buster
 
-RUN python3 -m pip install flask
+RUN python3 -m pip install flask python-ucam-webauth werkzeug==0.16
 
 VOLUME /app
 

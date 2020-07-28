@@ -11,29 +11,8 @@ import ucam_webauth.raven.flask_glue
 from werkzeug.exceptions import HTTPException
 
 
-class WLSRequest(ucam_webauth.Request):
-    def __str__(self):
-        query_string = ucam_webauth.Request.__str__(self)
-        return "https://auth.srcf.net/wls/authenticate?" + query_string
-
-
-class WLSResponse(ucam_webauth.Response):
-    keys = dict()
-    for kid in (2, 500):
-        with open('/etc/apache2/ucam_webauth_keys/pubkey{}'.format(kid), 'rb') as f:
-            keys[str(kid)] = ucam_webauth.rsa.load_key(f.read())
-
-
-class WLSAuthDecorator(ucam_webauth.flask_glue.AuthDecorator):
-    request_class = WLSRequest
-    response_class = WLSResponse
-    logout_url = "https://auth.srcf.net/logout"
-
-
-auth = WLSAuthDecorator(desc="Control Panel", require_ptags=None)
-raven = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF control panel",
+raven = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Freshers' Fair",
                                                     require_ptags=None)
-
 
 def parse_domain_name(domain):
     parsed = urlparse(domain.lower())
