@@ -5,3 +5,6 @@
 # obligatory, for mec
 .idea/
 .venv/
+
+# editors
+.vscode/
