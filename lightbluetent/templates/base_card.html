@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SRCF Freshers' Fair - {% if page_title is defined %}: {{ page_title }}{% endif %}</title>
+    <link href="/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/_srcf/srcf-bs.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+    <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
+  </head>
+  <body class="layout-card{% if wide|default(false) %} wide{% endif %}">
+    <div class="container">
+      <div class="card mx-auto">
+        <div class="card-body">
+          <img src="/_srcf/images/logo.svg" class="logo">
+          <h5 class="logo-title">SRCF Freshers' Fair</h5>
+	  {% block body %}{% endblock %}
+        </div>
+      </div>
+      <div class="float-left">
+        <a href="{{ url_for('home.home') }}" class="text-muted">{{ request.host_url.split("/", 3)[2].split(":", 1)[0] }}</a>
+      </div>
+      <div class="float-right">
+        <a href="https://www.srcf.net">
+          <span class="text-danger">Student-Run</span>
+          <span class="text-primary">Computing Facility</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
