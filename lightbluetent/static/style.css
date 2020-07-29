@@ -69,14 +69,10 @@ ul.traceback li {
 }
 
 .footer {
-  height: auto;    
+    height: 65px;
 }
 
 footer > .container {
     margin: 0px;
     padding: 2rem;
-}
-
-.flex-item {
-    padding: 0 1rem 0 1rem;
 }

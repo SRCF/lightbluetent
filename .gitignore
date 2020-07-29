@@ -4,7 +4,10 @@
 
 # obligatory, for mec
 .idea/
-.venv/
+venv
 
 # editors
-.vscode/
+.vscode
+
+# testing
+.coverage

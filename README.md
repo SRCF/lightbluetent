@@ -4,20 +4,20 @@ A simple Flask webapp to power the 2020 University of Cambridge Freshers' Fair v
 
 ## Development
 
-You can use Docker to make the development process much simpler.
+### Environment variables
 
-1. Ensure you have Docker installed
+* `APPLICATION_CONFIG` is strictly related to the project and is used only to load a JSON configuration file with the name specified in the variable itself.
+* `FLASK_CONFIG` is used to select the Python object that contains the configuration for the Flask application (see application/app.py and application/config.py). The value of the variable is converted into the name of a class.
+* `FLASK_ENV` is a variable used by Flask itself, and its values are dictated by it. See the configuration documentation mentioned in the resources of the previous section.
+
+
+### Getting started
+
 1. Clone this repository:
-```
+  
+```bash
 git clone https://github.com/SRCF/lightbluetent.git
 ```
-1. Enter the directory: `cd lightbluetent`
-1. Build the Docker image: `docker image build -t lightbluetent .`
-1. Run the Docker image:
-```
-docker container run --rm -v ~/lightbluetent:/app -p 5000:5000 lightbluetent
-```
+
+1. Start the containers: `cd lightbluetent` and then `./manage.py compose up -d`
 1. Navigate to localhost:5000 to see the app
-
-
-
