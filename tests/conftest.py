@@ -1,7 +1,7 @@
 import pytest
 
-from application.app import create_app
-from application.models import db
+from lightbluetent.app import create_app
+from lightbluetent.models import db
 
 
 @pytest.fixture
@@ -10,7 +10,7 @@ def app():
 
     return app
 
-
+# reset the database on each test to ensure reliability
 @pytest.fixture(scope="function")
 def database(app):
     with app.app_context():
