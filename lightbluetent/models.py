@@ -34,6 +34,10 @@ class Society(db.Model):
     banner_color = db.Column(db.String, unique=False, nullable=True)
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
     disable_private_chat = db.Column(db.Boolean, nullable=False, default=False)
+    attendee_pw = db.Column(db.String, unique=True, nullable=False)
+    moderator_pw = db.Column(db.String, unique=True, nullable=False)
+    uid = db.Column(db.String, unique=True, nullable=False)
+    bbb_id = db.Column(db.String, unique=True, nullable=False)
 
     
     def __repr__(self):
