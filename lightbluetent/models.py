@@ -40,7 +40,6 @@ class Society(db.Model):
     uid = db.Column(db.String, unique=True, nullable=False)
     bbb_id = db.Column(db.String, unique=True, nullable=False)
 
-    
     def __repr__(self):
         return f"Society('{self.name}', '{self.admins}')"
 
