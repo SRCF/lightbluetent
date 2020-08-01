@@ -1,5 +1,43 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <p>Administration page for {{ socname }}</p>
+
+  <p>Change your stand's settings:</p>
+
+  <form method="post">
+
+    <label for="name">Society name</label>
+    <input name=name id="name" content="{{ name }}"><br />
+
+    <label for="short_name">Society short name / acronym</label>
+    <input name=short_name id="short_name" content="{{ short_name }}"><br />
+
+    <label for="website">Website</label>
+    <input name=website id="website" content="{{ website }}"><br />
+
+    <label for="description">Society description</label>
+    <input name=description id="description" content="{{ description }}"><br />
+
+    <label for="welcome_text">Welcome text</label>
+    <input name=welcome_text id="welcome_text" content="{{ welcome_text }}"><br />
+
+    <label for="logo">Logo</label>
+    <input type="file" name=logo id="logo" content="{{ logo }}"><br />
+
+    <label for="banner_color">Banner colour</label>
+    <input type="color" name=banner_color id="banner_color" content="{{ banner_color }}"><br />
+
+    <label for="banner_text">Banner text</label>
+    <input name=banner_text id="banner_text" content="{{ banner_text }}"><br />
+
+    <label for="mute_on_start">Mute users on joining</label>
+    <input type="checkbox" name=mute_on_start id="mute_on_start" content="{{ mute_on_start }}" checked><br />
+
+    <label for="disable_private_chat">Disable private chat</label>
+    <input type="checkbox" name=disable_private_chat id="disable_private_chat" content="{{ disable_private_chat }}" checked><br />
+
+    <input type="submit" value="Save"><br /><br />
+
+    <a href="/admin/{{ name }}/add">Add a moderator</a>
+  </form>
 {% endblock %}

@@ -23,6 +23,7 @@ class Society(db.Model):
     __tablename__ = "societies"
 
     id = db.Column(db.Integer, primary_key=True)
+    short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
     admins = db.relationship('User', backref="society", lazy=True)
     description = db.Column(db.String, unique=False, nullable=True)
