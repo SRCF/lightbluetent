@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash
 from lightbluetent.models import db, User, Society
+from lightbluetent.utils import gen_bbb_id
 
 bp = Blueprint("home", __name__)
 
@@ -18,6 +19,10 @@ def register():
         email_address = request.form["email_address"]
         soc_name = request.form["soc_name"]
         soc_short_name = request.form["soc_short_name"]
+        uid = soc_short_name.lower()
+        bbb_id = gen_unique_string()
+        moderator_pw = gen_unique_string()[0:12]
+        attendee_pw = gen_unique_string()[0:12]
 
         errors = []
 
@@ -34,9 +39,51 @@ def register():
         if not soc_short_name:
             errors.append("A short society name is required.")
 
+        # TODO: What's the best way of handling the (unlikely) event
+        #       that the passwords are:
+        #    a) non-unique across registered societies
+        #    b) the same
+        #       Currently we flash the error:
+        #       "An error occured. Please try again."
+
+        if moderator_pw == attendee_pw:
+            errors.append("An error occured. Please try again.")
+
+        # TODO: check we don't already have user email address, society short name,
+        #       moderator_pw, attendee_pw etc.
+
+        if User.query.filter_by(email=email_address):
+            errors.append("That email address is already registered.")
+        if Society.query.filter_by(uid=uid):
+            errors.append("That society short name is already in use.")
+        if (Society.query.filter_by(attendee_pw=attendee_pw)
+                or Society.query.filter_by(moderator_pw=moderator_pw)
+                or Society.query.filter_by(bbb_id=bbb_id)):
+            errors.append("An error occured. Please try again.")
+
+
         if not errors:
-            pass
-            # TODO: write to the database
+
+            # TODO: BBB create() API call goes here?
+
+            # TODO: add admins field from currently authenticated user
+            society = Society(short_name=soc_short_name,
+                              name=name,
+                              attendee_pw=attendee_pw,
+                              moderator_pw=moderator_pw,
+                              uid=uid,
+                              bbb_id=bbb_id)
+
+            # TODO: add crsid field from currently authenticated user
+            admin = User(email=email_address,
+                         name=name,
+                         society_id=society.id,
+                         attendee_pw)
+
+            db.session.add(society)
+            db.session.add(admin)
+            db.session.commit()
+
         else:
             for message in errors:
                 flash(message)
