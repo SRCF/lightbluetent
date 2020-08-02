@@ -13,6 +13,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
     society_id = db.Column(db.Integer, db.ForeignKey('societies.id'), nullable=False)
+    time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # will it work if I use the backref here?
     def __repr__(self):
@@ -27,6 +28,12 @@ class Society(db.Model):
     name = db.Column(db.String, unique=False, nullable=False)
     admins = db.relationship('User', backref="society", lazy=True)
     description = db.Column(db.String, unique=False, nullable=True)
+    time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # uid:    A short name for the society. Duplicate of short_name for now,
+    #         but stored as lower case.
+    # bbb_id: Randomly generated UUID. Sent to BBB as the meetingID parameter
+    #         on the 'create' API call.
 
     website = db.Column(db.String, unique=False, nullable=True, default='https://www.srcf.net')
     welcome_text = db.Column(db.String, unique=False, nullable=True, default='Your welcome text here!')
@@ -42,4 +49,5 @@ class Society(db.Model):
 
     def __repr__(self):
         return f"Society('{self.name}', '{self.admins}')"
+
 
