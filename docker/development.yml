@@ -25,6 +25,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_PORT: ${POSTGRES_PORT}
       FLASK_SECRET_KEY: dummy_secret_key
+      FLASK_TRUSTED_HOSTS: ${FLASK_TRUSTED_HOSTS}
     command: flask run --host 0.0.0.0
     volumes:
       - ${PWD}:/opt/code

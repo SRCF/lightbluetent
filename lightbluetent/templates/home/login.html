@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <p>Login page</p>
+
+  {% if session.user %}
+    <p>You are logged in as {{ session.user }}</p>
+    <p><a href="{{ url_for("home.logout") }}">Log out</a></p>
+  {% else %}
+    <p>You are not logged in.</p>
+    <p><a href="{{ url_for("home.login_raven") }}">Log in via Raven</a></p>
+  {% endif %}
+
 {% endblock %}

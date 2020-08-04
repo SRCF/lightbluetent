@@ -1,18 +1,28 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, session, url_for, redirect
 from lightbluetent.models import db, User, Society
-from lightbluetent.utils import gen_bbb_id
+from lightbluetent.utils import gen_unique_string
+from datetime import datetime
+
+import ucam_webauth
+import ucam_webauth.raven
+import ucam_webauth.raven.flask_glue
 
 bp = Blueprint("home", __name__)
+
+auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
 
 @bp.route("/")
 def index():
     return render_template("home/index.html")
 
-@bp.route("/login")
-def login():
-    return render_template("home/login.html")
+@bp.route("/logout")
+def logout():
+    auth_decorator.logout()
+    flash("You have been logged out.")
+    return redirect(url_for("home.index"))
 
 @bp.route("/register", methods=("GET", "POST"))
+@auth_decorator
 def register():
     if request.method == "POST":
         name = request.form["name"]
@@ -49,14 +59,11 @@ def register():
         if moderator_pw == attendee_pw:
             errors.append("An error occured. Please try again.")
 
-        # TODO: check we don't already have user email address, society short name,
-        #       moderator_pw, attendee_pw etc.
-
         if User.query.filter_by(email=email_address):
             errors.append("That email address is already registered.")
         if Society.query.filter_by(uid=uid):
             errors.append("That society short name is already in use.")
-        if (Society.query.filter_by(attendee_pw=attendee_pw)
+        elif (Society.query.filter_by(attendee_pw=attendee_pw)
                 or Society.query.filter_by(moderator_pw=moderator_pw)
                 or Society.query.filter_by(bbb_id=bbb_id)):
             errors.append("An error occured. Please try again.")
@@ -66,19 +73,18 @@ def register():
 
             # TODO: BBB create() API call goes here?
 
-            # TODO: add admins field from currently authenticated user
+            admin = User(email=email_address,
+                         name=name,
+                         society_id=society.id,
+                         crsid=auth_decorator.principal)
+
             society = Society(short_name=soc_short_name,
                               name=name,
                               attendee_pw=attendee_pw,
                               moderator_pw=moderator_pw,
                               uid=uid,
-                              bbb_id=bbb_id)
-
-            # TODO: add crsid field from currently authenticated user
-            admin = User(email=email_address,
-                         name=name,
-                         society_id=society.id,
-                         attendee_pw)
+                              bbb_id=bbb_id,
+                              admins=admin)
 
             db.session.add(society)
             db.session.add(admin)
@@ -88,7 +94,10 @@ def register():
             for message in errors:
                 flash(message)
 
-    return render_template("home/register.html", page_title="Register a Society")
+    print(f"{auth_decorator.principal}")
+
+    return render_template("home/register.html", page_title="Register a Society",
+                           crsid=auth_decorator.principal)
 
 @bp.route("/<socname>")
 def society_welcome(socname):
