@@ -7,9 +7,6 @@ import subprocess
 import time
 
 import click
-import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-
 
 # Ensure an environment variable exists and has a value
 def setenv(variable, default):
@@ -98,41 +95,11 @@ def compose(subcommand):
         p.wait()
 
 
-def run_sql(statements):
-    conn = psycopg2.connect(
-        dbname=os.getenv("POSTGRES_DB"),
-        user=os.getenv("POSTGRES_USER"),
-        password=os.getenv("POSTGRES_PASSWORD"),
-        host=os.getenv("POSTGRES_HOSTNAME"),
-        port=os.getenv("POSTGRES_PORT"),
-    )
-
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    cursor = conn.cursor()
-    for statement in statements:
-        cursor.execute(statement)
-
-    cursor.close()
-    conn.close()
-
-
 def wait_for_logs(cmdline, message):
     logs = subprocess.check_output(cmdline)
     while message not in logs.decode("utf-8"):
         time.sleep(0.1)
         logs = subprocess.check_output(cmdline)
-
-
-@cli.command()
-def create_initial_db():
-    configure_app(os.getenv("APPLICATION_CONFIG"))
-
-    try:
-        run_sql([f"CREATE DATABASE {os.getenv('APPLICATION_DB')}"])
-    except psycopg2.errors.DuplicateDatabase:
-        print(
-            f"The database {os.getenv('APPLICATION_DB')} already exists and will not be recreated"
-        )
 
 
 @cli.command()
@@ -146,8 +113,6 @@ def test(filenames):
 
     cmdline = docker_compose_cmdline("logs db")
     wait_for_logs(cmdline, "ready to accept connections")
-
-    run_sql([f"CREATE DATABASE {os.getenv('APPLICATION_DB')}"])
 
     cmdline = ["pytest", "--capture=no", "--verbosity=2", "--cov=application", "--cov-report=term-missing"]
     cmdline.extend(filenames)
