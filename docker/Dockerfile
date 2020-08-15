@@ -2,8 +2,13 @@ FROM python:3.8-buster
 
 ENV PYTHONUNBUFFERED 1
 
-RUN mkdir /opt/code && mkdir /opt/requirements
-WORKDIR /opt/code
+WORKDIR /opt/code/
 
-COPY requirements /opt/requirements
-RUN python3 -m pip install -r /opt/requirements/development.txt
+RUN python -m pip install pipenv
+
+COPY Pipfile .
+COPY Pipfile.lock .
+
+RUN pipenv install
+
+COPY . .

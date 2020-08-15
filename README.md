@@ -47,9 +47,9 @@ unclear
 
 ### Development
 
-* create your venv with `python3 -m venv venv`
-* activate the venv `. venv/bin/activate`
-* install dependencies with `pip install -r requirements/development.txt`
+* Make sure you have [Pipenv](https://pypi.org/project/pipenv/) installed
+* install dependencies with `pipenv install --dev`
+* `pipenv shell` to spawn a shell with the dependencies installed
 * `./manage.py flask run` to run the web app locally (not recommended)
 * `./manage.py compose up` to build and run the Flask container and the PostgreSQL container, attach the `-d` flag optionally to run the containers as daemons in the background
 * `./manage.py compose down` to tear down the containers
