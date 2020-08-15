@@ -8,5 +8,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Pipenv
+      run: python -m pip install pipenv
+    - name: Bootstrap
+      run: pipenv install --dev
     - name: Test
-      run: ./manage.py test
+      run: pipenv run ./manage.py test
