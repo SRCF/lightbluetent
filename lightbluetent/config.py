@@ -9,7 +9,7 @@ class Config(object):
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
     hostname = os.environ["POSTGRES_HOSTNAME"]
-    port = os.environ["POSTGRES_PORT"]
+    port = int(os.getenv("POSTGRES_PORT", 5432))
     database = os.environ["APPLICATION_DB"]
 
     SQLALCHEMY_DATABASE_URI = (

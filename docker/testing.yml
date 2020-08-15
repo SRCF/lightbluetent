@@ -9,4 +9,4 @@ services:
       POSTGRES_HOSTNAME: ${POSTGRES_HOSTNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
