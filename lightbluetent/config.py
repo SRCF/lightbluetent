@@ -6,11 +6,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     """Base configuration"""
 
-    user = os.environ["POSTGRES_USER"]
-    password = os.environ["POSTGRES_PASSWORD"]
-    hostname = os.environ["POSTGRES_HOSTNAME"]
+    user = os.getenv("POSTGRES_USER", "postgres")
+    password = os.getenv("POSTGRES_PASSWORD")
+    hostname = os.getenv("POSTGRES_HOSTNAME", "localhost")
     port = int(os.getenv("POSTGRES_PORT", 5432))
-    database = os.environ["APPLICATION_DB"]
+    database = os.getenv("APPLICATION_DB", "lightbluetent")
 
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database}"
