@@ -149,7 +149,7 @@ def test(filenames):
 
     run_sql([f"CREATE DATABASE {os.getenv('APPLICATION_DB')}"])
 
-    cmdline = ["pytest", "-svv", "--cov=application", "--cov-report=term-missing"]
+    cmdline = ["pytest", "--capture=no", "--verbosity=2", "--cov=application", "--cov-report=term-missing"]
     cmdline.extend(filenames)
     subprocess.call(cmdline)
 
