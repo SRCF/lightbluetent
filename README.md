@@ -18,7 +18,7 @@ A simple Flask webapp to power the 2020 University of Cambridge Freshers' Fair v
 git clone https://github.com/SRCF/lightbluetent.git
 ```
 
-1. Start the containers: `cd lightbluetent` and then `./manage.py compose up -d`
+1. Start the containers: `cd lightbluetent` and then `docker-compose -f docker/development.yml up`
 1. Navigate to localhost:5000 to see the app
 
 ## Application structure
