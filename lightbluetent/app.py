@@ -3,7 +3,10 @@ from flask import Flask
 from . import admin, home
 
 
-def create_app(config_name):
+def create_app(config_name=None):
+
+    if config_name == None:
+        config_name = "Production"
 
     app = Flask(__name__,
                 template_folder="templates")
