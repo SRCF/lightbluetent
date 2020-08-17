@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, session, url_for, 
 from lightbluetent.models import db, User, Society
 from lightbluetent.utils import gen_unique_string
 from datetime import datetime
+from utils import fetch_lookup_data
 
 import ucam_webauth
 import ucam_webauth.raven
@@ -93,11 +94,14 @@ def register():
         else:
             for message in errors:
                 flash(message)
+    else:
+        # GET Request
+        data = fetch_lookup_data(auth_decorator.principal)
 
     print(f"{auth_decorator.principal}")
 
     return render_template("home/register.html", page_title="Register a Society",
-                           crsid=auth_decorator.principal)
+                           crsid=auth_decorator.principal, user_data=data)
 
 @bp.route("/<socname>")
 def society_welcome(socname):

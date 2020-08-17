@@ -37,6 +37,8 @@ git clone https://github.com/SRCF/lightbluetent.git
 
 unclear
 
+Must be run within the CUDN for Lookup queries to function correctly.
+
 ### Testing
 
 * `./manage.py test` will run all the tests defined in `tests`
