@@ -30,9 +30,6 @@ git clone https://github.com/SRCF/lightbluetent.git
 * `json` configuration for environment variables live in `config`
 * `docker` contains Docker-related files
 * `tests` contains unit tests that are run with `py-test`
-* `requirements` defines three separate requirement files for `pip`
-  * development inherits from testing which inherits from production
-  * the top-level `requirements.txt` in the root directory points to production
 
 ## Workflow
 
@@ -56,7 +53,9 @@ unclear
 
 #### Database management
 
-* `./manage.py flask db init` to create the database
-* `./manage.py flask db migrate -m "your message"` and `./manage.py flask db upgrade` to complete a database migration
+DB data is preserved in a docker volume. To remove the volume, `docker volume ls` and then use the relevant command to delete the volume. This wipes your local dev DB. The next time the container starts up, it will generate an empty database called `lightbluetent`.
+
+* `./manage.py flask db init` to fill the `lightbluetent` database with our schema
+* `./manage.py flask db migrate -m "your message"` and `./manage.py flask db upgrade` to complete a database migration, do this every time you change the DB structure
 
 Project structure and base code based on [this tutorial](https://www.thedigitalcatonline.com/blog/2020/07/06/flask-project-setup-tdd-docker-postgres-and-more-part-2/)
