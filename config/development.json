@@ -21,11 +21,11 @@
   },
   {
     "name": "POSTGRES_PASSWORD",
-    "value": "postgres"
+    "value": "password"
   },
   {
     "name": "APPLICATION_DB",
-    "value": "application"
+    "value": "lightbluetent"
   },
   {
     "name": "FLASK_TRUSTED_HOSTS",
