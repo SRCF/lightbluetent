@@ -59,13 +59,13 @@ def register():
         if moderator_pw == attendee_pw:
             errors.append("An error occured. Please try again.")
 
-        if User.query.filter_by(email=email_address):
+        if User.query.filter_by(email=email_address).first():
             errors.append("That email address is already registered.")
-        if Society.query.filter_by(uid=uid):
+        if Society.query.filter_by(uid=uid).first():
             errors.append("That society short name is already in use.")
-        elif (Society.query.filter_by(attendee_pw=attendee_pw)
-                or Society.query.filter_by(moderator_pw=moderator_pw)
-                or Society.query.filter_by(bbb_id=bbb_id)):
+        elif (Society.query.filter_by(attendee_pw=attendee_pw).first()
+                or Society.query.filter_by(moderator_pw=moderator_pw).first()
+                or Society.query.filter_by(bbb_id=bbb_id).first()):
             errors.append("An error occured. Please try again.")
 
 
@@ -73,20 +73,21 @@ def register():
 
             # TODO: BBB create() API call goes here?
 
+            society = Society(short_name=soc_short_name,
+                              name=soc_name,
+                              attendee_pw=attendee_pw,
+                              moderator_pw=moderator_pw,
+                              uid=uid,
+                              bbb_id=bbb_id)
+
+            db.session.add(society)
+            db.session.commit()
+
             admin = User(email=email_address,
                          name=name,
                          society_id=society.id,
                          crsid=auth_decorator.principal)
 
-            society = Society(short_name=soc_short_name,
-                              name=name,
-                              attendee_pw=attendee_pw,
-                              moderator_pw=moderator_pw,
-                              uid=uid,
-                              bbb_id=bbb_id,
-                              admins=admin)
-
-            db.session.add(society)
             db.session.add(admin)
             db.session.commit()
 
