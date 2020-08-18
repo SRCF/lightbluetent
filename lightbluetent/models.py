@@ -12,7 +12,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     crsid = db.Column(db.String(7), db.CheckConstraint('crsid = lower(crsid)'))
     email = db.Column(db.String, unique=True, nullable=False)
-    name = db.Column(db.String, unique=False, nullable=False)
+    first_name = db.Column(db.String, unique=False, nullable=False)
+    surname = db.Column(db.String, unique=False, nullable=False)
     society_id = db.Column(db.Integer, db.ForeignKey('societies.id'), nullable=False)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

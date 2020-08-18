@@ -1,11 +1,16 @@
-from flask import Blueprint, render_template, request, flash, session, url_for, redirect
+import re
+
+from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort
 from lightbluetent.models import db, User, Society
-from lightbluetent.utils import gen_unique_string
+from lightbluetent.utils import gen_unique_string, validate_email
 from datetime import datetime
 
 import ucam_webauth
 import ucam_webauth.raven
 import ucam_webauth.raven.flask_glue
+
+ILLEGAL_NAME_RE = re.compile(r'[:,=\n]')
+ILLEGAL_NAME_ERR = "Please do not use any of the following characters: : , = ⏎ "
 
 bp = Blueprint("home", __name__)
 
@@ -24,81 +29,101 @@ def logout():
 @bp.route("/register", methods=("GET", "POST"))
 @auth_decorator
 def register():
+
+    crsid = auth_decorator.principal
+
     if request.method == "POST":
-        name = request.form["name"]
-        email_address = request.form["email_address"]
-        soc_name = request.form["soc_name"]
-        soc_short_name = request.form["soc_short_name"]
-        uid = soc_short_name.lower()
-        bbb_id = gen_unique_string()
-        moderator_pw = gen_unique_string()[0:12]
-        attendee_pw = gen_unique_string()[0:12]
 
-        errors = []
+        # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
 
-        if not name:
-            errors.append("A name is required.")
-        if not email_address:
-            errors.append("An email address is required.")
-        if not "@" in email_address:
-            errors.append("Enter a valid email address.")
-        elif not "." in email_address:
-            errors.append("Enter a valid email address.")
-        if not soc_name:
-            errors.append("A society name is required.")
-        if not soc_short_name:
-            errors.append("A short society name is required.")
+        values = {}
+        for key in ("first_name", "surname", "email_address", "soc_name", "soc_short_name"):
+            values[key] = request.form.get(key, "").strip()
+
+        for key in ("dpa", "tos"):
+            values[key] = bool(request.form.get(key, False))
+
+        errors = {}
+
+        if len(values["first_name"]) <= 1:
+            errors["first_name"] = "A first name is required."
+        elif ILLEGAL_NAME_RE.search(values["first_name"]):
+            errors["first_name"] = ILLEGAL_NAME_ERR
+
+        email_err = validate_email(crsid, values["email_address"])
+        if email_err is not None:
+            errors["email_address"] = email_err
+
+        if not values["dpa"]:
+            errors["dpa"] = "We need to store your information to register you."
+        if not values["tos"]:
+            errors["tos"] = "You must accept the terms of service to register."
+
+        values["uid"] = values["soc_short_name"].lower()
+        values["bbb_id"] = gen_unique_string()
+        values["moderator_pw"] = gen_unique_string()[0:12]
+        values["attendee_pw"] = gen_unique_string()[0:12]
+
+        if User.query.filter_by(email=values["email_address"]).first():
+            errors["email_address"] = "That email address is already registered."
+        if Society.query.filter_by(uid=values["uid"]).first():
+            errors["soc_short_name"] = "That society short name is already in use."
 
         # TODO: What's the best way of handling the (unlikely) event
         #       that the passwords are:
         #    a) non-unique across registered societies
         #    b) the same
-        #       Currently we flash the error:
-        #       "An error occured. Please try again."
+        #       Currently we abort(500)
 
-        if moderator_pw == attendee_pw:
-            errors.append("An error occured. Please try again.")
+        if values["moderator_pw"] == values["attendee_pw"]:
+            abort(500)
 
-        if User.query.filter_by(email=email_address).first():
-            errors.append("That email address is already registered.")
-        if Society.query.filter_by(uid=uid).first():
-            errors.append("That society short name is already in use.")
-        elif (Society.query.filter_by(attendee_pw=attendee_pw).first()
-                or Society.query.filter_by(moderator_pw=moderator_pw).first()
-                or Society.query.filter_by(bbb_id=bbb_id).first()):
-            errors.append("An error occured. Please try again.")
+        elif (Society.query.filter_by(attendee_pw=values["attendee_pw"]).first()
+                or Society.query.filter_by(moderator_pw=values["moderator_pw"]).first()
+                or Society.query.filter_by(bbb_id=values["bbb_id"]).first()):
+            abort(500)
 
-
-        if not errors:
-
-            # TODO: BBB create() API call goes here?
-
-            society = Society(short_name=soc_short_name,
-                              name=soc_name,
-                              attendee_pw=attendee_pw,
-                              moderator_pw=moderator_pw,
-                              uid=uid,
-                              bbb_id=bbb_id)
+        if errors:
+            return render_template("home/register.html", page_title="Register a society", errors=errors, **values)
+        else:
+            society = Society(short_name=values["soc_short_name"],
+                              name=values["soc_name"],
+                              attendee_pw=values["attendee_pw"],
+                              moderator_pw=values["moderator_pw"],
+                              uid=values["uid"],
+                              bbb_id=values["bbb_id"])
 
             db.session.add(society)
             db.session.commit()
 
-            admin = User(email=email_address,
-                         name=name,
+            admin = User(email=values["email_address"],
+                         first_name=values["first_name"],
+                         surname=values["surname"],
                          society_id=society.id,
                          crsid=auth_decorator.principal)
 
             db.session.add(admin)
             db.session.commit()
 
-        else:
-            for message in errors:
-                flash(message)
+            return redirect(url_for("home.register_success"))
 
-    print(f"{auth_decorator.principal}")
+    else:
+        # defaults
+        values = {
+            "first_name": "First name from lookup",
+            "surname": "Surname from lookup",
+            "email_address": "Email address from lookup",
+            "dpa": False,
+            "tos": False
+        }
 
-    return render_template("home/register.html", page_title="Register a Society",
-                           crsid=auth_decorator.principal)
+        return render_template("home/register.html", page_title="Register a Society",
+                           crsid=crsid, errors={}, **values)
+
+@bp.route("/register/success")
+def register_success():
+    return render_template("home/register_success.html", page_title="Success!")
+
 
 @bp.route("/<socname>")
 def society_welcome(socname):
