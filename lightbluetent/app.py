@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from . import admin, home
+from . import admin, home, society
 
 
 def create_app(config_name=None):
@@ -28,5 +28,6 @@ def create_app(config_name=None):
 
     app.register_blueprint(admin.bp)
     app.register_blueprint(home.bp)
+    app.register_blueprint(society.bp)
 
     return app
