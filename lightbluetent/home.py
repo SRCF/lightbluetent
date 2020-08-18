@@ -119,12 +119,6 @@ def register():
 
         return render_template("home/register.html", page_title="Register a Society",
                            crsid=crsid, errors={}, **values)
-      
-            return redirect(url_for("society", socname=soc_short_name))
-
-        else:
-            for message in errors:
-                flash(message)
 
 @bp.route("/register/success")
 def register_success():
