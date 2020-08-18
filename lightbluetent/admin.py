@@ -133,7 +133,6 @@ def add(short_name):
         # TODO: identifying users should be CRSid-based, changed to email address for testing purposes
         existing_user = User.query.filter_by(email=values["email_address"]).first()
         if existing_user:
-            print("Already registered.")
             # Check the existing user isn't already an admin
             if not society in existing_user.societies:
                 pass
@@ -158,7 +157,6 @@ def add(short_name):
 
         # Otherwise, we'll need to add a new User
         else:
-            print("Not already registered.")
             if len(values["first_name"]) <= 1:
                 errors["first_name"] = "A first name is required."
             elif ILLEGAL_NAME_RE.search(values["first_name"]):
@@ -178,7 +176,6 @@ def add(short_name):
                                 crsid=values["crsid"])
                 new_user.societies.append(society)
 
-                print(new_user)
                 db.session.add(new_user)
                 db.session.commit()
 
