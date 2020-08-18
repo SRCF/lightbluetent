@@ -90,6 +90,8 @@ def register():
             db.session.add(admin)
             db.session.commit()
 
+            return redirect(url_for("society", socname=soc_short_name))
+
         else:
             for message in errors:
                 flash(message)
@@ -97,8 +99,4 @@ def register():
     print(f"{auth_decorator.principal}")
 
     return render_template("home/register.html", page_title="Register a Society",
-                           crsid=auth_decorator.principal)
-
-@bp.route("/<socname>")
-def society_welcome(socname):
-    return render_template("home/welcome.html", socname=socname)
+                           crsid=auth_decorator.principal, user_data=data)
