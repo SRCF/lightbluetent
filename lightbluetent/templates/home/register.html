@@ -1,15 +1,87 @@
 {% extends "base.html" %}
 
 {% block body %}
+  <p>Welcome to Lightbluetent, the SRCF's platform for the 2020 Freshers' Fair! Before you start, you'll need to register yourself and your society.</p>
   <form method="post">
-    <label for="name">Your name</label>
-    <input name=name id="name" value="Default name from lookup" required><br />
-    <label for="email_address">Email address</label>
-    <input name=email_address id="email_address" value="{{ crsid }}@cam.ac.uk" required><br />
-    <label for="soc_name">Society name</label>
-    <input name=soc_name id="soc_name" required><br />
-    <label for="soc_short_name">Society short name / acronym</label>
-    <input name=soc_short_name id="soc_short_name" required><br />
-    <input type="submit" value="Register">
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="first_name">First name</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=first_name id="first_name" class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" value="{{ first_name }}" required>
+        {%- if errors.first_name is defined %}
+                <small class="invalid-feedback">{{ errors.first_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">Please only use unaccented English characters in your name.</small>
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="surname">Surname</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=surname id="surname" class="form-control{% if errors.surname is defined %} is-invalid{% endif %}" value="{{ surname }}" required>
+        {%- if errors.surname is defined %}
+          <small class="invalid-feedback">{{ errors.surname }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="email_address">Email address</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="email_address" id="email_address" name="email_address" class="form-control{% if errors.email_address is defined %} is-invalid{% endif %}" value="{{ email_address }}" required>
+        {%- if errors.email_address is defined %}
+          <small class="invalid-feedback">{{ errors.email_address }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the email address that the SRCF will use for communication about your membership and your account.</small>
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_name">Society name</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="soc_name" id="soc_name" name="soc_name" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" required>
+        {%- if errors.soc_name is defined %}
+          <small class="invalid-feedback">{{ errors.soc_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the full name of your society. Example: Student-Run Computing Facility</small>
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_short_name">Society short name</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="soc_short_name" id="soc_short_name" name="soc_short_name" class="form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" required>
+        {%- if errors.soc_short_name is defined %}
+          <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the short name or acronym of your society. Example: SRCF</small>
+      </div>
+    </div>
+
+    <!-- TODO: rewrite the DPA label and link to the TOS -->
+
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input type="checkbox" name="dpa" class="form-check-input" {% if dpa %} checked{% endif %} required>
+        DPA confirmation
+      </label>
+      {%- if errors.dpa is defined %}
+        <small class="form-text text-danger">{{ errors.dpa }}</small>
+      {%- endif %}
+      <small class="form-text text-muted">In creating your account, we store the above information.  The Data Protection Act requires us to explicitly seek your permission to keep the above personal data on our server, for the purposes of providing your account facilities and keeping you informed about the SRCF as a society.</small>
+    </div>
+
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input type="checkbox" name="tos" class="form-check-input" {% if tos %} checked{% endif %} required>
+        I accept the Terms of Service
+      </label>
+      {%- if errors.tos is defined %}
+        <small class="form-text text-danger">{{ errors.tos }}</small>
+      {%- endif %}
+    </div>
+
+    <input type="submit" class="btn btn-outline-primary" value="Register">
+
   </form>
 {% endblock %}
