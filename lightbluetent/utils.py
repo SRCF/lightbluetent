@@ -1,6 +1,12 @@
 import uuid
 import re
 
+import ucam_webauth
+import ucam_webauth.raven
+import ucam_webauth.raven.flask_glue
+
+auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
+
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 
 def gen_unique_string():

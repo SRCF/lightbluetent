@@ -2,42 +2,124 @@
 
 {% block body %}
 
-  <p>Change your stand's settings:</p>
+  <p><b>Current administrators:</b></p>
+  {%- for admin in admins %}
+    <p><b>{{ admin.crsid }}</b> ({{ admin.first_name }} {{ admin.surname }} &lt;{{ admin.email }}&gt;)</p>
+  {%- endfor %}
+  <a href="{{ url_for("admin.add", short_name=short_name) }}">Add an administrator</a>
 
   <form method="post">
 
-    <label for="name">Society name</label>
-    <input name=name id="name" content="{{ name }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="logo">Logo</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="file" name=logo id="logo" class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" value="{{ logo }}" required>
+        {%- if errors.logo is defined %}
+                <small class="invalid-feedback">{{ errors.logo }}</small>
+        {%- endif %}
+      </div>
+    </div>
 
-    <label for="short_name">Society short name / acronym</label>
-    <input name=short_name id="short_name" content="{{ short_name }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_name">Society name</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=soc_name id="soc_name" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
+        {%- if errors.soc_name is defined %}
+                <small class="invalid-feedback">{{ errors.soc_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the full name of your society. Example: Student-Run Computing Facility</small>
+      </div>
+    </div>
 
-    <label for="website">Website</label>
-    <input name=website id="website" content="{{ website }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_short_name">Short name / acronym</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=soc_short_name id="soc_short_name" class="form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" value="{{ soc_short_name }}" required>
+        {%- if errors.soc_short_name is defined %}
+                <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the short name or acronym of your society. Example: SRCF</small>
+      </div>
+    </div>
 
-    <label for="description">Society description</label>
-    <input name=description id="description" content="{{ description }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="website">Website</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=website id="website" class="form-control{% if errors.website is defined %} is-invalid{% endif %}" value="{{ website }}">
+        {%- if errors.website is defined %}
+                <small class="invalid-feedback">{{ errors.website }}</small>
+        {%- endif %}
+      </div>
+    </div>
 
-    <label for="welcome_text">Welcome text</label>
-    <input name=welcome_text id="welcome_text" content="{{ welcome_text }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="desc">Description</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <textarea id="description" name="description" class="form-control{% if errors.desc is defined %} is-invalid{% endif %}">{{ description }}</textarea>
+        {%- if errors.desc is defined %}
+                <small class="invalid-feedback">{{ errors.desc }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">Write a bit about your society here. What do you do? How often do you meet? How many members do you have?</small>
+      </div>
+    </div>
 
-    <label for="logo">Logo</label>
-    <input type="file" name=logo id="logo" content="{{ logo }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="welcome_text">Welcome text</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=welcome_text id="welcome_text" spellcheck=True class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}" value="{{ welcome_text }}">
+        {%- if errors.welcome_text is defined %}
+                <small class="invalid-feedback">{{ errors.welcome_text }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">A welcome message of your choosing to the freshers. This will be displayed $SOMEWHERE...</small>
+      </div>
+    </div>
 
-    <label for="banner_color">Banner colour</label>
-    <input type="color" name=banner_color id="banner_color" content="{{ banner_color }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_text">Banner text</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=banner_text id="banner_color" spellcheck=True class="form-control{% if errors.banner_text is defined %} is-invalid{% endif %}" value="{{ banner_text }}">
+        {%- if errors.banner_text is defined %}
+                <small class="invalid-feedback">{{ errors.banner_text }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">The text on your banner. This will go $SOMEWHERE_ELSE...</small>
+      </div>
+    </div>
 
-    <label for="banner_text">Banner text</label>
-    <input name=banner_text id="banner_text" content="{{ banner_text }}"><br />
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_color">Banner colour</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="color" name=banner_color id="banner_color" class="form-control{% if errors.banner_color is defined %} is-invalid{% endif %}" value="{{ banner_color }}">
+        {%- if errors.banner_color is defined %}
+                <small class="invalid-feedback">{{ errors.banner_color }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">Choose the colour of your welcome banner.</small>
+      </div>
+    </div>
 
-    <label for="mute_on_start">Mute users on joining</label>
-    <input type="checkbox" name=mute_on_start id="mute_on_start" content="{{ mute_on_start }}" checked><br />
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %} checked{% endif %}>
+        Mute users on start
+      </label>
+      {%- if errors.mute_on_start is defined %}
+        <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
+      {%- endif %}
+      <small class="form-text text-muted">Mute users when they first join your stand</small>
+    </div>
 
-    <label for="disable_private_chat">Disable private chat</label>
-    <input type="checkbox" name=disable_private_chat id="disable_private_chat" content="{{ disable_private_chat }}" checked><br />
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input type="checkbox" name="disable_private_chat" class="form-check-input" {% if disable_private_chat %} checked{% endif %}>
+        Disable private chat
+      </label>
+      {%- if errors.disable_private_chat is defined %}
+        <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
+      {%- endif %}
+      <small class="form-text text-muted">Mute users when they first join your stand</small>
+    </div>
 
     <input type="submit" value="Save"><br /><br />
 
-    <a href="/admin/{{ name }}/add">Add a moderator</a>
+    <a href="/admin/{{ name }}/add">Add an administrator</a>
   </form>
 {% endblock %}

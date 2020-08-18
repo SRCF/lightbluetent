@@ -2,19 +2,13 @@ import re
 
 from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort
 from lightbluetent.models import db, User, Society
-from lightbluetent.utils import gen_unique_string, validate_email
+from lightbluetent.utils import gen_unique_string, validate_email, auth_decorator
 from datetime import datetime
-
-import ucam_webauth
-import ucam_webauth.raven
-import ucam_webauth.raven.flask_glue
 
 ILLEGAL_NAME_RE = re.compile(r'[:,=\n]')
 ILLEGAL_NAME_ERR = "Please do not use any of the following characters: : , = ⏎ "
 
 bp = Blueprint("home", __name__)
-
-auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
 
 @bp.route("/")
 def index():
@@ -35,6 +29,9 @@ def register():
     if request.method == "POST":
 
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
+
+        # TODO: CRSid field should be unique, i.e. one User per user.
+        # Will want to do this later because it'll make testing a pain...
 
         values = {}
         for key in ("first_name", "surname", "email_address", "soc_name", "soc_short_name"):
@@ -86,6 +83,11 @@ def register():
         if errors:
             return render_template("home/register.html", page_title="Register a society", errors=errors, **values)
         else:
+            admin = User(email=values["email_address"],
+                         first_name=values["first_name"],
+                         surname=values["surname"],
+                         crsid=auth_decorator.principal)
+
             society = Society(short_name=values["soc_short_name"],
                               name=values["soc_name"],
                               attendee_pw=values["attendee_pw"],
@@ -93,16 +95,10 @@ def register():
                               uid=values["uid"],
                               bbb_id=values["bbb_id"])
 
-            db.session.add(society)
-            db.session.commit()
-
-            admin = User(email=values["email_address"],
-                         first_name=values["first_name"],
-                         surname=values["surname"],
-                         society_id=society.id,
-                         crsid=auth_decorator.principal)
+            society.admins.append(admin)
 
             db.session.add(admin)
+            db.session.add(society)
             db.session.commit()
 
             return redirect(url_for("home.register_success"))

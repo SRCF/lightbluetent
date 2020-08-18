@@ -5,6 +5,10 @@ from datetime import datetime
 db = SQLAlchemy()
 migrate = Migrate()
 
+# Assocation table for many-to-many relationship between admins and societies.
+user_society = db.Table("user_society",
+                  db.Column("admin_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+                  db.Column("society_id", db.Integer, db.ForeignKey("societies.id"), primary_key=True))
 
 class User(db.Model):
     __tablename__ = "users"
@@ -14,13 +18,10 @@ class User(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     first_name = db.Column(db.String, unique=False, nullable=False)
     surname = db.Column(db.String, unique=False, nullable=False)
-    society_id = db.Column(db.Integer, db.ForeignKey('societies.id'), nullable=False)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # will it work if I use the backref here?
     def __repr__(self):
-        return f"User('{self.name}', '{self.email}')"
-
+        return f"User('{self.first_name}', '{self.surname}', '{self.email}')"
 
 class Society(db.Model):
     __tablename__ = "societies"
@@ -28,7 +29,7 @@ class Society(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
-    admins = db.relationship('User', backref="society", lazy=True)
+    admins = db.relationship("User", secondary=user_society, lazy="subquery", backref=db.backref('societies', lazy=True))
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+  <p><b>Current administrators:</b></p>
+  {%- for admin in admins %}
+    <p><b>{{ admin.crsid }}</b> ({{ admin.first_name }} {{ admin.surname }} &lt;{{ admin.email }}&gt;)</p>
+  {%- endfor %}
+
+  <form method="post">
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="first_name">First name</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=first_name id="first_name" class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" value="{{ first_name }}" required>
+        {%- if errors.first_name is defined %}
+          <small class="invalid-feedback">{{ errors.first_name }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="surname">Surname</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=surname id="surname" class="form-control{% if errors.surname is defined %} is-invalid{% endif %}" value="{{ surname }}" required>
+        {%- if errors.surname is defined %}
+          <small class="invalid-feedback">{{ errors.surname }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="email_address">Email address</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=email_address id="email_address" class="form-control{% if errors.email_address is defined %} is-invalid{% endif %}" value="{{ email_address }}" required>
+        {%- if errors.email_address is defined %}
+          <small class="invalid-feedback">{{ errors.email_address }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="crsid">CRSid</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" name=crsid id="crsid" class="form-control{% if errors.crsid is defined %} is-invalid{% endif %}" value="{{ crsid }}" required>
+        {%- if errors.crsid is defined %}
+          <small class="invalid-feedback">{{ errors.crsid }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <small>Please ensure the moderator you're adding has given permission for you to share their data with us!</small>
+
+    <input type="submit" value="Add"><br /><br />
+
+  </form>
+{% endblock %}
