@@ -19,8 +19,6 @@ def validate_email(crsid, email):
     if isinstance(email, str):
         email = email.lower()
 
-    print(f"{ email }")
-
     if not email:
         return "Enter your email address."
     elif not email_re.match(email):

@@ -116,6 +116,7 @@ def add(short_name):
         abort(404)
     # Check that the currently authenticated user is allowed to administer this society.
     if not society in current_user_socs:
+        abort(403)
 
     if request.method == "POST":
 
@@ -132,7 +133,7 @@ def add(short_name):
         # TODO: identifying users should be CRSid-based, changed to email address for testing purposes
         existing_user = User.query.filter_by(email=values["email_address"]).first()
         if existing_user:
-
+            print("Already registered.")
             # Check the existing user isn't already an admin
             if not society in existing_user.societies:
                 pass
@@ -157,6 +158,7 @@ def add(short_name):
 
         # Otherwise, we'll need to add a new User
         else:
+            print("Not already registered.")
             if len(values["first_name"]) <= 1:
                 errors["first_name"] = "A first name is required."
             elif ILLEGAL_NAME_RE.search(values["first_name"]):
@@ -174,7 +176,9 @@ def add(short_name):
                                 first_name=values["first_name"],
                                 surname=values["surname"],
                                 crsid=values["crsid"])
+                new_user.societies.append(society)
 
+                print(new_user)
                 db.session.add(new_user)
                 db.session.commit()
 

@@ -33,6 +33,8 @@ def register():
         # TODO: CRSid field should be unique, i.e. one User per user.
         # Will want to do this later because it'll make testing a pain...
 
+        # TODO: validate that CRSid is 7 chars or fewer
+
         values = {}
         for key in ("first_name", "surname", "email_address", "soc_name", "soc_short_name"):
             values[key] = request.form.get(key, "").strip()
@@ -115,12 +117,6 @@ def register():
 
         return render_template("home/register.html", page_title="Register a Society",
                            crsid=crsid, errors={}, **values)
-      
-            return redirect(url_for("society", socname=soc_short_name))
-
-        else:
-            for message in errors:
-                flash(message)
 
 @bp.route("/register/success")
 def register_success():
