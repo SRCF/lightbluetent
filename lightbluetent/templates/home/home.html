@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<p>Hello, <b>{{ crsid }}</b>. Here are the stands for your societies.</p>
+
+<div class="card-columns">
+  {% if not user_societies %}
+    <p>You currently have no societies registered.</p><br />
+  {% else %}
+    {% for society in user_societies %}
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
+          <ul class="fa-ul">
+            <li>
+              <i class="fa fa-li fa-link" title="Stall URL"></i>
+              <a href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
+            </li>
+            <li>
+              {% for admin in society.admins %}
+                <i class="fa fa-li fa-user" title="Administrator"></i>
+                {{ admin.crsid }}
+              {% endfor %}
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <div class="btn btn-outline-primary">Manage (coming soon!)</div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+<a href="{{ url_for('home.register_soc') }}" class="btn btn-outline-primary">Add a society</a>
+{% endblock %}
