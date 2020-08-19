@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <p>Welcome, {{ crsid }}! Before you start, you'll need to register yourself.</p>
+  <p>Welcome, <b>{{ crsid }}</b>! Before you start, you'll need to register yourself. This is for society committee members and administrators. There's no need to register if you're not running a stall!</p>
 
   {%- if errors.crsid %}
     <small class="text-danger">{{ errors.crsid }}</small>
@@ -12,7 +12,7 @@
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="first_name">First name</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" name=first_name id="first_name" class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" value="{{ first_name }}" required>
+        <input type="text" name=first_name id="first_name" placeholder="First name" class="form-control{% if errors.first_name is defined %} is-invalid{% endif %}" value="{{ first_name }}" required>
         {%- if errors.first_name is defined %}
                 <small class="invalid-feedback">{{ errors.first_name }}</small>
         {%- endif %}
@@ -22,7 +22,7 @@
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="surname">Surname</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" name=surname id="surname" class="form-control{% if errors.surname is defined %} is-invalid{% endif %}" value="{{ surname }}" required>
+        <input type="text" name=surname id="surname" placeholder="Surname" class="form-control{% if errors.surname is defined %} is-invalid{% endif %}" value="{{ surname }}" required>
         {%- if errors.surname is defined %}
           <small class="invalid-feedback">{{ errors.surname }}</small>
         {%- endif %}
@@ -32,15 +32,15 @@
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="email_address">Email address</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="email_address" id="email_address" name="email_address" class="form-control{% if errors.email_address is defined %} is-invalid{% endif %}" value="{{ email_address }}" required>
+        <input type="email_address" id="email_address" name="email_address" placeholder="Email address" class="form-control{% if errors.email_address is defined %} is-invalid{% endif %}" value="{{ email_address }}" required>
         {%- if errors.email_address is defined %}
           <small class="invalid-feedback">{{ errors.email_address }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This is the email address that the SRCF will use for communication about your membership and your account.</small>
+        <small class="form-text text-muted">This is the email address that the SRCF will use for communication about your account.</small>
       </div>
     </div>
 
-    <!-- TODO: rewrite the DPA label -->
+    <br />
 
     <div class="form-group form-check">
       <label class="form-check-label">
@@ -50,7 +50,7 @@
       {%- if errors.dpa is defined %}
         <small class="form-text text-danger">{{ errors.dpa }}</small>
       {%- endif %}
-      <small class="form-text text-muted">In creating your account, we store the above information.  The Data Protection Act requires us to explicitly seek your permission to keep the above personal data on our server, for the purposes of providing your account facilities and keeping you informed about the SRCF as a society.</small>
+      <small class="form-text text-muted">In creating your account, we store the above information. The Data Protection Act requires us to explicitly seek your permission to keep the above personal data on our server for the purposes of providing account facilities.</small>
     </div>
 
     <div class="form-group form-check">
@@ -62,6 +62,8 @@
         <small class="form-text text-danger">{{ errors.tos }}</small>
       {%- endif %}
     </div>
+
+    <br />
 
     <input type="submit" class="btn btn-outline-primary" value="Register">
 

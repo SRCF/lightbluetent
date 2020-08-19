@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>SRCF Freshers' Fair - {% if page_title is defined %}: {{ page_title }}{% endif %}</title>
+  <title>SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}</title>
   <link href="https://srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://srcf.net/_srcf/srcf-bs.css" rel="stylesheet">
@@ -18,11 +18,12 @@
   <nav class="navbar navbar-expand-md navbar-light fixed-top">
     <div class="container">
       <h1 class="navbar-brand">
-        <a href="{{ DOMAIN_WEB }}/">
+        <a href="{{ url_for('home.home') }}">
           <img src="https://srcf.net/_srcf/images/logo.svg">
           <span>
             <span class="text-danger">Student-Run</span>
             <span class="text-primary">Computing Facility</span>
+            <span class="text-muted">&mdash; Virtual Freshers' Fair</span>
           </span>
         </a>
       </h1>
@@ -32,8 +33,9 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('home.index') }}"><i class="fa fa-wrench"></i>
-              Control Panel</a></li>
+          {% if crsid %}
+            <div class="text-muted">{{ crsid }} <a href="{{ url_for('home.logout') }}">(Log out)</a></div>
+          {% endif %}
         </ul>
       </div>
     </div>

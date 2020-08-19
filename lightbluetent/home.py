@@ -9,22 +9,43 @@ import ucam_webauth
 import ucam_webauth.raven
 import ucam_webauth.raven.flask_glue
 
-ILLEGAL_NAME_RE = re.compile(r'[:,=\n]')
-ILLEGAL_NAME_ERR = "Please do not use any of the following characters: : , = ⏎ "
-
 bp = Blueprint("home", __name__)
 
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
 
 @bp.route("/")
 def index():
-    return render_template("home/index.html")
+    return render_template("home/index.html", page_title="Welcome to the 2020 Virtual Freshers' Fair!")
 
 @bp.route("/logout")
 def logout():
     auth_decorator.logout()
-    flash("You have been logged out.")
     return redirect(url_for("home.index"))
+
+@bp.route("/log_in")
+@auth_decorator
+def log_in():
+    return redirect(url_for("home.home"))
+
+@bp.route("/home")
+@auth_decorator
+def home():
+    crsid = auth_decorator.principal
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    if not user:
+        return redirect(url_for("home.register"))
+
+    if user.societies:
+        user_societies = user.societies
+
+        return render_template("home/home.html", page_title="Home", user_societies=user_societies, crsid=crsid)
+
+    else:
+        return render_template("home/home.html", page_title="Home", user_societies={}, crsid=crsid)
+
+
 
 @bp.route("/register_soc", methods=("GET", "POST"))
 @auth_decorator
@@ -94,6 +115,10 @@ def register():
 
     crsid = auth_decorator.principal
 
+    existing_user = User.query.filter_by(crsid=crsid).first()
+    if existing_user:
+        return redirect(url_for("home.home"))
+
     if request.method == "POST":
 
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
@@ -109,8 +134,6 @@ def register():
 
         if len(values["first_name"]) <= 1:
             errors["first_name"] = "A first name is required."
-        elif ILLEGAL_NAME_RE.search(values["first_name"]):
-            errors["first_name"] = ILLEGAL_NAME_ERR
 
         email_err = validate_email(crsid, values["email_address"])
         if email_err is not None:
@@ -123,10 +146,6 @@ def register():
 
         if User.query.filter_by(email=values["email_address"]).first():
             errors["email_address"] = "That email address is already registered."
-
-        existing_user = User.query.filter_by(crsid=crsid).first()
-        if existing_user:
-            errors["crsid"] = "This CRSid is already associated with an account."
 
         if errors:
             return render_template("home/register.html", page_title="Register", crsid=crsid, errors=errors, **values)
@@ -145,9 +164,9 @@ def register():
     else:
         # defaults
         values = {
-            "first_name": "First name from lookup",
-            "surname": "Surname from lookup",
-            "email_address": "Email address from lookup",
+            "first_name": "",
+            "surname": "",
+            "email_address": "",
             "dpa": False,
             "tos": False
         }
