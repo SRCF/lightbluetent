@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <p>Welcome to Lightbluetent, the SRCF's platform for the 2020 Freshers' Fair! Before you start, you'll need to register yourself and your society.</p>
+  <p>Welcome, {{ crsid }}! Before you start, you'll need to register yourself.</p>
+
+  {%- if errors.crsid %}
+    <small class="text-danger">{{ errors.crsid }}</small>
+  {%- endif %}
+
   <form method="post">
 
     <div class="form-group-row">
@@ -11,7 +16,6 @@
         {%- if errors.first_name is defined %}
                 <small class="invalid-feedback">{{ errors.first_name }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Please only use unaccented English characters in your name.</small>
       </div>
     </div>
 
@@ -36,29 +40,7 @@
       </div>
     </div>
 
-    <div class="form-group-row">
-      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_name">Society name</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="soc_name" id="soc_name" name="soc_name" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" required>
-        {%- if errors.soc_name is defined %}
-          <small class="invalid-feedback">{{ errors.soc_name }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">This is the full name of your society. Example: Student-Run Computing Facility</small>
-      </div>
-    </div>
-
-    <div class="form-group-row">
-      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_short_name">Society short name</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="soc_short_name" id="soc_short_name" name="soc_short_name" class="form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" required>
-        {%- if errors.soc_short_name is defined %}
-          <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">This is the short name or acronym of your society. Example: SRCF</small>
-      </div>
-    </div>
-
-    <!-- TODO: rewrite the DPA label and link to the TOS -->
+    <!-- TODO: rewrite the DPA label -->
 
     <div class="form-group form-check">
       <label class="form-check-label">
@@ -74,7 +56,7 @@
     <div class="form-group form-check">
       <label class="form-check-label">
         <input type="checkbox" name="tos" class="form-check-input" {% if tos %} checked{% endif %} required>
-        I accept the Terms of Service
+        I accept the <a href=https://www.srcf.net/tos>Terms of Service</a>
       </label>
       {%- if errors.tos is defined %}
         <small class="form-text text-danger">{{ errors.tos }}</small>
