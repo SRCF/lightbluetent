@@ -1,0 +1,5 @@
+RequestHeader set Host expr=%{HTTP_HOST}
+RequestHeader set X-Forwarded-For expr=%{REMOTE_ADDR}
+RequestHeader set X-Forwarded-Proto expr=%{REQUEST_SCHEME}
+RequestHeader set X-Real-IP expr=%{REMOTE_ADDR}
+RewriteRule ^(.*)$ unix:/home/mw781/lightbluetent/web.sock|http://lbt.mw781.srcf.net/$1 [P,NE,L,QSA]

@@ -1,0 +1,10 @@
+[Unit]
+Description=LBT
+ConditionHost=sinkhole
+
+[Install]
+WantedBy=default.target
+
+[Service]
+ExecStart=/home/mw781/lightbluetent/run.sh
+Restart=always
