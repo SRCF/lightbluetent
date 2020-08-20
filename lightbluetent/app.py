@@ -1,10 +1,8 @@
 import os, subprocess
 from flask import Flask
 from . import admin, home, society
- from .flask_seasurf import SeaSurf 
-
-
-
+from .flask_seasurf import SeaSurf 
+from flask_talisman import Talisman 
 
 def create_app(config_name=None):
 
@@ -26,7 +24,7 @@ def create_app(config_name=None):
 
     app.config['CSRF_CHECK_REFERER'] = False
     csrf = SeaSurf(app)
-
+    Talisman(app) 
 
     from lightbluetent.models import db, migrate
 
