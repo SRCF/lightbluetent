@@ -4,11 +4,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta property="og:title" content="SRCF Timeout - Virtual Freshers' Fair" />
+  <meta property="og:type" content="website" />
+  <!--TODO: ADD SOCIETY DESCRIPTION HERE-->
+  <meta property="og:description" content="This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair" />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
+  
   <title>SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}</title>
   <link href="https://srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://srcf.net/_srcf/srcf-bs.css" rel="stylesheet">
-  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <link href="https://srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
   <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
   {% block head %}{% endblock %}
@@ -77,7 +85,7 @@
   </div>
   <footer class="footer pt-3">
     <p class="text-center mb-1">
-      Powered by the SRCF | github-rev
+      This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a free provider of quality and reliable computing services for over 21 years | {{github_rev}}
     </p>
   </footer>
   <script src="https://srcf.net/_srcf/vendor/js/jquery.min.js"></script>

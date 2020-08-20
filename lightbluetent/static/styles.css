@@ -69,10 +69,10 @@ ul.traceback li {
 }
 
 .footer {
-    height: 65px;
-}
-
-footer > .container {
     margin: 0px;
-    padding: 2rem;
+    color: #9aa0ac;
+    font-size: 0.875rem;
+    background-color: #ffffff !important;
+    width: 100%;
+    height: 65px;
 }

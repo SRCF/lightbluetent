@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <p>Welcome, <b>{{ crsid }}</b>! Before you start, you'll need to register yourself. This is for society committee members and administrators. There's no need to register if you're not running a stall!</p>
+  <p>Welcome, <b>{{ crsid }}</b>! Before you start, you'll need to register an administrator account. This is for society stall managers <b>only</b>. If you are a visitor of the fair, please return to the <a href="https://cambridgesu.co.uk/">freshers' fair main page.</a></p>
 
   {%- if errors.crsid %}
     <small class="text-danger">{{ errors.crsid }}</small>

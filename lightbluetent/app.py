@@ -3,6 +3,8 @@ from flask import Flask
 from . import admin, home, society
 
 
+
+
 def create_app(config_name=None):
 
     if config_name == None:
@@ -29,5 +31,9 @@ def create_app(config_name=None):
     app.register_blueprint(admin.bp)
     app.register_blueprint(home.bp)
     app.register_blueprint(society.bp)
+
+    @app.context_processor
+    def inject_gh_rev():
+        return dict(github_rev=os.system('git describe --tags'))
 
     return app

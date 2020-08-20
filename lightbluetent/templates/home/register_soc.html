@@ -21,11 +21,14 @@
         {%- if errors.soc_short_name is defined %}
           <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This is the short name or acronym unique to your society.</small>
+        <small class="form-text text-muted">This is the short name or acronym unique to your society. Include "CU" if this is part of your short name.</small>
       </div>
     </div>
     <br />
+    <p>Please confirm these details as you will not be able to change these once they are submitted.</p>
     <input type="submit" class="btn btn-outline-primary" value="Register">
 
   </form>
+
+
 {% endblock %}
