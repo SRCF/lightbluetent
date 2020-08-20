@@ -40,9 +40,9 @@ class Society(db.Model):
     # bbb_id: Randomly generated UUID. Sent to BBB as the meetingID parameter
     #         on the 'create' API call.
 
-    website = db.Column(db.String, unique=False, nullable=True, default='https://www.srcf.net')
-    welcome_text = db.Column(db.String, unique=False, nullable=True, default='Your welcome text here!')
-    logo = db.Column(db.String, unique=False, nullable=True, default='default.png')
+    website = db.Column(db.String, unique=False, nullable=True)
+    welcome_text = db.Column(db.String, unique=False, nullable=True)
+    logo = db.Column(db.String, unique=False, nullable=True)
     banner_text = db.Column(db.String, unique=False, nullable=True)
     banner_color = db.Column(db.String, unique=False, nullable=True)
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)

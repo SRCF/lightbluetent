@@ -10,6 +10,7 @@
   {% else %}
     {% for society in user_societies %}
       <div class="card">
+        <div class="card-header" style="background-color: {{ society.banner_color }};"></div>
         <div class="card-body">
           <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
           <ul class="fa-ul">
@@ -26,7 +27,7 @@
           </ul>
         </div>
         <div class="card-footer">
-          <div class="btn btn-outline-primary">Manage (coming soon!)</div>
+          <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
         </div>
       </div>
     {% endfor %}

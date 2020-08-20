@@ -6,7 +6,7 @@
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_name">Society name</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="soc_name" id="soc_name" name="soc_name" placeholder="E.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" required>
+        <input type="soc_name" id="soc_name" name="soc_name" placeholder="E.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
         {%- if errors.soc_name is defined %}
           <small class="invalid-feedback">{{ errors.soc_name }}</small>
         {%- endif %}
@@ -17,7 +17,7 @@
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_short_name">Society short name</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="soc_short_name" id="soc_short_name" name="soc_short_name" placeholder="E.g. SRCF" class="form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" required>
+        <input type="soc_short_name" id="soc_short_name" name="soc_short_name" placeholder="E.g. SRCF" class="form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" value="{{ soc_short_name }}" required>
         {%- if errors.soc_short_name is defined %}
           <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
         {%- endif %}

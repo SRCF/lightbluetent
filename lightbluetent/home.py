@@ -102,7 +102,7 @@ def register_soc():
             user.societies.append(society)
             db.session.commit()
 
-            return redirect(url_for("home.register_soc_success"))
+            return redirect(url_for("home.home"))
 
 
     else:
@@ -159,7 +159,7 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            return redirect(url_for("home.register_success"))
+            return redirect(url_for("home.home"))
 
     else:
         # defaults
@@ -174,10 +174,3 @@ def register():
         return render_template("home/register.html", page_title="Register",
                            crsid=crsid, errors={}, **values)
 
-@bp.route("/register/success")
-def register_success():
-    return render_template("home/register_success.html", page_title="Success!")
-
-@bp.route("/register_soc/success")
-def register_soc_success():
-    return render_template("/home/register_soc_success.html", page_title="Success!")
