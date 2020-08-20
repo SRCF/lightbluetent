@@ -1,6 +1,7 @@
 import os, subprocess
 from flask import Flask
 from . import admin, home, society
+ from .flask_seasurf import SeaSurf 
 
 
 
@@ -22,6 +23,10 @@ def create_app(config_name=None):
 
     if not app.request_class.trusted_hosts and 'FLASK_TRUSTED_HOSTS' in os.environ:
         app.request_class.trusted_hosts = os.environ['FLASK_TRUSTED_HOSTS'].split(",")
+
+    app.config['CSRF_CHECK_REFERER'] = False
+    csrf = SeaSurf(app)
+
 
     from lightbluetent.models import db, migrate
 

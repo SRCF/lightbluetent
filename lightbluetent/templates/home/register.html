@@ -9,6 +9,8 @@
 
   <form method="post">
 
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+
     <div class="form-group-row">
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="first_name">First name</label>
       <div class="col-lg-10 col-md-9 col-sm-8">

@@ -6,6 +6,8 @@
 
   <form method="post">
 
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+
     <label for="name">Society name</label>
     <input name=name id="name" content="{{ name }}"><br />
 
