@@ -1,4 +1,4 @@
-import os
+import os, subprocess
 from flask import Flask
 from . import admin, home, society
 
@@ -34,6 +34,6 @@ def create_app(config_name=None):
 
     @app.context_processor
     def inject_gh_rev():
-        return dict(github_rev=os.system('git describe --tags'))
+        return dict(github_rev=subprocess.check_output(["git", "describe", "--always"]).strip().decode())
 
     return app

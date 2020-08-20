@@ -6,5 +6,7 @@ ConditionHost=sinkhole
 WantedBy=default.target
 
 [Service]
-ExecStart=/home/mw781/lightbluetent/run.sh
+Environment=APPLICATION_CONFIG=production
+ExecStart=/public/home/mw781/lightbluetent/run.sh
+WorkingDirectory=/public/home/mw781/lightbluetent
 Restart=always
