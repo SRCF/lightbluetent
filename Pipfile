@@ -10,6 +10,7 @@ psycopg2-binary = "*"
 Flask-Migrate = "*"
 python-ucam-webauth = "*"
 gunicorn = "*"
+python-dotenv = "*"
 
 [dev-packages]
 pytest = "*"
