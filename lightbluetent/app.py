@@ -24,7 +24,13 @@ def create_app(config_name=None):
 
     app.config['CSRF_CHECK_REFERER'] = False
     csrf = SeaSurf(app)
-    Talisman(app) 
+    csp = {
+        'default-src': [
+            '\'self\'',
+            '*.srcf.net'
+        ]
+    }
+    Talisman(app, content_security_policy=csp) 
 
     from lightbluetent.models import db, migrate
 
