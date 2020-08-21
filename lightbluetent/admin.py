@@ -1,8 +1,30 @@
-from flask import Blueprint, render_template, request, flash, abort, redirect, url_for
+import os
+
+from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
+from lightbluetent.utils import gen_unique_string
+from werkzeug.utils import secure_filename
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
+
+# Delete logo on disk for the society with given uid
+def delete_society_logo(uid):
+    society = Society.query.filter_by(uid=uid).first()
+    logo_path = f"images/{ society.logo }"
+
+    if society.logo is None:
+        return
+    else:
+        old_logo = os.path.join(current_app.root_path, "static/images", society.logo)
+        os.remove(old_logo)
+
+        society.logo = None
+        db.session.commit()
+
+        return
 
 @bp.route("/<uid>", methods=("GET", "POST"))
 @auth_decorator
@@ -19,6 +41,8 @@ def admin(uid):
     if society not in user.societies:
         abort(403)
 
+    logo_path = f"images/{ society.logo }"
+
     if request.method == "POST":
 
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
@@ -32,22 +56,30 @@ def admin(uid):
         for key in ("mute_on_start", "disable_private_chat"):
             values[key] = bool(request.form.get(key, False))
 
-        print(values["mute_on_start"])
-        print(values["disable_private_chat"])
-        print(values["description"])
-
         errors = {}
 
         if len(values["soc_name"]) <= 1:
             errors["soc_name"] = "Society name is too short."
 
-       # if "logo" in request.files:
-        #    logo = request.files["logo"]
-#
- #           if logo.filename == "":
-  #              errors["logo"] = "Invalid file name."
+        if "logo" in request.files:
+            logo = request.files["logo"]
 
-        # TODO: validate and process the logo
+            logo_filename, logo_extension = os.path.splitext(logo.filename)
+
+            # TODO: is use of current_app.root_path okay?
+            if logo and logo_filename != "":
+                if logo_extension in LOGO_ALLOWED_EXTENSIONS:
+
+                    # Delete the old logo
+                    delete_society_logo(uid)
+
+                    static_filename = society.uid + "_" + gen_unique_string() + logo_extension
+                    path = os.path.join(current_app.root_path, "static/images", static_filename)
+                    logo.save(path)
+                    society.logo = static_filename
+                    db.session.commit()
+                else:
+                    errors["logo"] = "Invalid file."
 
         # TODO: tweak these values when their ideal maximum lengths become apparent
         if len(values["welcome_text"]) > 100:
@@ -56,7 +88,7 @@ def admin(uid):
             errors["banner_text"] = "Banner text is too long."
 
         # Adding a new admin
-        if values["new_admin_crsid"] is not "":
+        if values["new_admin_crsid"] != "":
 
             new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
             if not new_admin:
@@ -65,14 +97,13 @@ def admin(uid):
                 society.admins.append(new_admin)
 
         if errors:
-            return render_template("admin/admin.html", page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors=errors, **values)
+            return render_template("admin/admin.html", logo_path=logo_path, page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors=errors, **values)
         else:
             society.name = values["soc_name"]
-            society.website = values["website"]
-            society.description = values["description"]
-            society.welcome_text = values["welcome_text"]
-            society.logo = values["logo"]
-            society.banner_text = values["banner_text"]
+            society.website = values["website"] if society.website != "None" else ""
+            society.description = values["description"] if society.description != "None" else ""
+            society.welcome_text = values["welcome_text"] if society.welcome_text != "None" else ""
+            society.banner_text = values["banner_text"] if society.banner_text != "None" else ""
             society.banner_color = values["banner_color"]
             society.mute_on_start = values["mute_on_start"]
             society.disable_private_chat = values["disable_private_chat"]
@@ -95,9 +126,26 @@ def admin(uid):
             "disable_private_chat": society.disable_private_chat
         }
 
-    print(values["website"])
+    return render_template("admin/admin.html", logo_path=logo_path, page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors={}, **values)
 
-    return render_template("admin/admin.html", page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors={}, **values)
+@bp.route("/<uid>/delete_logo")
+@auth_decorator
+def delete_logo(uid):
+
+    society = Society.query.filter_by(uid=uid).first()
+
+    if not society:
+        abort(404)
+
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    if society not in user.societies:
+        abort(403)
+
+    delete_society_logo(uid)
+
+    return redirect(url_for("admin.admin", uid=society.uid))
 
 @bp.route("/<uid>/delete", methods=("GET", "POST"))
 @auth_decorator
@@ -119,15 +167,14 @@ def delete(uid):
 
         errors = {}
 
-        print(society.short_name)
-        print(submitted_short_name)
-
         if society.short_name != submitted_short_name:
             errors["soc_short_name"] = "That is the wrong name."
 
         if errors:
             return render_template("admin/delete.html", page_title=f"Delete { society.name }", crsid=crsid, society=society, errors=errors)
         else:
+            delete_society_logo(uid)
+
             db.session.delete(society)
             db.session.commit()
 
@@ -137,5 +184,3 @@ def delete(uid):
         return render_template("admin/delete.html", page_title=f"Delete { society.name }", crsid=crsid, society=society, errors={})
 
 
-# TODO: delete society?
-# TODO: add more admins 

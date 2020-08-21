@@ -2,7 +2,7 @@
 
 {% block body %}
 
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
   <div class="row">
   <div class="col">
 
@@ -64,19 +64,23 @@
 
     <div class="col">
 
+    {%- if society.logo != None %}
     <div class="form-group-row">
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <img src="{{ url_for('static', filename='logos/default.png') }}" alt="Society logo" class="img-thumbnail">
+        <img src="{{ url_for('static', filename=logo_path) }}" alt="Society logo" class="img-thumbnail">
       </div>
     </div>
+    {%- endif %}
 
     <div class="form-group-row">
       <label class="col col-form-label" for="logo">Logo</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="file" id="logo" name="logo" content="{{ logo }}" class="form-control{% if errors.logo is defined %} is-invalid{% endif %}">
+        <input type="file" id="logo" name="logo" content="{{ logo }}" class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
         {%- if errors.logo is defined %}
           <small class="invalid-feedback">{{ errors.logo }}</small>
         {%- endif %}
+        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
+        <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
       </div>
     </div>
 

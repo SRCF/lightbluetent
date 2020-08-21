@@ -2,9 +2,6 @@ import os
 from flask import Flask
 from . import admin, home, society
 
-
-
-
 def create_app(config_name=None):
 
     if config_name == None:
