@@ -27,10 +27,12 @@ def create_app(config_name=None):
     csp = {
         'default-src': [
             '\'self\'',
-            'www.srcf.net',
+            'www.srcf.net'
         ],
-        'img-src':[
-            'data:'
+        'img-src': [
+            '\'self\'',
+            'data:',
+            'www.srcf.net'
         ]
     }
     Talisman(app, content_security_policy=csp) 
