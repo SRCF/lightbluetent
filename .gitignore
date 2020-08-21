@@ -10,3 +10,6 @@
 
 # testing
 .coverage
+
+# production
+production.log
