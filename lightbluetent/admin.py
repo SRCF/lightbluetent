@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, flash, abort, redirect, u
 from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
 from lightbluetent.utils import gen_unique_string
-from werkzeug.utils import secure_filename
+from PIL import Image
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -12,19 +12,42 @@ LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
 
 # Delete logo on disk for the society with given uid
 def delete_society_logo(uid):
+
     society = Society.query.filter_by(uid=uid).first()
     logo_path = f"images/{ society.logo }"
 
-    if society.logo is None:
+    print(society.logo)
+
+    if society.logo == "default_logo.png":
         return
     else:
         old_logo = os.path.join(current_app.root_path, "static/images", society.logo)
         os.remove(old_logo)
 
-        society.logo = None
+        society.logo = "default_logo.png"
         db.session.commit()
 
         return
+
+# Delete logo on disk for the society with given uid
+def delete_society_bbb_logo(uid):
+    society = Society.query.filter_by(uid=uid).first()
+    logo_path = f"images/{ society.bbb_logo }"
+
+    print(society.logo)
+
+    if society.bbb_logo == "default_bbb_logo.png":
+        return
+    else:
+        old_logo = os.path.join(current_app.root_path, "static/images", society.bbb_logo)
+        os.remove(old_logo)
+
+        society.bbb_logo = "default_bbb_logo.png"
+        db.session.commit()
+
+        return
+
+
 
 @bp.route("/<uid>", methods=("GET", "POST"))
 @auth_decorator
@@ -40,8 +63,6 @@ def admin(uid):
 
     if society not in user.societies:
         abort(403)
-
-    logo_path = f"images/{ society.logo }"
 
     if request.method == "POST":
 
@@ -63,23 +84,47 @@ def admin(uid):
 
         if "logo" in request.files:
             logo = request.files["logo"]
+            bbb_logo = request.files["bbb_logo"]
 
             logo_filename, logo_extension = os.path.splitext(logo.filename)
+            bbb_logo_filename, bbb_logo_extension = os.path.splitext(bbb_logo.filename)
 
             # TODO: is use of current_app.root_path okay?
             if logo and logo_filename != "":
                 if logo_extension in LOGO_ALLOWED_EXTENSIONS:
 
-                    # Delete the old logo
+                    # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
                     static_filename = society.uid + "_" + gen_unique_string() + logo_extension
                     path = os.path.join(current_app.root_path, "static/images", static_filename)
-                    logo.save(path)
+
+                    logo_img = Image.open(logo)
+                    logo_resized = logo_img.resize((512, 512))
+                    logo_resized.save(path)
+
                     society.logo = static_filename
                     db.session.commit()
                 else:
                     errors["logo"] = "Invalid file."
+
+            if bbb_logo and bbb_logo_filename != "":
+                if bbb_logo_extension in LOGO_ALLOWED_EXTENSIONS:
+
+                    # Delete the old logo if it's not the default
+                    delete_society_bbb_logo(uid)
+
+                    static_filename = society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                    path = os.path.join(current_app.root_path, "static/images", static_filename)
+
+                    bbb_logo_img = Image.open(bbb_logo)
+                    bbb_logo_resized = bbb_logo_img.resize((512, 256))
+                    bbb_logo_resized.save(path)
+
+                    society.bbb_logo = static_filename
+                    db.session.commit()
+                else:
+                    errors["bbb_logo"] = "Invalid file."
 
         # TODO: tweak these values when their ideal maximum lengths become apparent
         if len(values["welcome_text"]) > 100:
@@ -97,7 +142,9 @@ def admin(uid):
                 society.admins.append(new_admin)
 
         if errors:
-            return render_template("admin/admin.html", logo_path=logo_path, page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors=errors, **values)
+            return render_template("admin/admin.html",
+                                   page_title=f"Settings for { society.name }",
+                                   society=society, crsid=crsid, errors=errors, **values)
         else:
             society.name = values["soc_name"]
             society.website = values["website"] if society.website != "None" else ""
@@ -126,7 +173,9 @@ def admin(uid):
             "disable_private_chat": society.disable_private_chat
         }
 
-    return render_template("admin/admin.html", logo_path=logo_path, page_title=f"Settings for { society.name }", society=society, crsid=crsid, errors={}, **values)
+    return render_template("admin/admin.html",
+                           page_title=f"Settings for { society.name }",
+                           society=society, crsid=crsid, errors={}, **values)
 
 @bp.route("/<uid>/delete_logo")
 @auth_decorator
@@ -144,6 +193,25 @@ def delete_logo(uid):
         abort(403)
 
     delete_society_logo(uid)
+
+    return redirect(url_for("admin.admin", uid=society.uid))
+
+@bp.route("/<uid>/delete_bbb_logo")
+@auth_decorator
+def delete_bbb_logo(uid):
+
+    society = Society.query.filter_by(uid=uid).first()
+
+    if not society:
+        abort(404)
+
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    if society not in user.societies:
+        abort(403)
+
+    delete_society_bbb_logo(uid)
 
     return redirect(url_for("admin.admin", uid=society.uid))
 

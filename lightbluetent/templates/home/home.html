@@ -10,7 +10,12 @@
   {% else %}
     {% for society in user_societies %}
       <div class="card">
-        <div class="card-header" style="background-color: {{ society.banner_color }};"></div>
+        <div class="card-header" style="background-color: {{ society.banner_color }};">
+          {% set current_logo = "images/{}".format(society.logo) %}
+          {% if society.logo != "default_logo.png" %}
+            <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right" style="width: 20%">
+          {% endif %}
+        </div>
         <div class="card-body">
           <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
           <ul class="fa-ul">

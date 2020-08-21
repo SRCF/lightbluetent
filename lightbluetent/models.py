@@ -42,7 +42,8 @@ class Society(db.Model):
 
     website = db.Column(db.String, unique=False, nullable=True)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
-    logo = db.Column(db.String, unique=True, nullable=True)
+    logo = db.Column(db.String, unique=True, nullable=False, default="default_logo.png")
+    bbb_logo = db.Column(db.String, unique=True, nullable=False, default="default_bbb_logo.png")
     banner_text = db.Column(db.String, unique=False, nullable=True)
     banner_color = db.Column(db.String, unique=False, nullable=True, default="#e8e8e8")
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
