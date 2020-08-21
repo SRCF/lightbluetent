@@ -1,7 +1,4 @@
 #!/bin/bash -e
-
-pipenv run
-
-PYTHONPATH=~/lightbluetent/lightbluetent:$PYTHONPATH \
-    exec gunicorn -w 2 -b unix:/home/mw781/lightbluetent/web.sock \
-    --log-file - wsgi:app
+PIPENV_DONT_LOAD_ENV=1 /home/mw781/.local/bin/pipenv run gunicorn -w 2  \
+    -b unix:/public/home/mw781/web.sock \
+    --log-file production.log wsgi:app

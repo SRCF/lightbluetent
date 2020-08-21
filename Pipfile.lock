@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d6388e20c84ff1b26afa9d9903079ce144c057476d9b2a901935bdcb5c773a5f"
+            "sha256": "86c0b9aec41b9383f5b32fb7e433ae862ca7320eee3d19c2e652897e085a5b6e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -54,6 +54,14 @@
             ],
             "index": "pypi",
             "version": "==2.4.4"
+        },
+        "flask-talisman": {
+            "hashes": [
+                "sha256:468131464a249274ed226efc21b372518f442487e58918ccab8357eaa638fd1f",
+                "sha256:eaa754f4b771dfbe473843391d69643b79e3a38c865790011ac5e4179c68e3ec"
+            ],
+            "index": "pypi",
+            "version": "==0.7.0"
         },
         "gunicorn": {
             "hashes": [
@@ -203,6 +211,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.8.1"
+        },
+        "python-dotenv": {
+            "hashes": [
+                "sha256:8c10c99a1b25d9a68058a1ad6f90381a62ba68230ca93966882a4dbc3bc9c33d",
+                "sha256:c10863aee750ad720f4f43436565e4c1698798d763b63234fb5021b6c616e423"
+            ],
+            "index": "pypi",
+            "version": "==0.14.0"
         },
         "python-editor": {
             "hashes": [

@@ -13,9 +13,9 @@
   <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
   
   <title>SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}</title>
-  <link href="https://srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
+  <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://www.srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
   <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
@@ -27,7 +27,7 @@
     <div class="container">
       <h1 class="navbar-brand">
         <a href="{{ url_for('home.home') }}">
-          <img src="https://srcf.net/_srcf/images/logo.svg">
+          <img src="https://www.srcf.net/_srcf/images/logo.svg">
           <span>
             <span class="text-danger">Student-Run</span>
             <span class="text-primary">Computing Facility</span>
@@ -85,12 +85,14 @@
   </div>
   <footer class="footer pt-3">
     <p class="text-center mb-1">
-      This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a free provider of quality and reliable computing services for over 21 years | {{github_rev}}
+      This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a free provider of quality and reliable computing services for over 21 years
+      |
+      <a href="https://github.com/SRCF/lightbluetent">{{github_rev}}</a>
     </p>
   </footer>
-  <script src="https://srcf.net/_srcf/vendor/js/jquery.min.js"></script>
-  <script src="https://srcf.net/_srcf/vendor/js/popper.min.js"></script>
-  <script src="https://srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
+  <script src="https://www.srcf.net/_srcf/vendor/js/jquery.min.js"></script>
+  <script src="https://www.srcf.net/_srcf/vendor/js/popper.min.js"></script>
+  <script src="https://www.srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 

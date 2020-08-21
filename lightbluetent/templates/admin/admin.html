@@ -4,9 +4,13 @@
 
   <form method="post" enctype="multipart/form-data">
 
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
 
     <div class="row">
     <div class="col">
+
+    <label for="name">Society name</label>
+    <input name=name id="name" content="{{ name }}"><br />
 
     <div class="form-group-row">
       <label class="col col-form-label" for="soc_name">Society name</label>

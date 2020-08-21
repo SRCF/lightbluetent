@@ -11,9 +11,7 @@ class Config(object):
     hostname = os.getenv("POSTGRES_HOSTNAME", "localhost")
     port = int(os.getenv("POSTGRES_PORT", 5432))
     database = os.getenv("APPLICATION_DB", "lightbluetent")
-
-    SQLALCHEMY_DATABASE_URI = (
-        f"postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database}"
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_URI", f"postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

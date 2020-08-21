@@ -35,7 +35,15 @@ git clone https://github.com/SRCF/lightbluetent.git
 
 ### Production
 
-unclear
+1. Clone repository
+2. `pipenv install`
+3. Move .htaccess into public_html
+4. Move lbt.service into the right place (https://docs.srcf.net/app-hosting/index.html?highlight=systemctl)
+5. `systemctl --user enable lbt`
+6. Set the ENV vars
+7. `systemctl --user start lbt`
+
+`PIPENV_DONT_LOAD_ENV=1 pipenv shell`
 
 ### Testing
 

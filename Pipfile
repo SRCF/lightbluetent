@@ -11,6 +11,8 @@ Flask-Migrate = "*"
 python-ucam-webauth = "*"
 gunicorn = "*"
 Pillow = "*"
+python-dotenv = "*"
+flask-talisman = "*"
 
 [dev-packages]
 pytest = "*"
