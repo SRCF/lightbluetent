@@ -65,7 +65,7 @@
         {%- if errors.logo is defined %}
           <small class="invalid-feedback">{{ errors.logo }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. This logo will be displayed on your society's welcome page.</small>
+        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This logo will be displayed on your society's welcome page.</small>
         <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
       </div>
     </div>
@@ -96,8 +96,8 @@
         {%- if errors.bbb_logo is defined %}
           <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
         <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
+        <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
         <small class="form-text text-muted"><a href="{{ url_for('admin.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
       </div>
     </div>
@@ -123,7 +123,7 @@
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_text">Banner</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="input-group mb-3">
-          <input type="text" id="banner_text" name="banner_text" class="form-control" placeholder="E.g. Welcome to {{ society.name }}!" aria-label="" aria-describedby="basic-addon1">
+          <input type="text" id="banner_text" name="banner_text" class="form-control" placeholder="E.g. Welcome to {{ society.name }}!" aria-label="" aria-describedby="basic-addon1" value="{{ banner_text }}">
           <div class="input-group-append">
             <input type="color" id="banner_color" name="banner_color" style="width: 50px" class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}" value="{{ banner_color }}" required>
           </div>
@@ -132,6 +132,7 @@
             <small class="text-danger">{{ errors.new_admin_crsid }}</small>
         {%- endif %}
         <small class="form-text text-muted">This is an optional field that will add a banner to your stall with your chosen banner color.</small>
+        <small class="form-text text-muted"><a href="{{ url_for('admin.reset_banner', uid=society.uid) }}">Delete banner</a></small>
       </div>
     </div>
 

@@ -173,6 +173,30 @@ def admin(uid):
                            page_title=f"Stall administration for { society.name }",
                            society=society, crsid=crsid, errors={}, **values)
 
+@bp.route("/<uid>/reset_banner")
+@auth_decorator
+def reset_banner(uid):
+    society = Society.query.filter_by(uid=uid).first()
+
+    if not society:
+        abort(404)
+
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    if society not in user.societies:
+        abort(403)
+
+    if society.banner_text != None:
+        society.banner_text = None
+
+    if society.banner_color != "#e8e8e8":
+        society.banner_color = "#e8e8e8"
+
+    db.session.commit()
+
+    return redirect(url_for("admin.admin", uid=society.uid))
+
 @bp.route("/<uid>/delete_logo")
 @auth_decorator
 def delete_logo(uid):
