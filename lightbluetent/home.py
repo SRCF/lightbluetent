@@ -86,6 +86,9 @@ def register_soc():
         if Society.query.filter_by(uid=values["uid"]).first():
             errors["soc_short_name"] = "That society short name is already in use."
 
+        if " " in values["soc_short_name"]:
+            errors["soc_short_name"] = "Your society short name must not contain spaces."
+
         if errors:
             return render_template("home/register_soc.html", page_title="Register a society", crsid=crsid, errors=errors, **values)
         else:
