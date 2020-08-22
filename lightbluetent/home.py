@@ -102,6 +102,8 @@ def register_soc():
             user.societies.append(society)
             db.session.commit()
 
+            app.logger.info(f"Registered society {values['uid']}")
+
             return redirect(url_for("home.register_soc_success"))
 
 
@@ -158,6 +160,8 @@ def register():
 
             db.session.add(user)
             db.session.commit()
+
+            app.logger.info(f"Registered user with CRSid {auth_decorator.principal}")
 
             return redirect(url_for("home.register_success"))
 
