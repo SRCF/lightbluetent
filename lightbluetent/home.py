@@ -102,7 +102,7 @@ def register_soc():
             user.societies.append(society)
             db.session.commit()
 
-            app.logger.info(f"Registered society with name {values["soc_name"]}")
+            app.logger.info(f"Registered society {values['uid']}")
 
             return redirect(url_for("home.register_soc_success"))
 
