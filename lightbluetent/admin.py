@@ -139,7 +139,7 @@ def admin(uid):
 
         if errors:
             return render_template("admin/admin.html",
-                                   page_title=f"Settings for { society.name }",
+                                   page_title=f"Stall administration for { society.name }",
                                    society=society, crsid=crsid, errors=errors, **values)
         else:
             society.name = values["soc_name"]
@@ -170,7 +170,7 @@ def admin(uid):
         }
 
     return render_template("admin/admin.html",
-                           page_title=f"Settings for { society.name }",
+                           page_title=f"Stall administration for { society.name }",
                            society=society, crsid=crsid, errors={}, **values)
 
 @bp.route("/<uid>/delete_logo")
