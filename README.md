@@ -52,18 +52,19 @@ git clone https://github.com/SRCF/lightbluetent.git
 
 ### Development
 
+`docker-compose` will automtically look for a .env file and load those environment variables.
+
 * Make sure you have [Pipenv](https://pypi.org/project/pipenv/) installed
 * install dependencies with `pipenv install --dev`
-* `pipenv shell` to spawn a shell with the dependencies installed
-* `./manage.py flask run` to run the web app locally (not recommended)
-* `./manage.py compose up` to build and run the Flask container and the PostgreSQL container, attach the `-d` flag optionally to run the containers as daemons in the background
-* `./manage.py compose down` to tear down the containers
+* `PIPENV_DONT_LOAD_ENV=1 pipenv shell` to spawn a shell with the dependencies installed
+* `docker-compose -p development -f docker/development.yml up -d` to build and run the Flask container and the PostgreSQL container, attach the `-d` flag optionally to run the containers as daemons in the background
+* `docker-compose -p development -f docker/development.yml down` to tear down the containers
 
 #### Database management
 
 DB data is preserved in a docker volume. To remove the volume, `docker volume ls` and then use the relevant command to delete the volume. This wipes your local dev DB. The next time the container starts up, it will generate an empty database called `lightbluetent`.
 
-* `./manage.py flask db init` to fill the `lightbluetent` database with our schema
-* `./manage.py flask db migrate -m "your message"` and `./manage.py flask db upgrade` to complete a database migration, do this every time you change the DB structure
+* `flask db init` to fill the `lightbluetent` database with our schema
+* `flask db migrate -m "your message"` and `flask db upgrade` to complete a database migration, do this every time you change the DB structure
 
 Project structure and base code based on [this tutorial](https://www.thedigitalcatonline.com/blog/2020/07/06/flask-project-setup-tdd-docker-postgres-and-more-part-2/)
