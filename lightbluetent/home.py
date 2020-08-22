@@ -1,6 +1,6 @@
 import re
 
-from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort
+from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.utils import gen_unique_string, validate_email
 from datetime import datetime
@@ -102,7 +102,7 @@ def register_soc():
             user.societies.append(society)
             db.session.commit()
 
-            app.logger.info(f"Registered society {values['uid']}")
+            current_app.logger.info(f"Registered society {values['uid']}")
 
             return redirect(url_for("home.register_soc_success"))
 
@@ -161,7 +161,7 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            app.logger.info(f"Registered user with CRSid {auth_decorator.principal}")
+            current_app.logger.info(f"Registered user with CRSid {auth_decorator.principal}")
 
             return redirect(url_for("home.register_success"))
 
