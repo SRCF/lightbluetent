@@ -13,3 +13,8 @@
 
 # production
 production.log
+
+# society logos
+lightbluetent/static/images/*.png
+!lightbluetent/static/images/default_logo.png
+!lightbluetent/static/images/default_bbb_logo.png
