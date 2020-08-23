@@ -31,6 +31,7 @@
         {%- endif %}
       </div>
     </div>
+
     <br />
 
     <label class="col col-form-label">Social media / contact</label>
@@ -67,8 +68,6 @@
     </div>
 
     </div>
-
-
 
     <div class="col-sm">
 
@@ -150,7 +149,7 @@
           </div>
         </div>
         {%- if errors.new_admin_crsid is defined %}
-            <small class="text-danger">{{ errors.new_admin_crsid }}</small>
+            <small class="text-danger">{{ errors.banner_text }}</small>
         {%- endif %}
         <small class="form-text text-muted">This is an optional field that will add a banner to your stall with your chosen banner color.</small>
         <small class="form-text text-muted"><a href="{{ url_for('admin.reset_banner', uid=society.uid) }}">Delete banner</a></small>
@@ -192,7 +191,7 @@
     <div class="col-sm">
 
     <div class="form-group-row">
-      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="new_admin_crsid">Society admins</label>
+      <label class="col col-form-label" for="new_admin_crsid">Society admins</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -211,6 +210,106 @@
     </div>
 
     </div>
+    </div>
+
+    <br />
+    <hr />
+
+    <div class="row">
+    <div class="col-sm">
+
+    <label class="col col-form-label">Session times</label>
+    <label class="col col-form-label" for="new_session_day">Add new session:</label>
+
+    <div class="form-group-row">
+      <div class="col col-lg-10 col-md-9 col-sm-8">
+        <select class="custom-select" name="new_session_day" id="new_session_day">
+          <option value="---">---</option>
+          <option value="day_1">Day 1</option>
+          <option value="day_2">Day 2</option>
+        </select>
+        {%- if errors.new_session_day is defined %}
+            <br /><small class="text-danger">{{ errors.new_session_day }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+
+    <div class="form-group-row">
+      <label class="col col-form-label" for="new_session_day">Start time:</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="time" class="form-control" id="new_session_start" name="new_session_start">
+        {%- if errors.new_session_start is defined %}
+          <small class="text-danger">{{ errors.new_session_start }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    <div class="form-group-row">
+      <label class="col col-form-label" for="new_session_day">End time:</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="time" class="form-control" id="new_session_end" name="new_session_end">
+        {%- if errors.new_session_end is defined %}
+          <small class="text-danger">{{ errors.new_session_end }}</small>
+        {%- endif %}
+      </div>
+    </div>
+
+    </div>
+
+    <div class="col-sm">
+
+    <br />
+
+    <div class="card col">
+      <div class="card-body col">
+        <h4 class="card-title">Day 1</h4>
+        <ul class="fa-ul">
+          {% if num_sessions_day_1 == 0 %}
+            <li>
+              <i class="fa fa-li fa-times" title="Session"></i>
+              There are no sessions on the first day.
+            </li>
+          {% else %}
+            {% for session in society.sessions %}
+              {% if session["day"] == "day_1" %}
+                <li>
+                  <i class="fa fa-li fa-clock-o" title="Session"></i>
+                  {{ session["start"] }} - {{ session["end"] }}
+                  <span class="pull-right">
+                    <a class="text-danger" href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
+                  </span>
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </ul>
+        <h4 class="card-title">Day 2</h4>
+        <ul class="fa-ul">
+          {% if num_sessions_day_2 == 0 %}
+            <li>
+              <i class="fa fa-li fa-times" title="Session"></i>
+              There are no sessions on the second day.
+            </li>
+          {% else %}
+            {% for session in society.sessions %}
+              {% if session["day"] == "day_2" %}
+                <li>
+                  <i class="fa fa-li fa-clock-o" title="Session"></i>
+                  {{ session["start"] }} - {{ session["end"] }}
+                  <span class="pull-right">
+                    <a class="text-danger" href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
+                  </span>
+                </li>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    </div>
+
     </div>
 
     <br />

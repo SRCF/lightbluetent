@@ -1,5 +1,7 @@
 import os
+import copy
 
+from operator import itemgetter
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
@@ -43,6 +45,21 @@ def delete_society_bbb_logo(uid):
 
         return
 
+# Delete one of the saved sessions in the database, identified by its ID.
+# Returns if that session_id doesn't exist.
+def delete_society_session(uid, session_id):
+    society = Society.query.filter_by(uid=uid).first()
+    sessions = copy.deepcopy(society.sessions)
+    session_to_delete = next((session for session in sessions if session["id"] == session_id), None)
+
+    if session_to_delete is None:
+        return
+    else:
+        sessions.remove(session_to_delete)
+        society.sessions = sessions
+        db.session.commit()
+        return
+
 
 
 @bp.route("/<uid>", methods=("GET", "POST"))
@@ -60,7 +77,18 @@ def admin(uid):
     if society not in user.societies:
         abort(403)
 
+    # Find the number of sessions registered on each day. We pass these to
+    # render_template so we can detect the case where we have no registered sessions
+    # by day.
+    num_sessions_day_1_gen = (1 for session in society.sessions if session["day"] == "day_1")
+    num_sessions_day_1 = sum(num_sessions_day_1_gen)
+    num_sessions_day_2_gen = (1 for session in society.sessions if session["day"] == "day_2")
+    num_sessions_day_2 = sum(num_sessions_day_2_gen)
+
     if request.method == "POST":
+
+        is_new_admin = False
+        is_new_session = False
 
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
 
@@ -69,7 +97,9 @@ def admin(uid):
         for key in ("soc_name", "website", "description",
                     "welcome_text", "logo", "banner_text",
                     "banner_color", "new_admin_crsid",
-                    "social_1", "social_2"):
+                    "social_1", "social_2",
+                    "new_session_day", "new_session_start",
+                    "new_session_end"):
             values[key] = request.form.get(key, "").strip()
 
         for key in ("mute_on_start", "disable_private_chat"):
@@ -136,13 +166,49 @@ def admin(uid):
             new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
             if not new_admin:
                 errors["new_admin_crsid"] = "That user is not registered yet. Users must register before being added as administrators."
+            is_new_admin = True
+
+        # Add a new session
+        if values["new_session_day"] != "---" or values["new_session_start"] or values["new_session_end"]:
+            if (values["new_session_day"] != ""
+                    and values["new_session_start"] != ""
+                    and values["new_session_end"] != ""):
+                if ":" not in values["new_session_start"]:
+                    errors["new_session_start"] = "Invalid start time."
+                if ":" not in values["new_session_end"]:
+                    errors["new_session_end"] = "Invalid end time."
+
+                start_time = values["new_session_start"].split(":")
+                end_time = values["new_session_end"].split(":")
+
+                # Check the hours
+                if int(start_time[0]) < 0 or int(start_time[0]) > 24:
+                    errors["new_session_start"] = "Invalid start time."
+                if int(end_time[0]) < 0 or int(end_time[0]) > 24:
+                    errors["new_session_end"] = "Invalid end time."
+
+                # Check the minutes
+                if int(start_time[1]) < 0 or int(start_time[1]) > 60:
+                    errors["new_session_start"] = "Invalid start time."
+                if int(end_time[1]) < 0 or int(end_time[1]) > 60:
+                    errors["new_session_end"] = "Invalid end time."
+
+                is_new_session = True
+
             else:
-                society.admins.append(new_admin)
+                if values["new_session_day"] == "":
+                    errors["new_session_day"] = "Select a day."
+                if values["new_session_start"] == "":
+                    errors["new_session_start"] = "No start time specified."
+                if values["new_session_end"] == "":
+                    errors["new_session_end"] = "No end time specified."
 
         if errors:
             return render_template("admin/admin.html",
                                    page_title=f"Stall administration for { society.name }",
-                                   society=society, crsid=crsid, errors=errors, **values)
+                                   society=society, crsid=crsid, errors=errors,
+                                   num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                                   **values)
         else:
             society.name = values["soc_name"]
             society.website = values["website"]
@@ -154,6 +220,21 @@ def admin(uid):
             society.banner_color = values["banner_color"]
             society.mute_on_start = values["mute_on_start"]
             society.disable_private_chat = values["disable_private_chat"]
+
+            if is_new_admin:
+                society.admins.append(new_admin)
+
+            if is_new_session:
+
+                sessions = copy.deepcopy(society.sessions)
+
+                sessions.append({"id": gen_unique_string(),
+                                 "day": values["new_session_day"],
+                                 "start": values["new_session_start"],
+                                 "end": values["new_session_end"]})
+
+                society.sessions = sorted(sessions, key=itemgetter("start"))
+
 
             db.session.commit()
 
@@ -177,7 +258,9 @@ def admin(uid):
 
     return render_template("admin/admin.html",
                            page_title=f"Stall administration for { society.name }",
-                           society=society, crsid=crsid, errors={}, **values)
+                           society=society, crsid=crsid, errors={},
+                           num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                           **values)
 
 @bp.route("/<uid>/reset_banner")
 @auth_decorator
@@ -238,6 +321,25 @@ def delete_bbb_logo(uid):
         abort(403)
 
     delete_society_bbb_logo(uid)
+
+    return redirect(url_for("admin.admin", uid=society.uid))
+
+@bp.route("/<uid>/delete_session/<session_id>")
+@auth_decorator
+def delete_session(uid, session_id):
+
+    society = Society.query.filter_by(uid=uid).first()
+
+    if not society:
+        abort(404)
+
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    if society not in user.societies:
+        abort(403)
+
+    delete_society_session(uid, session_id)
 
     return redirect(url_for("admin.admin", uid=society.uid))
 

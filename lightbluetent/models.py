@@ -43,6 +43,7 @@ class Society(db.Model):
     website = db.Column(db.String, unique=False, nullable=True)
     social_1 = db.Column(db.String, unique=False, nullable=True)
     social_2 = db.Column(db.String, unique=False, nullable=True)
+    sessions = db.Column(db.JSON, nullable=True)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     logo = db.Column(db.String, unique=False, nullable=False, default="default_logo.png")
     bbb_logo = db.Column(db.String, unique=False, nullable=False, default="default_bbb_logo.png")
