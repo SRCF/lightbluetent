@@ -31,6 +31,27 @@
         {%- endif %}
       </div>
     </div>
+    <br />
+
+    <label class="col col-form-label">Social media / contact</label>
+    <div class="form-group-row">
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" id="social_1" name="social_1" placeholder="E.g. a social media URL" class="form-control{% if errors.social_1 is defined %} is-invalid{% endif %}" value="{{ social_1 }}">
+        {%- if errors.social_1 is defined %}
+          <small class="invalid-feedback">{{ errors.social_1 }}</small>
+        {%- endif %}
+      </div>
+    </div>
+    <br />
+    <div class="form-group-row">
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" id="social_2" name="social_2" placeholder="E.g. a contact email address" class="form-control{% if errors.social_2 is defined %} is-invalid{% endif %}" value="{{ social_2 }}">
+        {%- if errors.social_2 is defined %}
+          <small class="invalid-feedback">{{ errors.social_2 }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">Here you can add URLs to your social media pages, or any other contact information you would like to be made available.</small>
+      </div>
+    </div>
 
     <br />
 

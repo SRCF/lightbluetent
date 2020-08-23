@@ -67,7 +67,9 @@ def admin(uid):
         values = {}
 
         for key in ("soc_name", "website", "description",
-                    "welcome_text", "logo", "banner_text", "banner_color", "new_admin_crsid"):
+                    "welcome_text", "logo", "banner_text",
+                    "banner_color", "new_admin_crsid",
+                    "social_1", "social_2"):
             values[key] = request.form.get(key, "").strip()
 
         for key in ("mute_on_start", "disable_private_chat"):
@@ -143,10 +145,12 @@ def admin(uid):
                                    society=society, crsid=crsid, errors=errors, **values)
         else:
             society.name = values["soc_name"]
-            society.website = values["website"] if society.website != "None" else ""
-            society.description = values["description"] if society.description != "None" else ""
-            society.welcome_text = values["welcome_text"] if society.welcome_text != "None" else ""
-            society.banner_text = values["banner_text"] if society.banner_text != "None" else ""
+            society.website = values["website"]
+            society.social_1 = values["social_1"]
+            society.social_2 = values["social_2"]
+            society.description = values["description"]
+            society.welcome_text = values["welcome_text"]
+            society.banner_text = values["banner_text"]
             society.banner_color = values["banner_color"]
             society.mute_on_start = values["mute_on_start"]
             society.disable_private_chat = values["disable_private_chat"]
@@ -160,6 +164,8 @@ def admin(uid):
         values = {
             "soc_name": society.name,
             "website": society.website if society.website != "None" else "",
+            "social_1": society.social_1 if society.social_1 != "None" else "",
+            "social_2": society.social_2 if society.social_2 != "None" else "",
             "description": society.description if society.description != "None" else "",
             "welcome_text": society.welcome_text if society.welcome_text != "None" else "",
             "banner_text": society.banner_text if society.banner_text != "None" else "",
