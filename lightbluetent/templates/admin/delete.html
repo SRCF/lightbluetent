@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+  <p>You are about to delete {{ society.name }} ({{ society.short_name }}). <b>This cannot be undone.</b> <br />To confirm, type "{{ society.short_name }}" below.</p>
+
+  <form method="post">
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="soc_short_name"></label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" id="soc_short_name" name="soc_short_name" class="soc_delete_form form-control{% if errors.soc_short_name is defined %} is-invalid{% endif %}" value="{{ soc_short_name }}" required>
+        {%- if errors.soc_short_name is defined %}
+          <small class="invalid-feedback">{{ errors.soc_short_name }}</small>
+        {%- endif %}
+      </div>
+    </div>
+    <br />
+    <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Go back</a>
+    <input type="submit" class="btn btn-outline-danger float-right" value="Delete">
+    <br />
+  </form>
+{% endblock %}

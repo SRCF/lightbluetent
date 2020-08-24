@@ -15,6 +15,8 @@ class Config(object):
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Requests up to 1 MB
+    MAX_CONTENT_LENGTH = 1024 * 1024
 
 class ProductionConfig(Config):
     """Production configuration"""

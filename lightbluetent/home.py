@@ -83,11 +83,11 @@ def register_soc():
                 or Society.query.filter_by(bbb_id=values["bbb_id"]).first()):
             abort(500)
 
-        if Society.query.filter_by(uid=values["uid"]).first():
-            errors["soc_short_name"] = "That society short name is already in use."
-
         if " " in values["soc_short_name"]:
             errors["soc_short_name"] = "Your society short name must not contain spaces."
+
+        if Society.query.filter_by(uid=values["uid"]).first():
+            errors["soc_short_name"] = "That society short name is already in use."
 
         if errors:
             return render_template("home/register_soc.html", page_title="Register a society", crsid=crsid, errors=errors, **values)
@@ -107,7 +107,7 @@ def register_soc():
 
             current_app.logger.info(f"Registered society {values['uid']}")
 
-            return redirect(url_for("home.register_soc_success"))
+            return redirect(url_for("home.home"))
 
 
     else:
@@ -166,7 +166,7 @@ def register():
 
             current_app.logger.info(f"Registered user with CRSid {auth_decorator.principal}")
 
-            return redirect(url_for("home.register_success"))
+            return redirect(url_for("home.home"))
 
     else:
         # defaults
@@ -180,11 +180,3 @@ def register():
 
         return render_template("home/register.html", page_title="Register",
                            crsid=crsid, errors={}, **values)
-
-@bp.route("/register/success")
-def register_success():
-    return render_template("home/register_success.html", page_title="Success!")
-
-@bp.route("/register_soc/success")
-def register_soc_success():
-    return render_template("/home/register_soc_success.html", page_title="Success!")
