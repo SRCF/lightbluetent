@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta property="og:title" content="SRCF Timeout - Virtual Freshers' Fair" />
+  <meta property="og:type" content="website" />
+  <!--TODO: ADD SOCIETY DESCRIPTION HERE-->
+  <meta property="og:description" content="This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair" />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  {% set logo = 'images/' + society.logo %}
+  <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
+
+  <title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} Virtual Freshers' Fair</title>
+  <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://www.srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='styles-welcome.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+  <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/svg">
+  {% block head %}{% endblock %}
+</head>
+
+<body class="layout-footer">
+  <main role="main" class="container">
+    {%- if page_title is defined %}
+    <h2>
+      {%- if page_parent is defined %}
+      <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+      {%- endif %}
+      {%- if page_subtitle is defined %}
+      <small class="text-muted">{{ page_subtitle }}</small>
+      {%- endif %}
+    </h2>
+    {%- endif %}
+    {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </main>
+  <div id="action-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="container">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <div id="action-modal-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer pt-3">
+    <p class="text-center mb-1">
+      This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a free provider of quality and reliable computing services for over 21 years
+      |
+      <a href="https://github.com/SRCF/lightbluetent">{{github_rev}}</a>
+    </p>
+  </footer>
+  <script src="https://www.srcf.net/_srcf/vendor/js/jquery.min.js"></script>
+  <script src="https://www.srcf.net/_srcf/vendor/js/popper.min.js"></script>
+  <script src="https://www.srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
