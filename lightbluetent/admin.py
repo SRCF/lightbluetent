@@ -22,7 +22,11 @@ def delete_society_logo(uid):
         return
     else:
         old_logo = os.path.join(current_app.root_path, "static/images", society.logo)
-        os.remove(old_logo)
+
+        try:
+            os.remove(old_logo)
+        except FileNotFoundError:
+            pass
 
         society.logo = "default_logo.png"
         db.session.commit()
@@ -38,7 +42,11 @@ def delete_society_bbb_logo(uid):
         return
     else:
         old_logo = os.path.join(current_app.root_path, "static/images", society.bbb_logo)
-        os.remove(old_logo)
+
+        try:
+            os.remove(old_logo)
+        except FileNotFoundError:
+            pass
 
         society.bbb_logo = "default_bbb_logo.png"
         db.session.commit()
