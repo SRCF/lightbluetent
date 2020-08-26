@@ -244,12 +244,12 @@ def admin(uid):
         # defaults
         values = {
             "soc_name": society.name,
-            "website": society.website if society.website != "None" else "",
-            "social_1": society.social_1 if society.social_1 != "None" else "",
-            "social_2": society.social_2 if society.social_2 != "None" else "",
-            "description": society.description if society.description != "None" else "",
-            "welcome_text": society.welcome_text if society.welcome_text != "None" else "",
-            "banner_text": society.banner_text if society.banner_text != "None" else "",
+            "website": society.website,
+            "social_1": society.social_1,
+            "social_2": society.social_2,
+            "description": society.description,
+            "welcome_text": society.welcome_text,
+            "banner_text": society.banner_text,
             "banner_color": society.banner_color,
             "logo": society.logo,
             "mute_on_start": society.mute_on_start,
