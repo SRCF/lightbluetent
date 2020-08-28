@@ -237,6 +237,7 @@ def admin(uid):
                                    page_title=f"Stall administration for { society.name }",
                                    society=society, crsid=crsid, errors=errors,
                                    num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                                   page_parent=url_for("home.home"),
                                    **values)
         else:
             society.name = values["soc_name"]
@@ -267,7 +268,9 @@ def admin(uid):
 
             db.session.commit()
 
-            return redirect(url_for("home.home"))
+            flash("Settings saved.")
+
+            return redirect(url_for("admin.admin", uid=society.uid))
 
     else:
         # defaults
@@ -289,6 +292,7 @@ def admin(uid):
                            page_title=f"Stall administration for { society.name }",
                            society=society, crsid=crsid, errors={},
                            num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                           page_parent=url_for("home.home"),
                            **values)
 
 @bp.route("/<uid>/reset_banner")
