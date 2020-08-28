@@ -11,39 +11,53 @@ from PIL import Image
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
+IMAGES_DIR = "lightbluetent/static/images"
+DEFAULT_LOGO = "default_logo.png"
+DEFAULT_BBB_LOGO = "default_bbb_logo.png"
+
+def remove_logo(path):
+
+    if not os.path.isdir(IMAGES_DIR):
+        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+        abort(500)
+
+    if not os.path.isfile(path):
+        current_app.logger.info(f"no logo to delete")
+        return
+
+    os.remove(path)
+    current_app.logger.info(f"Deleted logo '{ path }'")
 
 # Delete logo on disk for the society with given uid
 def delete_society_logo(uid):
 
     society = Society.query.filter_by(uid=uid).first()
-    logo_path = f"images/{ society.logo }"
 
-    if society.logo == "default_logo.png":
+    if society.logo == DEFAULT_LOGO:
         return
     else:
-        old_logo = os.path.join(current_app.root_path, "static/images", society.logo)
-        os.remove(old_logo)
-
-        society.logo = "default_logo.png"
+        current_app.logger.info(f"For uid='{ society.uid }': deleting logo...")
+        old_logo = os.path.join(IMAGES_DIR, society.logo)
+        remove_logo(old_logo)
+        society.logo = DEFAULT_LOGO
         db.session.commit()
-
         return
 
 # Delete logo on disk for the society with given uid
 def delete_society_bbb_logo(uid):
-    society = Society.query.filter_by(uid=uid).first()
-    logo_path = f"images/{ society.bbb_logo }"
 
-    if society.bbb_logo == "default_bbb_logo.png":
+    society = Society.query.filter_by(uid=uid).first()
+
+    if society.bbb_logo == DEFAULT_BBB_LOGO:
         return
     else:
-        old_logo = os.path.join(current_app.root_path, "static/images", society.bbb_logo)
-        os.remove(old_logo)
-
-        society.bbb_logo = "default_bbb_logo.png"
+        current_app.logger.info(f"For uid='{ society.uid }': deleting bbb_logo")
+        old_logo = os.path.join(IMAGES_DIR, society.bbb_logo)
+        remove_logo(old_logo)
+        society.bbb_logo = DEFAULT_BBB_LOGO
         db.session.commit()
-
         return
+
 
 # Delete one of the saved sessions in the database, identified by its ID.
 # Returns if that session_id doesn't exist.
@@ -117,7 +131,6 @@ def admin(uid):
             logo_filename, logo_extension = os.path.splitext(logo.filename)
             bbb_logo_filename, bbb_logo_extension = os.path.splitext(bbb_logo.filename)
 
-            # TODO: is use of current_app.root_path okay?
             if logo and logo_filename != "":
                 if logo_extension in LOGO_ALLOWED_EXTENSIONS:
 
@@ -125,14 +138,22 @@ def admin(uid):
                     delete_society_logo(uid)
 
                     static_filename = society.uid + "_" + gen_unique_string() + logo_extension
-                    path = os.path.join(current_app.root_path, "static/images", static_filename)
+                    path = os.path.join(IMAGES_DIR, static_filename)
+
+                    current_app.logger.info(f"For uid='{ society.uid }': changing logo...")
+                    if not os.path.isdir(IMAGES_DIR):
+                        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+                        abort(500)
 
                     logo_img = Image.open(logo)
                     logo_resized = logo_img.resize((512, 512))
                     logo_resized.save(path)
 
+                    current_app.logger.info(f"For uid='{ society.uid }': saved new logo '{ path }'")
+
                     society.logo = static_filename
                     db.session.commit()
+                    current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
                 else:
                     errors["logo"] = "Invalid file."
 
@@ -143,14 +164,22 @@ def admin(uid):
                     delete_society_bbb_logo(uid)
 
                     static_filename = society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
-                    path = os.path.join(current_app.root_path, "static/images", static_filename)
+                    path = os.path.join(IMAGES_DIR, static_filename)
+
+                    current_app.logger.info(f"For uid='{ society.uid }': changing bbb_logo...")
+                    if not os.path.isdir(IMAGES_DIR):
+                        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+                        abort(500)
 
                     bbb_logo_img = Image.open(bbb_logo)
                     bbb_logo_resized = bbb_logo_img.resize((512, 256))
                     bbb_logo_resized.save(path)
 
+                    current_app.logger.info(f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'")
+
                     society.bbb_logo = static_filename
                     db.session.commit()
+                    current_app.logger.info(f"For uid='{ society.uid }': updated bbb_logo.")
                 else:
                     errors["bbb_logo"] = "Invalid file."
 
