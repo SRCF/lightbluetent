@@ -1,5 +1,155 @@
-{% extends "base.html" %}
+{% extends "society/base.html" %}
 
 {% block body %}
-  <p>This is the home page for {{ society.name }}. This is the page fair visitors will see and where they will be able to join your virtual stall. Soon, you will be able to add a logo, a society description and more information.</p>
+
+  <div class="row">
+
+  <div class="col-sm-3">
+
+  <div class="card">
+    <div class="card-body">
+      <img class="rounded img-fluid" src="{{ url_for('static', filename=logo) }}" alt="Society logo">
+    </div>
+  </div>
+
+  </div>
+  <div class="col">
+
+  <div class="card">
+    <h4 class="card-header" style="margin-bottom: 0">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
+    <div class="card-body">
+      <ul class="fa-ul">
+      {% if society.website != "" %}
+        <li>
+          <i class="fa fa-li fa-globe" title="Website"></i>
+          <a href="{{ society.website }}">{{ society.website }}</a>
+        </li>
+      {% endif %}
+      {% if society.social_1 != "" %}
+        <li>
+          {% if socials_1.is_email %}
+            <i class="fa fa-li fa-envelope" title="Social 1"></i>
+            <a href="mailto:{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% elif socials_1.is_facebook %}
+            <i class="fa fa-li fa-facebook-square" title="Social 1"></i>
+            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% elif socials_1.is_twitter %}
+            <i class="fa fa-li fa-twitter-square" title="Social 1"></i>
+            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% elif socials_1.is_instagram %}
+            <i class="fa fa-li fa-instagram" title="Social 1"></i>
+            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% elif socials_1.is_youtube %}
+            <i class="fa fa-li fa-youtube-play" title="Social 1"></i>
+            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% else %}
+            <i class="fa fa-li fa-globe" title="Social 1"></i>
+            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+          {% endif %}
+        </li>
+      {% endif %}
+      {% if society.social_2 != "" %}
+        <li>
+          {% if socials_2.is_email %}
+            <i class="fa fa-li fa-envelope" title="Social 2"></i>
+            <a href="mailto:{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% elif socials_2.is_facebook %}
+            <i class="fa fa-li fa-facebook-square" title="Social 2"></i>
+            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% elif socials_2.is_twitter %}
+            <i class="fa fa-li fa-twitter-square" title="Social 2"></i>
+            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% elif socials_2.is_instagram %}
+            <i class="fa fa-li fa-instagram" title="Social 2"></i>
+            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% elif socials_2.is_youtube %}
+            <i class="fa fa-li fa-youtube-play" title="Social 2"></i>
+            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% else %}
+            <i class="fa fa-li fa-globe" title="Social 2"></i>
+            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+          {% endif %}
+        </li>
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  </div>
+
+  </div>
+  <div class="row">
+
+  <div class="col-sm">
+
+  <div class="card">
+    <div class="card-body">
+      {% for paragraph in desc_paragraphs %}
+        <p>{{ paragraph }}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  </div>
+
+
+  <div class="col-sm">
+
+  <div class="card">
+    <h5 class="card-header">Session times</h5>
+    <div class="card-body">
+      <h6 class="card-title">Day 1</h6>
+
+      <ul class="fa-ul">
+        {% if num_sessions_day_1 == 0 %}
+          <li>
+            <i class="fa fa-li fa-times" title="Session"></i>
+            <p class="card-text">There are no sessions on the first day.</p>
+          </li>
+        {% else %}
+          {% for session in society.sessions %}
+            {% if session["day"] == "day_1" %}
+              <li>
+                <i class="fa fa-li fa-clock-o" title="Session"></i>
+                <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+
+      <h6 class="card-title">Day 2</h6>
+      <ul class="fa-ul">
+        {% if num_sessions_day_2 == 0 %}
+          <li>
+            <i class="fa fa-li fa-times" title="Session"></i>
+            <p class="card-text">There are no sessions on the second day.</p>
+          </li>
+        {% else %}
+          {% for session in society.sessions %}
+            {% if session["day"] == "day_2" %}
+              <li>
+                <i class="fa fa-li fa-clock-o" title="Session"></i>
+                <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
+              </li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </ul>
+
+    <h6 class="card-title text-muted">Join the live session</h6>
+    <form>
+      <div class="form-group">
+        <input type="name" class="form-control" id="name" placeholder="Enter your name..." disabled>
+      </div>
+    </form>
+    <a href="#" class="btn btn-primary disabled" aria-disabled="true">Join session</a>
+    </div>
+  </div>
+
+
+  </div>
+
+  </div>
+
 {% endblock %}
