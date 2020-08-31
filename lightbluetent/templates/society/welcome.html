@@ -17,15 +17,19 @@
 
   <div class="card">
     <h4 class="card-header" style="margin-bottom: 0">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
+    {% if ((society.website == "" or society.website is none)
+        and (society.social_1 == "" or society.social_1 is none)
+        and (society.social_2 == "" or society.social_2 is none)) %}
+    {% else %}
     <div class="card-body">
       <ul class="fa-ul">
-      {% if society.website != "" %}
+      {% if society.website != "" and society.website is not none %}
         <li>
           <i class="fa fa-li fa-globe" title="Website"></i>
           <a href="{{ society.website }}">{{ society.website }}</a>
         </li>
       {% endif %}
-      {% if society.social_1 != "" %}
+      {% if society.social_1 != "" and society.social_1 is not none %}
         <li>
           {% if socials_1.is_email %}
             <i class="fa fa-li fa-envelope" title="Social 1"></i>
@@ -48,7 +52,7 @@
           {% endif %}
         </li>
       {% endif %}
-      {% if society.social_2 != "" %}
+      {% if society.social_2 != "" and society.social_2 is not none %}
         <li>
           {% if socials_2.is_email %}
             <i class="fa fa-li fa-envelope" title="Social 2"></i>
@@ -73,6 +77,7 @@
       {% endif %}
       </ul>
     </div>
+    {% endif %}
   </div>
 
   </div>
@@ -84,11 +89,16 @@
 
   <div class="card">
     <div class="card-body">
-      {% for paragraph in desc_paragraphs %}
-        <p>{{ paragraph }}</p>
-      {% endfor %}
+      {% if society.description != "" and society.description is not none %}
+        {% for paragraph in desc_paragraphs %}
+          <p>{{ paragraph }}</p>
+        {% endfor %}
+      {% else %}
+        <p>Your description here...</p>
+      {% endif %}
     </div>
   </div>
+
 
   </div>
 
