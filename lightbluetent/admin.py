@@ -69,6 +69,7 @@ def delete_society_session(uid, session_id):
     if session_to_delete is None:
         return
     else:
+        current_app.logger.info(f"For uid='{ society.uid }': deleting session [ day: { session_to_delete['day'] }, start: { session_to_delete['start'] }, end: { session_to_delete['end'] } ]")
         sessions.remove(session_to_delete)
         society.sessions = sessions
         db.session.commit()
@@ -192,6 +193,7 @@ def admin(uid):
         # Adding a new admin
         if values["new_admin_crsid"] != "":
 
+            current_app.logger.info(f"For uid='{ society.uid }': adding new admin { values['new_admin_crsid'] }...")
             new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
             if not new_admin:
                 errors["new_admin_crsid"] = "That user is not registered yet. Users must register before being added as administrators."
@@ -199,6 +201,9 @@ def admin(uid):
 
         # Add a new session
         if values["new_session_day"] != "---" or values["new_session_start"] or values["new_session_end"]:
+
+            current_app.logger.info(f"For uid='{ society.uid }': adding new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]...")
+
             if (values["new_session_day"] != ""
                     and values["new_session_start"] != ""
                     and values["new_session_end"] != ""):
@@ -267,6 +272,12 @@ def admin(uid):
 
 
             db.session.commit()
+
+            if is_new_admin:
+                current_app.logger.info(f"For uid='{ society.uid }': added new admin { new_admin }.")
+
+            if is_new_session:
+                current_app.logger.info(f"For uid='{ society.uid }': added new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]")
 
             flash("Settings saved.")
 
