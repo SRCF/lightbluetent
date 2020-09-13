@@ -12,7 +12,7 @@
     <div class="form-group-row">
       <label class="col col-form-label" for="soc_name">Society name</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="soc_name" name="soc_name" placeholder="E.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
+        <input type="text" id="soc_name" name="soc_name" placeholder="e.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
         {%- if errors.soc_name is defined %}
           <small class="invalid-feedback">{{ errors.soc_name }}</small>
         {%- endif %}
@@ -25,7 +25,7 @@
     <div class="form-group-row">
       <label class="col col-form-label" for="website">Website</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="website" name="website" placeholder="E.g. https://www.srcf.net/" class="form-control{% if errors.website is defined %} is-invalid{% endif %}" value="{% if website is not none %}{{ website }}{% endif %}">
+        <input type="text" id="website" name="website" placeholder="e.g. https://www.srcf.net/" class="form-control{% if errors.website is defined %} is-invalid{% endif %}" value="{% if website is not none %}{{ website }}{% endif %}">
         {%- if errors.website is defined %}
           <small class="invalid-feedback">{{ errors.website }}</small>
         {%- endif %}
@@ -37,7 +37,7 @@
     <label class="col col-form-label">Social media / contact</label>
     <div class="form-group-row">
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="social_1" name="social_1" placeholder="E.g. a social media URL" class="form-control{% if errors.social_1 is defined %} is-invalid{% endif %}" value="{% if social_1 is not none %}{{ social_1 }}{% endif %}">
+        <input type="text" id="social_1" name="social_1" placeholder="e.g. a social media URL" class="form-control{% if errors.social_1 is defined %} is-invalid{% endif %}" value="{% if social_1 is not none %}{{ social_1 }}{% endif %}">
         {%- if errors.social_1 is defined %}
           <small class="invalid-feedback">{{ errors.social_1 }}</small>
         {%- endif %}
@@ -46,7 +46,7 @@
     <br />
     <div class="form-group-row">
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="social_2" name="social_2" placeholder="E.g. a contact email address" class="form-control{% if errors.social_2 is defined %} is-invalid{% endif %}" value="{% if social_2 is not none %}{{ social_2 }}{% endif %}">
+        <input type="text" id="social_2" name="social_2" placeholder="e.g. a contact email address" class="form-control{% if errors.social_2 is defined %} is-invalid{% endif %}" value="{% if social_2 is not none %}{{ social_2 }}{% endif %}">
         {%- if errors.social_2 is defined %}
           <small class="invalid-feedback">{{ errors.social_2 }}</small>
         {%- endif %}
@@ -131,7 +131,7 @@
     <div class="form-group-row">
       <label class="col col-form-label" for="welcome_text">Welcome text</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="welcome_text" name="welcome_text" placeholder="E.g. Welcome to {{ society.name }}!" class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}" value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
+        <input type="text" id="welcome_text" name="welcome_text" placeholder="e.g. Welcome to {{ society.name }}!" class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}" value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
         {%- if errors.welcome_text is defined %}
           <small class="invalid-feedback">{{ errors.welcome_text }}</small>
         {%- endif %}
@@ -143,7 +143,7 @@
       <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_text">Banner</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="input-group mb-3">
-          <input type="text" id="banner_text" name="banner_text" class="form-control" placeholder="E.g. Welcome to {{ society.name }}!" aria-label="" aria-describedby="basic-addon1" value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
+          <input type="text" id="banner_text" name="banner_text" class="form-control" placeholder="e.g. Welcome to {{ society.name }}!" aria-label="" aria-describedby="basic-addon1" value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
           <div class="input-group-append">
             <input type="color" id="banner_color" name="banner_color" style="width: 50px" class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}" value="{{ banner_color }}" required>
           </div>

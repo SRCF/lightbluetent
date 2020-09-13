@@ -2,164 +2,146 @@
 
 {% block body %}
 
-  <div class="row">
-
-  <div class="col-sm-3">
-
-  <div class="card">
-    <div class="card-body">
-      <img class="rounded img-fluid" src="{{ url_for('static', filename=logo) }}" alt="Society logo">
-    </div>
-  </div>
-
-  </div>
-  <div class="col">
-
-  <div class="card">
-    <h4 class="card-header" style="margin-bottom: 0">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
-    {% if ((society.website == "" or society.website is none)
+<div class="row">
+    <div class="col-md">
+        <div class="card my-3 shadow-sm">
+            <h4 class="card-header" style="margin-bottom: 0">{{ society.name }} <small
+                    class="text-muted">{{ society.short_name }}</small></h4>
+            {% if ((society.website == "" or society.website is none)
         and (society.social_1 == "" or society.social_1 is none)
         and (society.social_2 == "" or society.social_2 is none)) %}
-    {% else %}
-    <div class="card-body">
-      <ul class="fa-ul">
-      {% if society.website != "" and society.website is not none %}
-        <li>
-          <i class="fa fa-li fa-globe" title="Website"></i>
-          <a href="{{ society.website }}">{{ society.website }}</a>
-        </li>
-      {% endif %}
-      {% if society.social_1 != "" and society.social_1 is not none %}
-        <li>
-          {% if socials_1.is_email %}
-            <i class="fa fa-li fa-envelope" title="Social 1"></i>
-            <a href="mailto:{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% elif socials_1.is_facebook %}
-            <i class="fa fa-li fa-facebook-square" title="Social 1"></i>
-            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% elif socials_1.is_twitter %}
-            <i class="fa fa-li fa-twitter-square" title="Social 1"></i>
-            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% elif socials_1.is_instagram %}
-            <i class="fa fa-li fa-instagram" title="Social 1"></i>
-            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% elif socials_1.is_youtube %}
-            <i class="fa fa-li fa-youtube-play" title="Social 1"></i>
-            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% else %}
-            <i class="fa fa-li fa-globe" title="Social 1"></i>
-            <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-          {% endif %}
-        </li>
-      {% endif %}
-      {% if society.social_2 != "" and society.social_2 is not none %}
-        <li>
-          {% if socials_2.is_email %}
-            <i class="fa fa-li fa-envelope" title="Social 2"></i>
-            <a href="mailto:{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% elif socials_2.is_facebook %}
-            <i class="fa fa-li fa-facebook-square" title="Social 2"></i>
-            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% elif socials_2.is_twitter %}
-            <i class="fa fa-li fa-twitter-square" title="Social 2"></i>
-            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% elif socials_2.is_instagram %}
-            <i class="fa fa-li fa-instagram" title="Social 2"></i>
-            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% elif socials_2.is_youtube %}
-            <i class="fa fa-li fa-youtube-play" title="Social 2"></i>
-            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% else %}
-            <i class="fa fa-li fa-globe" title="Social 2"></i>
-            <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-          {% endif %}
-        </li>
-      {% endif %}
-      </ul>
-    </div>
-    {% endif %}
-  </div>
-
-  </div>
-
-  </div>
-  <div class="row">
-
-  <div class="col-sm">
-
-  <div class="card">
-    <div class="card-body">
-      {% if society.description != "" and society.description is not none %}
-        {% for paragraph in desc_paragraphs %}
-          <p>{{ paragraph }}</p>
-        {% endfor %}
-      {% else %}
-        <p>Your description here...</p>
-      {% endif %}
-    </div>
-  </div>
-
-
-  </div>
-
-
-  <div class="col-sm">
-
-  <div class="card">
-    <h5 class="card-header">Session times</h5>
-    <div class="card-body">
-      <h6 class="card-title">Day 1</h6>
-
-      <ul class="fa-ul">
-        {% if num_sessions_day_1 == 0 %}
-          <li>
-            <i class="fa fa-li fa-times" title="Session"></i>
-            <p class="card-text">There are no sessions on the first day.</p>
-          </li>
-        {% else %}
-          {% for session in society.sessions %}
-            {% if session["day"] == "day_1" %}
-              <li>
-                <i class="fa fa-li fa-clock-o" title="Session"></i>
-                <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
-              </li>
+            {% else %}
+            <div class="card-body">
+                <ul class="fa-ul">
+                    {% if society.website != "" and society.website is not none %}
+                    <li>
+                        <i class="fa fa-li fa-globe" title="Website"></i>
+                        <a href="{{ society.website }}">{{ society.website }}</a>
+                    </li>
+                    {% endif %}
+                    {% if society.social_1 != "" and society.social_1 is not none %}
+                    <li>
+                        {% if socials_1.is_email %}
+                        <i class="fa fa-li fa-envelope" title="Social 1"></i>
+                        <a href="mailto:{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% elif socials_1.is_facebook %}
+                        <i class="fa fa-li fa-facebook-square" title="Social 1"></i>
+                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% elif socials_1.is_twitter %}
+                        <i class="fa fa-li fa-twitter-square" title="Social 1"></i>
+                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% elif socials_1.is_instagram %}
+                        <i class="fa fa-li fa-instagram" title="Social 1"></i>
+                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% elif socials_1.is_youtube %}
+                        <i class="fa fa-li fa-youtube-play" title="Social 1"></i>
+                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% else %}
+                        <i class="fa fa-li fa-globe" title="Social 1"></i>
+                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                    {% if society.social_2 != "" and society.social_2 is not none %}
+                    <li>
+                        {% if socials_2.is_email %}
+                        <i class="fa fa-li fa-envelope" title="Social 2"></i>
+                        <a href="mailto:{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% elif socials_2.is_facebook %}
+                        <i class="fa fa-li fa-facebook-square" title="Social 2"></i>
+                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% elif socials_2.is_twitter %}
+                        <i class="fa fa-li fa-twitter-square" title="Social 2"></i>
+                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% elif socials_2.is_instagram %}
+                        <i class="fa fa-li fa-instagram" title="Social 2"></i>
+                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% elif socials_2.is_youtube %}
+                        <i class="fa fa-li fa-youtube-play" title="Social 2"></i>
+                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% else %}
+                        <i class="fa fa-li fa-globe" title="Social 2"></i>
+                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                </ul>
+                <hr>
+                <div class="row no-gutters rounded overflow-hidden flex-md-row h-md-250 position-relative">
+                    <div class="col-auto d-none d-lg-block p-2">
+                        <img width="200" height="250" class="rounded img-fluid"
+                            src="{{ url_for('static', filename=logo) }}" alt="Society logo" role="img"
+                            aria-label="Placeholder: Thumbnail">
+                    </div>
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <div class="mb-1 text-muted">Society description</div>
+                        <div class="card-text mb-auto">
+                            {% if society.description != "" and society.description is not none %}
+                            {% for paragraph in desc_paragraphs %}
+                            <p>{{ paragraph }}</p>
+                            {% endfor %}
+                            {% else %}
+                            <p>Your description here...</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
-          {% endfor %}
-        {% endif %}
-      </ul>
-
-      <h6 class="card-title">Day 2</h6>
-      <ul class="fa-ul">
-        {% if num_sessions_day_2 == 0 %}
-          <li>
-            <i class="fa fa-li fa-times" title="Session"></i>
-            <p class="card-text">There are no sessions on the second day.</p>
-          </li>
-        {% else %}
-          {% for session in society.sessions %}
-            {% if session["day"] == "day_2" %}
-              <li>
-                <i class="fa fa-li fa-clock-o" title="Session"></i>
-                <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
-              </li>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      </ul>
-
-    <h6 class="card-title text-muted">Join the live session</h6>
-    <form>
-      <div class="form-group">
-        <input type="name" class="form-control" id="name" placeholder="Enter your name..." disabled>
-      </div>
-    </form>
-    <a href="#" class="btn btn-primary disabled" aria-disabled="true">Join session</a>
+        </div>
     </div>
-  </div>
+    <div class="col-md">
+        <div class="card my-3 shadow-sm">
+            <h5 class="card-header">Session times</h5>
+            <div class="card-body">
+                <h6 class="card-title">Day 1</h6>
 
+                <ul class="fa-ul">
+                    {% if num_sessions_day_1 == 0 %}
+                    <li>
+                        <i class="fa fa-li fa-times" title="Session"></i>
+                        <p class="card-text">There are no sessions on the first day.</p>
+                    </li>
+                    {% else %}
+                    {% for session in society.sessions %}
+                    {% if session["day"] == "day_1" %}
+                    <li>
+                        <i class="fa fa-li fa-clock-o" title="Session"></i>
+                        <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </ul>
 
-  </div>
-
-  </div>
+                <h6 class="card-title">Day 2</h6>
+                <ul class="fa-ul">
+                    {% if num_sessions_day_2 == 0 %}
+                    <li>
+                        <i class="fa fa-li fa-times" title="Session"></i>
+                        <p class="card-text">There are no sessions on the second day.</p>
+                    </li>
+                    {% else %}
+                    {% for session in society.sessions %}
+                    {% if session["day"] == "day_2" %}
+                    <li>
+                        <i class="fa fa-li fa-clock-o" title="Session"></i>
+                        <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+                <h6 class="card-title text-muted">Join the live session</h6>
+                <form>
+                    <div class="form-group">
+                        <input type="name" class="form-control" id="name" placeholder="Enter your name..." disabled>
+                    </div>
+                </form>
+                <a href="#" class="btn btn-primary disabled" aria-disabled="true">Join session</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
