@@ -82,6 +82,8 @@ def delete_society_session(uid, session_id):
 @auth_decorator
 def admin(uid):
 
+    has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
+
     society = Society.query.filter_by(uid=uid).first()
 
     if not society:
@@ -110,7 +112,7 @@ def admin(uid):
 
         values = {}
 
-        for key in ("soc_name", "website", "description",
+        for key in ("soc_name", "website", "description", "short_description",
                     "welcome_text", "logo", "banner_text",
                     "banner_color", "new_admin_crsid",
                     "social_1", "social_2",
@@ -125,6 +127,9 @@ def admin(uid):
 
         if len(values["soc_name"]) <= 1:
             errors["soc_name"] = _("Society name is too short.")
+
+        if len(values["short_description"]) > 200:
+            errors["short_description"] = _("This description is too long.")
 
         if "logo" in request.files:
             logo = request.files["logo"]
@@ -243,7 +248,7 @@ def admin(uid):
                                    page_title=f"Stall administration for { society.name }",
                                    society=society, crsid=crsid, errors=errors,
                                    num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
-                                   page_parent=url_for("home.home"),
+                                   page_parent=url_for("home.home"), has_directory_page=has_directory_page,
                                    **values)
         else:
             society.name = values["soc_name"]
@@ -251,6 +256,7 @@ def admin(uid):
             society.social_1 = values["social_1"]
             society.social_2 = values["social_2"]
             society.description = values["description"]
+            society.short_description = values["short_description"]
             society.welcome_text = values["welcome_text"]
             society.banner_text = values["banner_text"]
             society.banner_color = values["banner_color"]
@@ -292,6 +298,7 @@ def admin(uid):
             "social_1": society.social_1,
             "social_2": society.social_2,
             "description": society.description,
+            "short_description": society.short_description,
             "welcome_text": society.welcome_text,
             "banner_text": society.banner_text,
             "banner_color": society.banner_color,
@@ -304,7 +311,7 @@ def admin(uid):
                            page_title=f"Stall administration for { society.name }",
                            society=society, crsid=crsid, errors={},
                            num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
-                           page_parent=url_for("home.home"),
+                           page_parent=url_for("home.home"), has_directory_page=has_directory_page,
                            **values)
 
 @bp.route("/<uid>/reset_banner")

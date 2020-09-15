@@ -10,7 +10,7 @@
     <div class="col-sm">
 
     <div class="form-group-row">
-      <label class="col col-form-label" for="soc_name">Society name</label>
+      <label class="col col-form-label" for="soc_name">{{ _("Society name") }}</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <input type="text" id="soc_name" name="soc_name" placeholder="e.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
         {%- if errors.soc_name is defined %}
@@ -56,8 +56,23 @@
 
     <br />
 
+    {% if has_directory_page %}
+
     <div class="form-group-row">
-      <label class="col col-form-label" for="description">Society description</label>
+      <label class="col col-form-label" for="short_description">{{ _("Society summary") }}</label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <textarea id="short_description" name="short_description" maxlength=200 rows=5 class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
+        {%- if errors.short_description is defined %}
+          <small class="invalid-feedback">{{ errors.short_description }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
+      </div>
+    </div>
+
+    {% endif %}
+
+    <div class="form-group-row">
+      <label class="col col-form-label" for="description">{{ _("Society description") }}</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <textarea id="description" name="description" rows=5 class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
         {%- if errors.description is defined %}
@@ -191,7 +206,7 @@
     <div class="col-sm">
 
     <div class="form-group-row">
-      <label class="col col-form-label" for="new_admin_crsid">Society admins</label>
+      <label class="col col-form-label" for="new_admin_crsid">{{ _("Society admins") }}</label>
       <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -314,7 +329,7 @@
 
     <br />
 
-    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">Delete society</a>
+    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">_("Delete society")</a>
     <input type="submit" class="btn btn-outline-primary" value="Update">
 
   </form>

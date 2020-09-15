@@ -10,6 +10,8 @@ import ucam_webauth
 import ucam_webauth.raven
 import ucam_webauth.raven.flask_glue
 
+import random
+
 bp = Blueprint("home", __name__)
 
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
@@ -17,11 +19,18 @@ auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightblu
 @bp.route("/")
 def index():
 
-    societies = Society.query.all()
+    has_directory_page=current_app.config["HAS_DIRECTORY_PAGE"]
 
-    home_url = url_for('home.register')
+    # Check whether the directory page is enabled
+    if has_directory_page:
+        societies = Society.query.all()
 
-    return render_template("home/index.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"), has_directory_page=current_app.config["HAS_DIRECTORY_PAGE"], societies=societies, home_url=home_url)
+        # Shuffle the socs so they all have a chance of being near the top
+        random.shuffle(societies)
+        home_url = url_for('home.register')
+        return render_template("home/directory.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"), societies=societies, home_url=home_url)
+    else:
+        return render_template("home/index.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"))
 
 @bp.route("/logout")
 def logout():

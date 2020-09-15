@@ -1,0 +1,31 @@
+{% extends "home/directory_base.html" %}
+
+{% block body %}
+
+<div class="card-columns">
+  {% if not societies %}
+    <p>{{ _("There are no registered societies.") }}</p><br />
+  {% else %}
+    {% for society in societies %}
+      <div class="card">
+        <div class="card-header" style="background-color: {{ society.banner_color }};">
+          {% set current_logo = "images/{}".format(society.logo) %}
+          {% if society.logo != "default_logo.png" %}
+            <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right soc_logo_thumbnail">
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
+          {% if society.short_description %}
+            <p>{{ society.short_description }}</p>
+          {% endif %}
+          <a class="btn btn-outline-primary btn-sm stretched-link" href="{{ url_for('society.welcome', uid=society.uid) }}">See more...</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url=home_url) }}</p>
+
+{% endblock %}

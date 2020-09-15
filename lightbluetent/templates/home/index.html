@@ -2,55 +2,12 @@
 
 {% block body %}
 
-{% if has_directory_page %}
-
-<div class="card-columns">
-  {% if not societies %}
-    <p>{{ _("There are no registered societies.") }}</p><br />
-  {% else %}
-    {% for society in societies %}
-      <div class="card">
-        <div class="card-header" style="background-color: {{ society.banner_color }};">
-          {% set current_logo = "images/{}".format(society.logo) %}
-          {% if society.logo != "default_logo.png" %}
-            <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right soc_logo_thumbnail">
-          {% endif %}
-        </div>
-        <div class="card-body">
-          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
-          <a href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
-          {% if society.description|length > 200 %}
-            {% set short_desc = society.description[0:200] + "..." %}
-            <p>{{ short_desc }}...</p>
-          {% else %}
-            <p>{{ society.description }}</p>
-          {% endif %}
-
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
-
-
-
-<p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url=home_url) }}</p>
-
-
-
-
-
-
-{% else %}
-
 <p>{{ _("This is a platform provided by the SRCF for the 2020 Virtual Freshers' Fair. For society admins, it allows you to host a custom web page that connects to our <a href=\"https://timeout.srcf.net\">free video conferencing service, Timeout</a>.") }}</p>
   <a href="{{ url_for('home.register') }}" class="btn btn-lg btn-outline-primary">{{ _("Stall manager login") }}</a>
   <br>
   <br>
   <p>{{ _("For visitors of the fair, you can attend any society's stall.") }}</p>
   <a href="" class="btn btn-lg btn-outline-primary">{{ _("View the Cambridge SU society registry") }}</a>
-
-{% endif %}
 
 
 {% endblock %}

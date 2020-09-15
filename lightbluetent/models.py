@@ -32,6 +32,7 @@ class Society(db.Model):
     short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
     admins = db.relationship("User", secondary=user_society, lazy=True, backref=db.backref('societies', lazy=True))
+    short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
