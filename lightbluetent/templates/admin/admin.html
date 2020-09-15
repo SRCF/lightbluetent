@@ -2,320 +2,339 @@
 
 {% block body %}
 
-  <form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data">
 
-  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-    <div class="row">
-    <div class="col-sm">
-
-    <div class="form-group-row">
-      <label class="col col-form-label" for="soc_name">Society name</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="soc_name" name="soc_name" placeholder="e.g. Student-Run Computing Facility" class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}" required>
-        {%- if errors.soc_name is defined %}
-          <small class="invalid-feedback">{{ errors.soc_name }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">This is the full name of your society.</small>
-      </div>
-    </div>
-
-    <br />
-
-    <div class="form-group-row">
-      <label class="col col-form-label" for="website">Website</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="website" name="website" placeholder="e.g. https://www.srcf.net/" class="form-control{% if errors.website is defined %} is-invalid{% endif %}" value="{% if website is not none %}{{ website }}{% endif %}">
-        {%- if errors.website is defined %}
-          <small class="invalid-feedback">{{ errors.website }}</small>
-        {%- endif %}
-      </div>
-    </div>
-
-    <br />
-
-    <label class="col col-form-label">Social media / contact</label>
-    <div class="form-group-row">
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="social_1" name="social_1" placeholder="e.g. a social media URL" class="form-control{% if errors.social_1 is defined %} is-invalid{% endif %}" value="{% if social_1 is not none %}{{ social_1 }}{% endif %}">
-        {%- if errors.social_1 is defined %}
-          <small class="invalid-feedback">{{ errors.social_1 }}</small>
-        {%- endif %}
-      </div>
-    </div>
-    <br />
-    <div class="form-group-row">
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="social_2" name="social_2" placeholder="e.g. a contact email address" class="form-control{% if errors.social_2 is defined %} is-invalid{% endif %}" value="{% if social_2 is not none %}{{ social_2 }}{% endif %}">
-        {%- if errors.social_2 is defined %}
-          <small class="invalid-feedback">{{ errors.social_2 }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">Here you can add URLs to your social media pages, or any other contact information you would like to be made available.</small>
-      </div>
-    </div>
-
-    <br />
-
-    <div class="form-group-row">
-      <label class="col col-form-label" for="description">Society description</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <textarea id="description" name="description" rows=5 class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
-        {%- if errors.description is defined %}
-          <small class="invalid-feedback">{{ errors.description }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">Write a bit about your society here. What do you do? How often do you meet? How many members do you have?</small>
-      </div>
-    </div>
-
-    </div>
-
-    <div class="col-sm">
-
-    <div class="form-group-row">
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        {% set current_logo = "images/{}".format(society.logo) %}
-        <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail">
-      </div>
-    </div>
-
-    <div class="form-group-row">
-      <label class="col col-form-label" for="logo">Logo</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="file" id="logo" name="logo" content="{{ logo }}" class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
-        {%- if errors.logo is defined %}
-          <small class="invalid-feedback">{{ errors.logo }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This logo will be displayed on your society's welcome page.</small>
-        <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
-      </div>
-    </div>
-
-    </div>
-    </div>
-
-
-    <br />
-    <hr />
-    <br />
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
     <div class="row">
+        <div class="col-sm">
 
-    <div class="col-sm">
+            <div class="form-group-row">
+                <label class="col col-form-label" for="soc_name">Society name</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="text" id="soc_name" name="soc_name" placeholder="e.g. Student-Run Computing Facility"
+                        class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}"
+                        value="{{ soc_name }}" required>
+                    {%- if errors.soc_name is defined %}
+                    <small class="invalid-feedback">{{ errors.soc_name }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This is the full name of your society.</small>
+                </div>
+            </div>
 
-    <div class="form-group-row">
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        {% set current_bbb_logo = "images/{}".format(society.bbb_logo) %}
-        <img src="{{ url_for('static', filename=current_bbb_logo) }}" alt="Society wide logo" class="img-thumbnail">
-      </div>
-    </div>
+            <br />
 
-    <div class="form-group-row">
-      <label class="col col-form-label" for="bbb_logo">Wide logo</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="file" id="bbb_logo" name="bbb_logo" content="{{ bbb_logo }}" class="form-control{% if errors.bbb_logo is defined %} is-invalid{% endif %}" accept="image/*">
-        {%- if errors.bbb_logo is defined %}
-          <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
-        <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
-        <small class="form-text text-muted"><a href="{{ url_for('admin.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
-      </div>
-    </div>
+            <div class="form-group-row">
+                <label class="col col-form-label" for="website">Website</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="text" id="website" name="website" placeholder="e.g. https://www.srcf.net/"
+                        class="form-control{% if errors.website is defined %} is-invalid{% endif %}"
+                        value="{% if website is not none %}{{ website }}{% endif %}">
+                    {%- if errors.website is defined %}
+                    <small class="invalid-feedback">{{ errors.website }}</small>
+                    {%- endif %}
+                </div>
+            </div>
 
-    <br />
+            <br />
 
-    </div>
+            <label class="col col-form-label">Social media / contact</label>
+            <div class="form-group-row">
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="text" id="social_1" name="social_1" placeholder="e.g. a social media URL"
+                        class="form-control{% if errors.social_1 is defined %} is-invalid{% endif %}"
+                        value="{% if social_1 is not none %}{{ social_1 }}{% endif %}">
+                    {%- if errors.social_1 is defined %}
+                    <small class="invalid-feedback">{{ errors.social_1 }}</small>
+                    {%- endif %}
+                </div>
+            </div>
+            <br />
+            <div class="form-group-row">
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="text" id="social_2" name="social_2" placeholder="e.g. a contact email address"
+                        class="form-control{% if errors.social_2 is defined %} is-invalid{% endif %}"
+                        value="{% if social_2 is not none %}{{ social_2 }}{% endif %}">
+                    {%- if errors.social_2 is defined %}
+                    <small class="invalid-feedback">{{ errors.social_2 }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Here you can add URLs to your social media pages, or any other
+                        contact information you would like to be made available.</small>
+                </div>
+            </div>
 
-    <div class="col-sm">
+            <br />
 
-    <div class="form-group-row">
-      <label class="col col-form-label" for="welcome_text">Welcome text</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="text" id="welcome_text" name="welcome_text" placeholder="e.g. Welcome to {{ society.name }}!" class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}" value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
-        {%- if errors.welcome_text is defined %}
-          <small class="invalid-feedback">{{ errors.welcome_text }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">This message will be shown to all users in the chat when they join your stand.</small>
-      </div>
-    </div>
+            <div class="form-group-row">
+                <label class="col col-form-label" for="description">Society description</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <textarea id="description" name="description" rows=5
+                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
+                    {%- if errors.description is defined %}
+                    <small class="invalid-feedback">{{ errors.description }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Write a bit about your society here. What do you do? How often
+                        do you meet? How many members do you have?</small>
+                </div>
+            </div>
 
-    <div class="form-group-row">
-      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_text">Banner</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <div class="input-group mb-3">
-          <input type="text" id="banner_text" name="banner_text" class="form-control" placeholder="e.g. Welcome to {{ society.name }}!" aria-label="" aria-describedby="basic-addon1" value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
-          <div class="input-group-append">
-            <input type="color" id="banner_color" name="banner_color" style="width: 50px" class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}" value="{{ banner_color }}" required>
-          </div>
         </div>
-        {%- if errors.new_admin_crsid is defined %}
-            <small class="text-danger">{{ errors.banner_text }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">This is an optional field that will add a banner to your stall with your chosen banner color.</small>
-        <small class="form-text text-muted"><a href="{{ url_for('admin.reset_banner', uid=society.uid) }}">Delete banner</a></small>
-      </div>
-    </div>
 
-    <br />
+        <div class="col-sm">
 
-    <div class="form-group-row form-check">
-      <label class="form-check-label">
-        <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %} checked{% endif %}>
-        Mute users on joining
-      </label>
-      {%- if errors.mute_on_start is defined %}
-        <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
-      {%- endif %}
-    </div>
+            <div class="form-group-row">
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    {% set current_logo = "images/{}".format(society.logo) %}
+                    <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail">
+                </div>
+            </div>
 
-    <br />
+            <div class="form-group-row">
+                <label class="col col-form-label" for="logo">Logo</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="file" id="logo" name="logo" content="{{ logo }}"
+                        class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
+                    {%- if errors.logo is defined %}
+                    <small class="invalid-feedback">{{ errors.logo }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.
+                        <br /> This logo will be displayed on your society's welcome page.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
+                </div>
+            </div>
 
-    <div class="form-group-row form-check">
-      <label class="form-check-label">
-        <input type="checkbox" name="disable_private_chat" class="form-check-input" {% if disable_private_chat %} checked{% endif %}>
-        Disable private chat
-      </label>
-      {%- if errors.disable_private_chat is defined %}
-        <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
-      {%- endif %}
-      <small class="form-text text-muted">Prevent attendees from talking to each other individually</small>
-    </div>
-
-    </div>
-
-    </div>
-
-    <hr />
-
-    <div class="row">
-    <div class="col-sm">
-
-    <div class="form-group-row">
-      <label class="col col-form-label" for="new_admin_crsid">Society admins</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-users"></i></span>
-            {%- for admin in society.admins %}
-              <span class="input-group-text">{{ admin.crsid }}</span>
-            {%- endfor %}
-          </div>
-          <input type="text" id="new_admin_crsid" name="new_admin_crsid" class="form-control" placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
         </div>
-        {%- if errors.new_admin_crsid is defined %}
-            <small class="text-danger">{{ errors.new_admin_crsid }}</small>
-        {%- endif %}
-        <small class="form-text text-muted">Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.</b></small>
-      </div>
     </div>
 
+
+    <br />
+    <hr />
+    <br />
+
+    <div class="row">
+
+        <div class="col-sm">
+
+            <div class="form-group-row">
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    {% set current_bbb_logo = "images/{}".format(society.bbb_logo) %}
+                    <img src="{{ url_for('static', filename=current_bbb_logo) }}" alt="Society wide logo"
+                        class="img-thumbnail">
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <label class="col col-form-label" for="bbb_logo">Wide logo</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="file" id="bbb_logo" name="bbb_logo" content="{{ bbb_logo }}"
+                        class="form-control{% if errors.bbb_logo is defined %} is-invalid{% endif %}" accept="image/*">
+                    {%- if errors.bbb_logo is defined %}
+                    <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1
+                        MB.</small>
+                    <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('admin.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
+                </div>
+            </div>
+
+            <br />
+
+        </div>
+
+        <div class="col-sm">
+
+            <div class="form-group-row">
+                <label class="col col-form-label" for="welcome_text">Welcome text</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="text" id="welcome_text" name="welcome_text"
+                        placeholder="e.g. Welcome to {{ society.name }}!"
+                        class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}"
+                        value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
+                    {%- if errors.welcome_text is defined %}
+                    <small class="invalid-feedback">{{ errors.welcome_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This message will be shown to all users in the chat when they
+                        join your stand.</small>
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="banner_text">Banner</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <div class="input-group mb-3">
+                        <input type="text" id="banner_text" name="banner_text" class="form-control"
+                            placeholder="e.g. Welcome to {{ society.name }}!" aria-label=""
+                            aria-describedby="basic-addon1"
+                            value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
+                        <div class="input-group-append">
+                            <input type="color" id="banner_color" name="banner_color" style="width: 50px"
+                                class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}"
+                                value="{{ banner_color }}" required>
+                        </div>
+                    </div>
+                    {%- if errors.new_admin_crsid is defined %}
+                    <small class="text-danger">{{ errors.banner_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This is an optional field that will add a banner to your stall
+                        with your chosen banner color.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('admin.reset_banner', uid=society.uid) }}">Delete banner</a></small>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="form-group-row form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %}
+                        checked{% endif %}>
+                    Mute users on joining
+                </label>
+                {%- if errors.mute_on_start is defined %}
+                <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
+                {%- endif %}
+            </div>
+
+            <br />
+
+            <div class="form-group-row form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" name="disable_private_chat" class="form-check-input"
+                        {% if disable_private_chat %} checked{% endif %}>
+                    Disable private chat
+                </label>
+                {%- if errors.disable_private_chat is defined %}
+                <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
+                {%- endif %}
+                <small class="form-text text-muted">Prevent attendees from talking to each other individually</small>
+            </div>
+
+        </div>
+
     </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-sm">
+
+            <div class="form-group-row">
+                <label class="col col-form-label" for="new_admin_crsid">Society admins</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-users"></i></span>
+                            {%- for admin in society.admins %}
+                            <span class="input-group-text">{{ admin.crsid }}</span>
+                            {%- endfor %}
+                        </div>
+                        <input type="text" id="new_admin_crsid" name="new_admin_crsid" class="form-control"
+                            placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
+                    </div>
+                    {%- if errors.new_admin_crsid is defined %}
+                    <small class="text-danger">{{ errors.new_admin_crsid }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Enter another user's CRSid to grant them administrative
+                        privileges. This will allow them to change anything on this page, <b>including deleting the
+                            society</b>. The user should already be registered with us. <b>Once a admin has been added,
+                            they cannot be removed.</b></small>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <br />
     <hr />
 
     <div class="row">
-    <div class="col-sm">
+        <div class="col-sm">
 
-    <label class="col col-form-label">Session times</label>
-    <label class="col col-form-label" for="new_session_day">Add new session:</label>
+            <label class="col col-form-label-lg">Session times</label>
+            <label class="col col-form-label" for="new_session_day">Add new session:</label>
 
-    <div class="form-group-row">
-      <div class="col col-lg-10 col-md-9 col-sm-8">
-        <select class="custom-select" name="new_session_day" id="new_session_day">
-          <option value="---">---</option>
-          <option value="day_1">Day 1</option>
-          <option value="day_2">Day 2</option>
-        </select>
-        {%- if errors.new_session_day is defined %}
-            <br /><small class="text-danger">{{ errors.new_session_day }}</small>
-        {%- endif %}
-      </div>
-    </div>
+            <div class="form-group-row">
+                <div class="col col-lg-10 col-md-9 col-sm-8">
+                    <select class="custom-select" name="new_session_day" id="new_session_day">
+                        {% for n in range(1, sessions_data["days"] + 1) %}
+                        <option value="day_{{n}}">Day {{n}}</option>
+                        {% endfor %}
+                    </select>
+                    {%- if errors.new_session_day is defined %}
+                    <br /><small class="text-danger">{{ errors.new_session_day }}</small>
+                    {%- endif %}
+                </div>
+            </div>
 
 
-    <div class="form-group-row">
-      <label class="col col-form-label" for="new_session_day">Start time:</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="time" class="form-control" id="new_session_start" name="new_session_start">
-        {%- if errors.new_session_start is defined %}
-          <small class="text-danger">{{ errors.new_session_start }}</small>
-        {%- endif %}
-      </div>
-    </div>
+            <div class="form-group-row">
+                <label class="col col-form-label" for="new_session_day">Start time:</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="time" class="form-control" id="new_session_start" name="new_session_start">
+                    {%- if errors.new_session_start is defined %}
+                    <small class="text-danger">{{ errors.new_session_start }}</small>
+                    {%- endif %}
+                </div>
+            </div>
 
-    <div class="form-group-row">
-      <label class="col col-form-label" for="new_session_day">End time:</label>
-      <div class="col-lg-10 col-md-9 col-sm-8">
-        <input type="time" class="form-control" id="new_session_end" name="new_session_end">
-        {%- if errors.new_session_end is defined %}
-          <small class="text-danger">{{ errors.new_session_end }}</small>
-        {%- endif %}
-      </div>
-    </div>
+            <div class="form-group-row">
+                <label class="col col-form-label" for="new_session_day">End time:</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <input type="time" class="form-control" id="new_session_end" name="new_session_end">
+                    {%- if errors.new_session_end is defined %}
+                    <small class="text-danger">{{ errors.new_session_end }}</small>
+                    {%- endif %}
+                </div>
+            </div>
 
-    </div>
+        </div>
 
-    <div class="col-sm">
+        <div class="col-sm">
 
-    <br />
+            <br />
 
-    <div class="card col">
-      <div class="card-body col">
-        <h4 class="card-title">Day 1</h4>
-        <ul class="fa-ul">
-          {% if num_sessions_day_1 == 0 %}
-            <li>
-              <i class="fa fa-li fa-times" title="Session"></i>
-              There are no sessions on the first day.
-            </li>
-          {% else %}
-            {% for session in society.sessions %}
-              {% if session["day"] == "day_1" %}
-                <li>
-                  <i class="fa fa-li fa-clock-o" title="Session"></i>
-                  {{ session["start"] }} - {{ session["end"] }}
-                  <span class="pull-right">
-                    <a class="text-danger" href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
-                  </span>
-                </li>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        </ul>
-        <h4 class="card-title">Day 2</h4>
-        <ul class="fa-ul">
-          {% if num_sessions_day_2 == 0 %}
-            <li>
-              <i class="fa fa-li fa-times" title="Session"></i>
-              There are no sessions on the second day.
-            </li>
-          {% else %}
-            {% for session in society.sessions %}
-              {% if session["day"] == "day_2" %}
-                <li>
-                  <i class="fa fa-li fa-clock-o" title="Session"></i>
-                  {{ session["start"] }} - {{ session["end"] }}
-                  <span class="pull-right">
-                    <a class="text-danger" href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
-                  </span>
-                </li>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        </ul>
-      </div>
-    </div>
+            <div class="card col">
+                <div class="card-body col">
+                    {% for n in range(1, sessions_data["days"] + 1) %}
+                    {% set ns = namespace(found=false) %}
+                    <h4 class="card-title">Day {{n}}</h4>
+                    <ul class="fa-ul">
+                        {% for session in society.sessions %}
+                        {% if session["day"] == n %}
+                        {% set ns.found = true %}
+                        <li>
+                            <i class="fa fa-li fa-clock-o" title="Session"></i>
+                            {{ session["start"] }} - {{ session["end"] }}
+                            <span class="pull-right">
+                                <a class="text-danger"
+                                    href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
+                            </span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if not ns.found %}
+                        <li>
+                            <i class="fa fa-li fa-times" title="Session"></i>
+                            There are no sessions on the first day.
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% endfor %}
+                </div>
+            </div>
 
-    </div>
+        </div>
 
     </div>
 
     <br />
 
-    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">Delete society</a>
+    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">Delete
+        society</a>
     <input type="submit" class="btn btn-outline-primary" value="Update">
 
-  </form>
+</form>
 {% endblock %}

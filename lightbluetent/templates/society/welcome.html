@@ -91,44 +91,28 @@
         <div class="card my-3 shadow-sm">
             <h5 class="card-header">Session times</h5>
             <div class="card-body">
-                <h6 class="card-title">Day 1</h6>
-
-                <ul class="fa-ul">
-                    {% if num_sessions_day_1 == 0 %}
-                    <li>
-                        <i class="fa fa-li fa-times" title="Session"></i>
-                        <p class="card-text">There are no sessions on the first day.</p>
-                    </li>
-                    {% else %}
-                    {% for session in society.sessions %}
-                    {% if session["day"] == "day_1" %}
-                    <li>
-                        <i class="fa fa-li fa-clock-o" title="Session"></i>
-                        <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
-                    </li>
-                    {% endif %}
+                {% for n in range(1, sessions_data["days"] + 1) %}
+                    {% set ns = namespace(found=false) %}
+                    <h6 class="card-title">Day {{n}}</h6>
+                    <ul class="fa-ul">
+                        {% for session in society.sessions %}
+                        {% if session["day"] == n %}
+                        {% set ns.found = true %}
+                        <li>
+                            <i class="fa fa-li fa-clock-o" title="Session"></i>
+                            {{ session["start"] }} - {{ session["end"] }}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if not ns.found %}
+                        <li>
+                            <i class="fa fa-li fa-times" title="Session"></i>
+                            There are no sessions on the first day.
+                        </li>
+                        {% endif %}
+                    </ul>
                     {% endfor %}
-                    {% endif %}
-                </ul>
 
-                <h6 class="card-title">Day 2</h6>
-                <ul class="fa-ul">
-                    {% if num_sessions_day_2 == 0 %}
-                    <li>
-                        <i class="fa fa-li fa-times" title="Session"></i>
-                        <p class="card-text">There are no sessions on the second day.</p>
-                    </li>
-                    {% else %}
-                    {% for session in society.sessions %}
-                    {% if session["day"] == "day_2" %}
-                    <li>
-                        <i class="fa fa-li fa-clock-o" title="Session"></i>
-                        <p class="card-text">{{ session["start"] }} - {{ session["end"] }}</p>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-                </ul>
                 <h6 class="card-title text-muted">Join the live session</h6>
                 <form>
                     <div class="form-group">
