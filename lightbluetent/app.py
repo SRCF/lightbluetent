@@ -3,6 +3,7 @@ from flask import Flask
 from . import admin, home, society
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
+from .utils import sif
 
 def create_app(config_name=None):
 
@@ -39,6 +40,8 @@ def create_app(config_name=None):
         ]
     }
     Talisman(app, content_security_policy=csp)
+
+    app.jinja_env.globals["sif"] = sif
 
     from lightbluetent.models import db, migrate
 
