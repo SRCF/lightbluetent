@@ -24,3 +24,11 @@ def validate_email(crsid, email):
             return "You should use your own university email address."
 
     return None
+
+
+def sif(variable, val):
+    """"string if": `val` if `variable` is defined and truthy, else ''"""
+    if not jinja2.is_undefined(variable) and variable:
+        return val
+    else:    
+        return ""

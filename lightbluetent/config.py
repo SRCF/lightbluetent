@@ -19,6 +19,7 @@ class Config(object):
     MAX_CONTENT_LENGTH = 1024 * 1024
 
     HAS_DIRECTORY_PAGE = True
+    NUMBER_OF_DAYS = 2
 
 class ProductionConfig(Config):
     """Production configuration"""

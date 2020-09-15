@@ -1,6 +1,6 @@
 import re
 
-from flask import Blueprint, render_template, request, flash, abort
+from flask import Blueprint, render_template, request, flash, abort, current_app
 from lightbluetent.models import db, Society
 
 bp = Blueprint("society", __name__, url_prefix="/s")
@@ -20,13 +20,7 @@ def welcome(uid):
     if society.description is not None:
         desc_paragraphs=society.description.split("\n")
 
-    # Find the number of sessions registered on each day. We pass these to
-    # render_template so we can detect the case where we have no registered sessions
-    # by day.
-    num_sessions_day_1_gen = (1 for session in society.sessions if session["day"] == "day_1")
-    num_sessions_day_1 = sum(num_sessions_day_1_gen)
-    num_sessions_day_2_gen = (1 for session in society.sessions if session["day"] == "day_2")
-    num_sessions_day_2 = sum(num_sessions_day_2_gen)
+    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
 
     socials_1 = {}
     if society.social_1 is not None:
@@ -77,9 +71,9 @@ def welcome(uid):
                  or "youtu.be" in society.social_2):
             socials_2["is_youtube"] = True
 
+    
 
     return render_template("society/welcome.html", page_title=f"{ society.name }",
                            society=society, desc_paragraphs=desc_paragraphs,
-                           num_sessions_day_1=num_sessions_day_1,
-                           num_sessions_day_2=num_sessions_day_2,
+                           sessions_data=sessions_data,
                            socials_1=socials_1, socials_2=socials_2)

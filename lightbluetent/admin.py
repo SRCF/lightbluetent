@@ -8,6 +8,7 @@ from lightbluetent.home import auth_decorator
 from lightbluetent.utils import gen_unique_string
 from PIL import Image
 from flask_babel import _
+from datetime import time
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -95,13 +96,7 @@ def admin(uid):
     if society not in user.societies:
         abort(403)
 
-    # Find the number of sessions registered on each day. We pass these to
-    # render_template so we can detect the case where we have no registered sessions
-    # by day.
-    num_sessions_day_1_gen = (1 for session in society.sessions if session["day"] == "day_1")
-    num_sessions_day_1 = sum(num_sessions_day_1_gen)
-    num_sessions_day_2_gen = (1 for session in society.sessions if session["day"] == "day_2")
-    num_sessions_day_2 = sum(num_sessions_day_2_gen)
+    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
 
     if request.method == "POST":
 
@@ -206,48 +201,31 @@ def admin(uid):
             is_new_admin = True
 
         # Add a new session
-        if values["new_session_day"] != "---" or values["new_session_start"] or values["new_session_end"]:
+        if (values["new_session_start"] and values["new_session_end"]):
 
-            current_app.logger.info(f"For uid='{ society.uid }': adding new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]...")
+            start_time = [int(nstr) for nstr in values["new_session_start"].split(":")]
+            end_time = [int(nstr) for nstr in values["new_session_end"].split(":")]
 
-            if (values["new_session_day"] != ""
-                    and values["new_session_start"] != ""
-                    and values["new_session_end"] != ""):
-                if ":" not in values["new_session_start"]:
-                    errors["new_session_start"] = "Invalid start time."
-                if ":" not in values["new_session_end"]:
-                    errors["new_session_end"] = "Invalid end time."
+            # Check that start is before end
+            t1 = time(hour=start_time[0], minute=start_time[1])
+            t2 = time(hour=end_time[0], minute=end_time[1])
 
-                start_time = values["new_session_start"].split(":")
-                end_time = values["new_session_end"].split(":")
+            if t1 > t2:
+                errors["new_session_start"] = "Unfortunately, time travel is not possible."
 
-                # Check the hours
-                if int(start_time[0]) < 0 or int(start_time[0]) > 24:
-                    errors["new_session_start"] = "Invalid start time."
-                if int(end_time[0]) < 0 or int(end_time[0]) > 24:
-                    errors["new_session_end"] = "Invalid end time."
+            is_new_session = True
 
-                # Check the minutes
-                if int(start_time[1]) < 0 or int(start_time[1]) > 60:
-                    errors["new_session_start"] = "Invalid start time."
-                if int(end_time[1]) < 0 or int(end_time[1]) > 60:
-                    errors["new_session_end"] = "Invalid end time."
-
-                is_new_session = True
-
-            else:
-                if values["new_session_day"] == "":
-                    errors["new_session_day"] = "Select a day."
-                if values["new_session_start"] == "":
-                    errors["new_session_start"] = "No start time specified."
-                if values["new_session_end"] == "":
-                    errors["new_session_end"] = "No end time specified."
+        elif (values["new_session_start"]):
+            errors["new_session_end"] = "No end time specified."
+        elif (values["new_session_end"]):
+            errors["new_session_start"] = "No start time specified."
 
         if errors:
+            flash("There are errors with the information you provided.")
             return render_template("admin/admin.html",
                                    page_title=f"Stall administration for { society.name }",
                                    society=society, crsid=crsid, errors=errors,
-                                   num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                                   sessions_data=sessions_data,
                                    page_parent=url_for("home.home"), has_directory_page=has_directory_page,
                                    **values)
         else:
@@ -310,7 +288,7 @@ def admin(uid):
     return render_template("admin/admin.html",
                            page_title=f"Stall administration for { society.name }",
                            society=society, crsid=crsid, errors={},
-                           num_sessions_day_1=num_sessions_day_1, num_sessions_day_2=num_sessions_day_2,
+                           sessions_data=sessions_data,
                            page_parent=url_for("home.home"), has_directory_page=has_directory_page,
                            **values)
 

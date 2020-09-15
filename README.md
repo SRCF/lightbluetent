@@ -4,12 +4,6 @@ A simple Flask webapp to power the 2020 University of Cambridge Freshers' Fair v
 
 ## Development
 
-### Environment variables
-
-* `APPLICATION_CONFIG` is strictly related to the project and is used only to load a JSON configuration file with the name specified in the variable itself. By default is equal to `development` and is set to `testing` when running tests.
-* `FLASK_CONFIG` is used to select the Python object that contains the configuration for the Flask application (see application/app.py and application/config.py). The value of the variable is converted into the name of a class. Values are testing, development and production.
-* `FLASK_ENV` is a variable used by Flask itself, and its values are dictated by it. See the configuration documentation mentioned in the resources of the previous section.
-
 ### Getting started
 
 1. Clone this repository:
@@ -18,7 +12,7 @@ A simple Flask webapp to power the 2020 University of Cambridge Freshers' Fair v
 git clone https://github.com/SRCF/lightbluetent.git
 ```
 
-1. Start the containers: `cd lightbluetent` and then `docker-compose -f docker/development.yml up`
+1. Start the containers: `cd lightbluetent` and then `docker-compose -p development -f docker/development.yml up -d`
 1. Navigate to localhost:5000 to see the app
 
 ## Application structure
@@ -31,6 +25,12 @@ git clone https://github.com/SRCF/lightbluetent.git
 * `docker` contains Docker-related files
 * `tests` contains unit tests that are run with `py-test`
 
+### Environment variables
+
+* `APPLICATION_CONFIG` is strictly related to the project and is used only to load a JSON configuration file with the name specified in the variable itself. By default is equal to `development` and is set to `testing` when running tests.
+* `FLASK_CONFIG` is used to select the Python object that contains the configuration for the Flask application (see application/app.py and application/config.py). The value of the variable is converted into the name of a class. Values are testing, development and production.
+* `FLASK_ENV` is a variable used by Flask itself, and its values are dictated by it. See the configuration documentation mentioned in the resources of the previous section.
+
 ## Workflow
 
 ### Production
@@ -40,10 +40,9 @@ git clone https://github.com/SRCF/lightbluetent.git
 3. Move .htaccess into public_html
 4. Move lbt.service into the right place (https://docs.srcf.net/app-hosting/index.html?highlight=systemctl)
 5. `systemctl --user enable lbt`
-6. Set the ENV vars
+6. Set the ENV vars and copy .sample-env
 7. `systemctl --user start lbt`
-
-`PIPENV_DONT_LOAD_ENV=1 pipenv shell`
+8. Logs in production.log
 
 ### Testing
 
@@ -54,9 +53,11 @@ git clone https://github.com/SRCF/lightbluetent.git
 
 `docker-compose` will automtically look for a .env file and load those environment variables.
 
+* Copy .sample-env to .env and fill in the values (defaults for dev)
 * Make sure you have [Pipenv](https://pypi.org/project/pipenv/) installed
 * install dependencies with `pipenv install --dev`
 * `PIPENV_DONT_LOAD_ENV=1 pipenv shell` to spawn a shell with the dependencies installed
+* Remove the env var if you want to perform any database migrations or upgrade, in this case we want to load the variables so psycopg2 can connect
 * `docker-compose -p development -f docker/development.yml up -d` to build and run the Flask container and the PostgreSQL container, attach the `-d` flag optionally to run the containers as daemons in the background
 * `docker-compose -p development -f docker/development.yml down` to tear down the containers
 
@@ -72,5 +73,8 @@ DB data is preserved in a docker volume. To remove the volume, `docker volume ls
 * Modify the required strings in `lightbluetent/translations/en/LC_MESSAGES/messages.po`
 * `pybabel compile -d translations` to compile the translations
 * Further infomation for using flask-babel is [here](https://flask-babel.tkte.ch/)
+
+Note: make sure to spawn a shell with the right env vars before running these commands
+
 
 Project structure and base code based on [this tutorial](https://www.thedigitalcatonline.com/blog/2020/07/06/flask-project-setup-tdd-docker-postgres-and-more-part-2/)
