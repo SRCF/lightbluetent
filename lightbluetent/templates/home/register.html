@@ -3,9 +3,9 @@
 {% block body %}
   <form method="post">
     <label for="name">Your name</label>
-    <input name=name id="name" value="{% if user_data %} user_data.visibleName {% endif %}" required><br />
+    <input name=name id="name" value="{% if user_data %} user_data["visibleName"] {% endif %}" required><br />
     <label for="email_address">Email address</label>
-    <input name=email_address id="email_address" value="{% if user_data %} user_data.attributes[0]["value"] {% endif %}" required><br />
+    <input name=email_address id="email_address" value="{% if user_data %} user_data["attributes"][0]["value"] {% endif %}" required><br />
     <label for="soc_name">Society name</label>
     <input name=soc_name id="soc_name" required><br />
     <label for="soc_short_name">Society short name / acronym</label>
