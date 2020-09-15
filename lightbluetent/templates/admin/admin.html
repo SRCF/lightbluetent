@@ -16,7 +16,7 @@
         {%- if errors.soc_name is defined %}
           <small class="invalid-feedback">{{ errors.soc_name }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This is the full name of your society.</small>
+        <small class="form-text text-muted">{{ _("This is the full name of your society.") }}</small>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
         {%- if errors.social_2 is defined %}
           <small class="invalid-feedback">{{ errors.social_2 }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Here you can add URLs to your social media pages, or any other contact information you would like to be made available.</small>
+        <small class="form-text text-muted">{{ _("Here you can add URLs to your social media pages, or any other contact information you would like to be made available.") }}</small>
       </div>
     </div>
 
@@ -63,7 +63,7 @@
         {%- if errors.description is defined %}
           <small class="invalid-feedback">{{ errors.description }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Write a bit about your society here. What do you do? How often do you meet? How many members do you have?</small>
+        <small class="form-text text-muted">{{ _("Write a bit about your society here. What do you do? How often do you meet? How many members do you have?") }}</small>
       </div>
     </div>
 
@@ -85,7 +85,7 @@
         {%- if errors.logo is defined %}
           <small class="invalid-feedback">{{ errors.logo }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This logo will be displayed on your society's welcome page.</small>
+        <small class="form-text text-muted">{{ _("Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This logo will be displayed on your society's welcome page.") }}</small>
         <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
       </div>
     </div>
@@ -117,7 +117,7 @@
           <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
         {%- endif %}
         <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
-        <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
+        <small class="form-text text-muted">This logo will be displayed inside your stall.</small>
         <small class="form-text text-muted"><a href="{{ url_for('admin.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
       </div>
     </div>
@@ -135,7 +135,7 @@
         {%- if errors.welcome_text is defined %}
           <small class="invalid-feedback">{{ errors.welcome_text }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This message will be shown to all users in the chat when they join your stand.</small>
+        <small class="form-text text-muted">This message will be shown to all users in the chat when they join your stall.</small>
       </div>
     </div>
 
@@ -205,7 +205,7 @@
         {%- if errors.new_admin_crsid is defined %}
             <small class="text-danger">{{ errors.new_admin_crsid }}</small>
         {%- endif %}
-        <small class="form-text text-muted">Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.</b></small>
+        <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>.") }} The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.</b></small>
       </div>
     </div>
 

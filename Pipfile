@@ -13,6 +13,8 @@ Pillow = "*"
 gunicorn = "*"
 python-dotenv = "*"
 flask-talisman = "*"
+Flask-Babel = "*"
+Jinja2 = "*"
 
 [dev-packages]
 pytest = "*"

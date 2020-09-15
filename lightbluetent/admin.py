@@ -7,6 +7,7 @@ from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
 from lightbluetent.utils import gen_unique_string
 from PIL import Image
+from flask_babel import _
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -123,7 +124,7 @@ def admin(uid):
         errors = {}
 
         if len(values["soc_name"]) <= 1:
-            errors["soc_name"] = "Society name is too short."
+            errors["soc_name"] = _("Society name is too short.")
 
         if "logo" in request.files:
             logo = request.files["logo"]

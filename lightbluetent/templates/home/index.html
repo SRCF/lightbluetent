@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block body %}
-<p>This is a platform provided by the SRCF for the 2020 Virtual Freshers' Fair. For society admins, it allows you to host a custom web page that connects to our <a href="https://timeout.srcf.net">free video conferencing service, Timeout</a>.</p>
-  <a href="{{ url_for('home.register') }}" class="btn btn-lg btn-outline-primary">Stall manager login</a>
+<p>{{ _("This is a platform provided by the SRCF for the 2020 Virtual Freshers' Fair. For society admins, it allows you to host a custom web page that connects to our <a href=\"https://timeout.srcf.net\">free video conferencing service, Timeout</a>.") }}</p>
+  <a href="{{ url_for('home.register') }}" class="btn btn-lg btn-outline-primary">{{ _("Stall manager login") }}</a>
   <br>
   <br>
-  <p>For visitors of the fair, you can attend any society's stall.</p>
-  <a href="" class="btn btn-lg btn-outline-primary">View the Cambridge SU society registry</a>
+  <p>{{ _("For visitors of the fair, you can attend any society's stall.") }}</p>
+  <a href="" class="btn btn-lg btn-outline-primary">{{ _("View the Cambridge SU society registry") }}</a>
 {% endblock %}

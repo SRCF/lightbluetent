@@ -67,4 +67,10 @@ DB data is preserved in a docker volume. To remove the volume, `docker volume ls
 * `flask db init` to fill the `lightbluetent` database with our schema
 * `flask db migrate -m "your message"` and `flask db upgrade` to complete a database migration, do this every time you change the DB structure
 
+#### Customising strings
+
+* Modify the required strings in `lightbluetent/translations/en/LC_MESSAGES/messages.po`
+* `pybabel compile -d translations` to compile the translations
+* Further infomation for using flask-babel is [here](https://flask-babel.tkte.ch/)
+
 Project structure and base code based on [this tutorial](https://www.thedigitalcatonline.com/blog/2020/07/06/flask-project-setup-tdd-docker-postgres-and-more-part-2/)
