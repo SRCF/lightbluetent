@@ -8,6 +8,7 @@
 
     <div class="row">
         <div class="col-sm">
+
             <div class="form-group-row">
                 <label class="col col-form-label" for="soc_name">{{ _("Society name") }}</label>
                 <div class="col-lg-10 col-md-9 col-sm-8">
@@ -110,23 +111,6 @@
                     <small class="form-text text-muted">{{ _("Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This logo will be displayed on your society's welcome page.") }}</small>
                     <small class="form-text text-muted"><a
                         href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
-                </div>
-            </div>
-
-        <div class="col-sm">
-
-            <div class="form-group-row">
-                <label class="col col-form-label" for="logo">Logo</label>
-                <div class="col-lg-10 col-md-9 col-sm-8">
-                    <input type="file" id="logo" name="logo" content="{{ logo }}"
-                        class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
-                    {%- if errors.logo is defined %}
-                    <small class="invalid-feedback">{{ errors.logo }}</small>
-                    {%- endif %}
-                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.
-                        <br /> This logo will be displayed on your society's welcome page.</small>
-                    <small class="form-text text-muted"><a
-                            href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete logo</a></small>
                 </div>
             </div>
 
@@ -244,28 +228,29 @@
     <hr />
 
     <div class="row">
-    <div class="col-sm">
 
-        <div class="form-group-row">
-            <label class="col col-form-label" for="new_admin_crsid">{{ _("Society admins") }}</label>
-            <div class="col-lg-10 col-md-9 col-sm-8">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-users"></i></span>
-                        {%- for admin in society.admins %}
-                        <span class="input-group-text">{{ admin.crsid }}</span>
-                        {%- endfor %}
+        <div class="col-sm">
+
+            <div class="form-group-row">
+                <label class="col col-form-label" for="new_admin_crsid">{{ _("Society admins") }}</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-users"></i></span>
+                            {%- for admin in society.admins %}
+                            <span class="input-group-text">{{ admin.crsid }}</span>
+                            {%- endfor %}
+                        </div>
+                        <input type="text" id="new_admin_crsid" name="new_admin_crsid" class="form-control"
+                               placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
                     </div>
-                    <input type="text" id="new_admin_crsid" name="new_admin_crsid" class="form-control"
-                           placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
+                    {%- if errors.new_admin_crsid is defined %}
+                    <small class="text-danger">{{ errors.new_admin_crsid }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>.") }}
+                        The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.</b></small>
                 </div>
-                {%- if errors.new_admin_crsid is defined %}
-                <small class="text-danger">{{ errors.new_admin_crsid }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>.") }}
-                    The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.</b></small>
             </div>
-        </div>
 
         </div>
     </div>
@@ -355,7 +340,7 @@
 
     <br />
 
-    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">_("Delete society")</a>
+    <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">{{ _("Delete society") }} </a>
     <input type="submit" class="btn btn-outline-primary" value="Update">
 
 </form>
