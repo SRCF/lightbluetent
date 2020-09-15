@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-15 16:43+0100\n"
+"POT-Creation-Date: 2020-09-15 19:01+0100\n"
 "PO-Revision-Date: 2020-09-15 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -22,19 +22,19 @@ msgstr ""
 msgid "Society name is too short."
 msgstr ""
 
-#: lightbluetent/home.py:19
+#: lightbluetent/home.py:24
 msgid "Welcome to the 2020 Virtual Freshers' Fair!"
 msgstr ""
 
-#: lightbluetent/home.py:88
+#: lightbluetent/home.py:93
 msgid "Your society short name must not contain spaces."
 msgstr ""
 
-#: lightbluetent/home.py:91
+#: lightbluetent/home.py:96
 msgid "That society short name is already in use."
 msgstr ""
 
-#: lightbluetent/home.py:94 lightbluetent/home.py:115
+#: lightbluetent/home.py:99 lightbluetent/home.py:120
 msgid "Register a society"
 msgstr ""
 
@@ -96,7 +96,16 @@ msgstr ""
 msgid "Add a society"
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:4
+#: lightbluetent/templates/home/index.html:9
+msgid "There are no registered societies."
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:38
+#, python-format
+msgid "Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>"
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:47
 msgid ""
 "This is a platform provided by the SRCF for the 2020 Virtual Freshers' "
 "Fair. For society admins, it allows you to host a custom web page that "
@@ -104,15 +113,15 @@ msgid ""
 "conferencing service, Timeout</a>."
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:5
+#: lightbluetent/templates/home/index.html:48
 msgid "Stall manager login"
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:8
+#: lightbluetent/templates/home/index.html:51
 msgid "For visitors of the fair, you can attend any society's stall."
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:9
+#: lightbluetent/templates/home/index.html:52
 msgid "View the Cambridge SU society registry"
 msgstr ""
 
@@ -131,4 +140,36 @@ msgid ""
 "target=\"_blank\">the SRCF</a>, a volunteer student society that provides"
 " free quality and reliable computing services"
 msgstr ""
+
+#: lightbluetent/templates/society/welcome.html:77
+msgid "Society description"
+msgstr ""
+
+#~ msgid "There are no registered societies."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Are you a stall manager? <a "
+#~ "href=\"{{ url_for('home.register') }}\">Log in "
+#~ "here.</a>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is a platform provided by the"
+#~ " SRCF for the 2020 Virtual Freshers'"
+#~ " Fair. For society admins, it allows"
+#~ " you to host a custom web page"
+#~ " that connects to our <a "
+#~ "href=\"https://timeout.srcf.net\">free video conferencing"
+#~ " service, Timeout</a>."
+#~ msgstr ""
+
+#~ msgid "Stall manager login"
+#~ msgstr ""
+
+#~ msgid "For visitors of the fair, you can attend any society's stall."
+#~ msgstr ""
+
+#~ msgid "View the Cambridge SU society registry"
+#~ msgstr ""
 

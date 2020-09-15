@@ -18,6 +18,8 @@ class Config(object):
     # Requests up to 1 MB
     MAX_CONTENT_LENGTH = 1024 * 1024
 
+    HAS_DIRECTORY_PAGE = True
+
 class ProductionConfig(Config):
     """Production configuration"""
 
