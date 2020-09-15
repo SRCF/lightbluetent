@@ -83,6 +83,9 @@ def register_soc():
                 or Society.query.filter_by(bbb_id=values["bbb_id"]).first()):
             abort(500)
 
+        if len(values["soc_name"]) <= 1:
+            errors["soc_name"] = "Society name is too short."
+
         if " " in values["soc_short_name"]:
             errors["soc_short_name"] = "Your society short name must not contain spaces."
 
