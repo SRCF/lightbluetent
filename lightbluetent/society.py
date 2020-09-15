@@ -77,6 +77,7 @@ def welcome(uid):
                  or "youtu.be" in society.social_2):
             socials_2["is_youtube"] = True
 
+    
 
     return render_template("society/welcome.html", page_title=f"{ society.name }",
                            society=society, desc_paragraphs=desc_paragraphs,
