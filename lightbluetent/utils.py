@@ -61,10 +61,10 @@ def match_social(value):
 
 def get_social_by_id(id, socials):
     if socials:
-        for social in socials:
+        for index, social in enumerate(socials):
             if social["id"] == id:
-                return social
-    return False
+                return (index, social)
+    return (False, False)
 
 
 # from django humanize

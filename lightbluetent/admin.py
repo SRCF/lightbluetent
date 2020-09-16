@@ -226,22 +226,26 @@ def admin(uid):
             society.website = values["website"]
 
             # fetch all social fields from values, as we generate the uid in jinja
-            social_forms = {k: v for (k,v) in request.form.items() if ("social-" in k)}
+            social_forms = {k: v for (k, v) in request.form.items() if ("social-" in k)}
             for id, value in social_forms.items():
-                try_social = get_social_by_id(id, society.socials)
+                index, found_social = get_social_by_id(id, society.socials)
                 # do we have this social already?
-                if try_social:
-                    # has the value changed?
-                    if try_social["url"] != value:
-                        try_social["url"] = value
-                        try_social["type"] = match_social(value)
-                        flag_modified(society, 'sessions')
+                if found_social:
+                    if found_social["url"] != value:
+                        if value == "":
+                            del society.socials[index]
+                        else:
+                            found_social["url"] = value
+                            found_social["type"] = match_social(value)
+                    flag_modified(society, 'socials')
                 else:
                     # create a new social field
-                    social_type = match_social(value)
-                    social_data = {"id": id, "url": value, "type": social_type }
-                    society.socials.append(social_data)
-                    flag_modified(society, 'socials')
+                    # and check if its empty
+                    if value:
+                        social_type = match_social(value)
+                        social_data = {"id": id, "url": value, "type": social_type }
+                        society.socials.append(social_data)
+                        flag_modified(society, 'socials')
 
             society.description = values["description"]
             society.welcome_text = values["welcome_text"]
