@@ -12,7 +12,7 @@
       <div class="card">
         <div class="card-header" style="background-color: {{ society.banner_color }};">
           {% set current_logo = "images/{}".format(society.logo) %}
-          {% if society.logo != "default_logo.png" %}
+          {% if society.logo != config["DEFAULT_LOGO"] %}
             <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right soc_logo_thumbnail">
           {% endif %}
         </div>
