@@ -18,8 +18,10 @@
     <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='welcome.css') }}" rel="stylesheet" type="text/css">
+    {% if has_logo %}
     <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
     <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/svg">
+    {% endif %}
     {% block head %}{% endblock %}
 </head>
 
