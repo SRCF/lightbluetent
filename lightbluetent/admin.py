@@ -228,22 +228,20 @@ def admin(uid):
             # fetch all social fields from values, as we generate the uid in jinja
             social_forms = {k: v for (k,v) in request.form.items() if ("social-" in k)}
             for id, value in social_forms.items():
-                # is the value form filled?
-                if value:
-                    try_social = get_social_by_id(id, society.socials)
-                    # do we have this social already?
-                    if try_social:
-                        # has the value changed?
-                        if try_social["url"] != value:
-                            try_social["url"] = value
-                            try_social["type"] = match_social(value)
-                            flag_modified(society, 'sessions')
-                    else:
-                        # create a new social field
-                        social_type = match_social(value)
-                        social_data = {"id": id, "url": value, "type": social_type }
-                        society.socials.append(social_data)
-                        flag_modified(society, 'socials')
+                try_social = get_social_by_id(id, society.socials)
+                # do we have this social already?
+                if try_social:
+                    # has the value changed?
+                    if try_social["url"] != value:
+                        try_social["url"] = value
+                        try_social["type"] = match_social(value)
+                        flag_modified(society, 'sessions')
+                else:
+                    # create a new social field
+                    social_type = match_social(value)
+                    social_data = {"id": id, "url": value, "type": social_type }
+                    society.socials.append(social_data)
+                    flag_modified(society, 'socials')
 
             society.description = values["description"]
             society.welcome_text = values["welcome_text"]
