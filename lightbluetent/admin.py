@@ -418,6 +418,8 @@ def delete(uid):
             db.session.delete(society)
             db.session.commit()
 
+            current_app.logger.info(f"Deleted society with uid='{ society.uid }'")
+
             return redirect(url_for("home.home"))
 
     else:
