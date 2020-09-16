@@ -11,7 +11,7 @@ import ucam_webauth.raven.flask_glue
 
 bp = Blueprint("home", __name__)
 
-auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent")
+auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightbluetent", require_ptags=None)
 
 @bp.route("/")
 def index():
