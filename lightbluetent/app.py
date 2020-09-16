@@ -3,7 +3,7 @@ from flask import Flask
 from . import admin, home, society
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
-from .utils import sif
+from .utils import gen_unique_string, ordinal, sif
 
 def create_app(config_name=None):
 
@@ -42,6 +42,8 @@ def create_app(config_name=None):
     Talisman(app, content_security_policy=csp)
 
     app.jinja_env.globals["sif"] = sif
+    app.jinja_env.globals["gen_unique_string"] = gen_unique_string
+    app.jinja_env.globals["ordinal"] = ordinal
 
     from lightbluetent.models import db, migrate
 

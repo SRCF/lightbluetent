@@ -41,8 +41,7 @@ class Society(db.Model):
     #         on the 'create' API call.
 
     website = db.Column(db.String, unique=False, nullable=True)
-    social_1 = db.Column(db.String, unique=False, nullable=True)
-    social_2 = db.Column(db.String, unique=False, nullable=True)
+    socials = db.Column(db.JSON, nullable=False, default=list)
     sessions = db.Column(db.JSON, nullable=True)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     logo = db.Column(db.String, unique=False, nullable=False, default="default_logo.png")

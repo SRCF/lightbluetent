@@ -20,60 +20,8 @@ def welcome(uid):
     if society.description is not None:
         desc_paragraphs=society.description.split("\n")
 
-    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
-
-    socials_1 = {}
-    if society.social_1 is not None:
-
-        socials_1["is_email"] = False
-        socials_1["is_facebook"] = False
-        socials_1["is_twitter"] = False
-        socials_1["is_instagram"] = False
-        socials_1["is_youtube"] = False
-
-        if re.search(email_re, society.social_1):
-            socials_1["is_email"] = True
-        elif ("facebook." in society.social_1
-                 or "fb.me" in society.social_1
-                 or "fb.com" in society.social_1):
-            socials_1["is_facebook"] = True
-        elif ("twitter." in society.social_1
-                 or "t.co" in society.social_1):
-            socials_1["is_twitter"] = True
-        elif "instagram." in society.social_1:
-            socials_1["is_instagram"] = True
-        elif ("youtube." in society.social_1
-                 or "youtu.be" in society.social_1):
-            socials_1["is_youtube"] = True
-
-    socials_2 = {}
-    if society.social_2 is not None:
-
-        socials_2["is_email"] = False
-        socials_2["is_facebook"] = False
-        socials_2["is_twitter"] = False
-        socials_2["is_instagram"] = False
-        socials_2["is_youtube"] = False
-
-
-        if re.search(email_re, society.social_2):
-            socials_2["is_email"] = True
-        elif ("facebook." in society.social_2
-                 or "fb.me" in society.social_2
-                 or "fb.com" in society.social_2):
-            socials_2["is_facebook"] = True
-        elif ("twitter." in society.social_2
-                 or "t.co" in society.social_2):
-            socials_2["is_twitter"] = True
-        elif "instagram." in society.social_2:
-            socials_2["is_instagram"] = True
-        elif ("youtube." in society.social_2
-                 or "youtu.be" in society.social_2):
-            socials_2["is_youtube"] = True
-
-    
+    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}    
 
     return render_template("society/welcome.html", page_title=f"{ society.name }",
                            society=society, desc_paragraphs=desc_paragraphs,
-                           sessions_data=sessions_data,
-                           socials_1=socials_1, socials_2=socials_2)
+                           sessions_data=sessions_data)

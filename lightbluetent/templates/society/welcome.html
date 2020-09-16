@@ -2,6 +2,30 @@
 
 {% block body %}
 
+{% macro social_match(social) -%}
+<li>
+    {% if social.type == "email"%}
+    <i class="fa fa-li fa-envelope" title="Social {{social.id}}"></i>
+    {% elif social.type == "facebook" %}
+    <i class="fa fa-li fa-facebook-square" title="Social {{social.id}}"></i>
+    {% elif social.type == "twitter" %}
+    <i class="fa fa-li fa-twitter-square" title="Social {{social.id}}"></i>
+    {% elif social.type == "instagram" %}
+    <i class="fa fa-li fa-instagram" title="Social {{social.id}}"></i>
+    {% elif social.type == "youtube" %}
+    <i class="fa fa-li fa-youtube-play" title="Social {{social.id}}"></i>
+    {% else %}
+    <i class="fa fa-li fa-globe" title="Social {{social.id}}"></i>
+    {% endif %}
+
+    {% if social.type == "email"%}
+    <a href="mailto:{{ social.url }}">{{ social.url }}</a>
+    {% else %}
+    <a href="{{ social.url }}">{{ social.url}}</a>
+    {% endif %}
+</li>
+{%- endmacro %}
+
 <div class="row">
     <div class="col-md">
         <div class="card my-3 shadow-sm">
@@ -9,8 +33,7 @@
                     class="text-muted">{{ society.short_name }}</small></h4>
             <div class="card-body">
                 {% if (society.website
-                or society.social_1
-                or society.social_2) %}
+                or society.socials) %}
                 <ul class="fa-ul">
                     {% if society.website %}
                     <li>
@@ -18,52 +41,9 @@
                         <a href="{{ society.website }}">{{ society.website }}</a>
                     </li>
                     {% endif %}
-                    {% if society.social_1 %}
-                    <li>
-                        {% if socials_1.is_email %}
-                        <i class="fa fa-li fa-envelope" title="Social 1"></i>
-                        <a href="mailto:{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% elif socials_1.is_facebook %}
-                        <i class="fa fa-li fa-facebook-square" title="Social 1"></i>
-                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% elif socials_1.is_twitter %}
-                        <i class="fa fa-li fa-twitter-square" title="Social 1"></i>
-                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% elif socials_1.is_instagram %}
-                        <i class="fa fa-li fa-instagram" title="Social 1"></i>
-                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% elif socials_1.is_youtube %}
-                        <i class="fa fa-li fa-youtube-play" title="Social 1"></i>
-                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% else %}
-                        <i class="fa fa-li fa-globe" title="Social 1"></i>
-                        <a href="{{ society.social_1 }}">{{ society.social_1 }}</a>
-                        {% endif %}
-                    </li>
-                    {% endif %}
-                    {% if society.social_2 %}
-                    <li>
-                        {% if socials_2.is_email %}
-                        <i class="fa fa-li fa-envelope" title="Social 2"></i>
-                        <a href="mailto:{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% elif socials_2.is_facebook %}
-                        <i class="fa fa-li fa-facebook-square" title="Social 2"></i>
-                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% elif socials_2.is_twitter %}
-                        <i class="fa fa-li fa-twitter-square" title="Social 2"></i>
-                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% elif socials_2.is_instagram %}
-                        <i class="fa fa-li fa-instagram" title="Social 2"></i>
-                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% elif socials_2.is_youtube %}
-                        <i class="fa fa-li fa-youtube-play" title="Social 2"></i>
-                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% else %}
-                        <i class="fa fa-li fa-globe" title="Social 2"></i>
-                        <a href="{{ society.social_2 }}">{{ society.social_2 }}</a>
-                        {% endif %}
-                    </li>
-                    {% endif %}
+                    {% for social in society.socials %}
+                        {{social_match(social)}}
+                    {% endfor %}
                 </ul>
                 <hr>
                 {% endif %}
@@ -92,26 +72,26 @@
             <h5 class="card-header">Session times</h5>
             <div class="card-body">
                 {% for n in range(1, sessions_data["days"] + 1) %}
-                    {% set ns = namespace(found=false) %}
-                    <h6 class="card-title">Day {{n}}</h6>
-                    <ul class="fa-ul">
-                        {% for session in society.sessions %}
-                        {% if session["day"] == n %}
-                        {% set ns.found = true %}
-                        <li>
-                            <i class="fa fa-li fa-clock-o" title="Session"></i>
-                            {{ session["start"] }} - {{ session["end"] }}
-                        </li>
-                        {% endif %}
-                        {% endfor %}
-                        {% if not ns.found %}
-                        <li>
-                            <i class="fa fa-li fa-times" title="Session"></i>
-                            There are no sessions on the first day.
-                        </li>
-                        {% endif %}
-                    </ul>
+                {% set ns = namespace(found=false) %}
+                <h6 class="card-title">Day {{n}}</h6>
+                <ul class="fa-ul">
+                    {% for session in society.sessions %}
+                    {% if session["day"] == n %}
+                    {% set ns.found = true %}
+                    <li>
+                        <i class="fa fa-li fa-clock-o" title="Session"></i>
+                        {{ session["start"] }} - {{ session["end"] }}
+                    </li>
+                    {% endif %}
                     {% endfor %}
+                    {% if not ns.found %}
+                    <li>
+                        <i class="fa fa-li fa-times" title="Session"></i>
+                        There are no sessions on the {{ordinal(n)}} day.
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endfor %}
 
                 <h6 class="card-title text-muted">Join the live session</h6>
                 <form>
