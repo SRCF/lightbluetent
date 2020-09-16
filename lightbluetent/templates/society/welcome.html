@@ -78,7 +78,7 @@
                 <h6 class="card-title">Day {{n}}</h6>
                 <ul class="fa-ul">
                     {% for session in society.sessions %}
-                    {% if session["day"] == n %}
+                    {% if session["day"]|int == n %}
                     {% set ns.found = true %}
                     <li>
                         <i class="fa fa-li fa-clock-o" title="Session"></i>
