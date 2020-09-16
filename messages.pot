@@ -1,0 +1,171 @@
+# Translations template for PROJECT.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-09-15 22:18+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: lightbluetent/admin.py:129
+msgid "Society name is too short."
+msgstr ""
+
+#: lightbluetent/admin.py:132
+msgid "This description is too long."
+msgstr ""
+
+#: lightbluetent/home.py:26 lightbluetent/home.py:28
+msgid "Welcome to the 2020 Virtual Freshers' Fair!"
+msgstr ""
+
+#: lightbluetent/home.py:97
+msgid "Your society short name must not contain spaces."
+msgstr ""
+
+#: lightbluetent/home.py:100
+msgid "That society short name is already in use."
+msgstr ""
+
+#: lightbluetent/home.py:103 lightbluetent/home.py:124
+msgid "Register a society"
+msgstr ""
+
+#: lightbluetent/templates/base.html:8
+#: lightbluetent/templates/home/directory_base.html:8
+#: lightbluetent/templates/society/base.html:8
+msgid "SRCF Timeout - Virtual Freshers' Fair"
+msgstr ""
+
+#: lightbluetent/templates/base.html:11
+#: lightbluetent/templates/home/directory_base.html:11
+#: lightbluetent/templates/society/base.html:12
+msgid ""
+"This is a website for stall management using SRCF Timeout for the 2020 "
+"Virtual Freshers' Fair"
+msgstr ""
+
+#: lightbluetent/templates/base.html:34
+#: lightbluetent/templates/society/base.html:17
+msgid "Virtual Freshers' Fair"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:13
+msgid "Society name"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:19
+msgid "This is the full name of your society."
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:53
+msgid ""
+"Here you can add URLs to your social media pages, or any other contact "
+"information you would like to be made available."
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:62
+msgid "Society summary"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:68
+msgid ""
+"A short summary of your society. This will appear on the directory page. "
+"Maximum 200 characters."
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:75
+#: lightbluetent/templates/society/welcome.html:77
+msgid "Society description"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:81
+msgid ""
+"Write a bit about your society here. What do you do? How often do you "
+"meet? How many members do you have?"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:103
+msgid ""
+"Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This "
+"logo will be displayed on your society's welcome page."
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:209
+msgid "Society admins"
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:223
+msgid ""
+"Enter another user's CRSid to grant them administrative privileges. This "
+"will allow them to change anything on this page, <b>including deleting "
+"the society</b>."
+msgstr ""
+
+#: lightbluetent/templates/home/directory.html:7
+msgid "There are no registered societies."
+msgstr ""
+
+#: lightbluetent/templates/home/directory.html:29
+#, python-format
+msgid "Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>"
+msgstr ""
+
+#: lightbluetent/templates/home/home.html:5
+msgid "Here are the stalls for your societies."
+msgstr ""
+
+#: lightbluetent/templates/home/home.html:9
+msgid "You currently have no registered societies."
+msgstr ""
+
+#: lightbluetent/templates/home/home.html:41
+msgid "Add a society"
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:5
+msgid ""
+"This is a platform provided by the SRCF for the 2020 Virtual Freshers' "
+"Fair. For society admins, it allows you to host a custom web page that "
+"connects to our <a href=\"https://timeout.srcf.net\">free video "
+"conferencing service, Timeout</a>."
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:6
+msgid "Stall manager login"
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:9
+msgid "For visitors of the fair, you can attend any society's stall."
+msgstr ""
+
+#: lightbluetent/templates/home/index.html:10
+msgid "View the Cambridge SU society registry"
+msgstr ""
+
+#: lightbluetent/templates/home/register.html:4
+#, python-format
+msgid ""
+"Welcome, <b>%(crsid)s</b>! Before you start, you'll need to register an "
+"administrator account. This is for society stall managers <b>only</b>. If"
+" you are a visitor of the fair, please return to the <a "
+"href=\"https://cambridgesu.co.uk/\">freshers' fair main page.</a>"
+msgstr ""
+
+#: lightbluetent/templates/society/base.html:56
+msgid ""
+"This service is run by <a href=\"https://www.srcf.net\" "
+"target=\"_blank\">the SRCF</a>, a volunteer student society that provides"
+" free quality and reliable computing services"
+msgstr ""
+

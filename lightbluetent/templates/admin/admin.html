@@ -14,17 +14,18 @@
 
 <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
     <div class="form-row">
         <div class="col-md-6 px-5">
             <div class="form-group">
-                <label for="soc_name">Society name</label>
+                <label for="soc_name">{{ _("Society name") }}</label>
                 <input type="text" id="soc_name" name="soc_name" placeholder="e.g. Student-Run Computing Facility"
                     class="form-control{% if errors.soc_name is defined %} is-invalid{% endif %}" value="{{ soc_name }}"
                     required>
                 {%- if errors.soc_name is defined %}
                 <small class="invalid-feedback">{{ errors.soc_name }}</small>
                 {%- endif %}
-                <small class="form-text text-muted">This is the full name of your society.</small>
+                <small class="form-text text-muted">{{ _("This is the full name of your society.") }}</small>
             </div>
             <div class="form-group">
                 <label for="website">Website</label>
@@ -42,7 +43,7 @@
                 {{social_field(n, id=social.id, url=social.url)}}
                 {% endfor %}
                 {{social_field(n)}}
-                <small class="form-text text-muted">Add multiple URLs and emails to spruce up your main page.</small>
+                <small class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
             </div>
             {% else %}
             {% set social_defaults = ["e.g. https://facebook.com/srcf.net", "e.g. spqr2@srcf.net"] %}
@@ -51,18 +52,28 @@
                 {% for n in range(2) %}
                 {{social_field(n, social_defaults[n])}}
                 {% endfor %}
-                <small class="form-text text-muted">Add multiple URLs and emails to spruce up your main page.</small>
+                <small class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
+            </div>
+            {% endif %}
+            {% if has_directory_page %}
+            <div class="form-group">
+                <label for="short_description">{{ _("Society summary") }}</label>
+                <textarea id="short_description" name="short_description" maxlength=200 rows=5
+                    class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
+                {%- if errors.short_description is defined %}
+                <small class="invalid-feedback">{{ errors.short_description }}</small>
+                {%- endif %}
+                <small class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
             </div>
             {% endif %}
             <div class="form-group">
-                <label for="description">Society description</label>
+                <label for="description">{{ _("Society description") }}</label>
                 <textarea id="description" name="description" rows=5
                     class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
                 {%- if errors.description is defined %}
                 <small class="invalid-feedback">{{ errors.description }}</small>
                 {%- endif %}
-                <small class="form-text text-muted">Write a bit about your society here. What do you do? How often
-                    do you meet? How many members do you have?</small>
+                <small class="form-text text-muted">{{ _("Write a bit about your society here. What do you do? How often do you meet? How many members do you have?") }}</small>
             </div>
         </div>
         <div class="col-md-6 px-5">
@@ -79,7 +90,7 @@
                 <small class="invalid-feedback">{{ errors.logo }}</small>
                 {%- endif %}
                 <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
-                <small class="form-text text-muted">This logo will be displayed on your society's welcome page.</small>
+                <small class="form-text text-muted">{{ _("This logo will be displayed on your society's welcome page.") }}</small>
                 <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete
                         logo</a></small>
             </div>
@@ -164,9 +175,10 @@
         </div>
     </div>
     <hr />
+  
     <div class="form-row px-5">
         <div class="form-group">
-            <label for="new_admin_crsid">Society admins</label>
+            <label for="new_admin_crsid">{{ _("Society admins") }}</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-users"></i></span>
@@ -180,10 +192,7 @@
             {%- if errors.new_admin_crsid is defined %}
             <small class="text-danger">{{ errors.new_admin_crsid }}</small>
             {%- endif %}
-            <small class="form-text text-muted">Enter another user's CRSid to grant them administrative
-                privileges. This will allow them to change anything on this page, <b>including deleting the
-                    society</b>. The user should already be registered with us. <b>Once a admin has been added,
-                    they cannot be removed.</b></small>
+            <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an admin has been added, they cannot be removed.") }}</b></small>
         </div>
     </div>
     <hr />
@@ -254,10 +263,10 @@
             </div>
         </div>
     </div>
+
     <div class="form-group form-row px-5 float-right">
         <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">Delete
-            society</a>
+        <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">{{ _("Delete society") }}</a>
     </div>
 </form>
 {% endblock %}

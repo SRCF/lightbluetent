@@ -4,10 +4,13 @@ from flask import Blueprint, render_template, request, flash, session, url_for, 
 from lightbluetent.models import db, User, Society
 from lightbluetent.utils import gen_unique_string, validate_email
 from datetime import datetime
+from flask_babel import _
 
 import ucam_webauth
 import ucam_webauth.raven
 import ucam_webauth.raven.flask_glue
+
+import random
 
 bp = Blueprint("home", __name__)
 
@@ -15,7 +18,19 @@ auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(desc="SRCF Lightblu
 
 @bp.route("/")
 def index():
-    return render_template("home/index.html", page_title="Welcome to the 2020 Virtual Freshers' Fair!")
+
+    has_directory_page=current_app.config["HAS_DIRECTORY_PAGE"]
+
+    # Check whether the directory page is enabled
+    if has_directory_page:
+        societies = Society.query.all()
+
+        # Shuffle the socs so they all have a chance of being near the top
+        random.shuffle(societies)
+        home_url = url_for('home.register')
+        return render_template("home/directory.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"), societies=societies, home_url=home_url)
+    else:
+        return render_template("home/index.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"))
 
 @bp.route("/logout")
 def logout():
@@ -87,13 +102,13 @@ def register_soc():
             errors["soc_name"] = "Society name is too short."
 
         if " " in values["soc_short_name"]:
-            errors["soc_short_name"] = "Your society short name must not contain spaces."
+            errors["soc_short_name"] = _("Your society short name must not contain spaces.")
 
         if Society.query.filter_by(uid=values["uid"]).first():
-            errors["soc_short_name"] = "That society short name is already in use."
+            errors["soc_short_name"] = _("That society short name is already in use.")
 
         if errors:
-            return render_template("home/register_soc.html", page_title="Register a society", crsid=crsid, errors=errors, **values)
+            return render_template("home/register_soc.html", page_title=_("Register a society"), crsid=crsid, errors=errors, **values)
         else:
             society = Society(short_name=values["soc_short_name"],
                               name=values["soc_name"],
@@ -114,7 +129,7 @@ def register_soc():
 
 
     else:
-        return render_template("home/register_soc.html", page_title="Register a society", crsid=crsid, errors={})
+        return render_template("home/register_soc.html", page_title=_("Register a society"), crsid=crsid, errors={})
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -160,9 +175,9 @@ def register():
         else:
 
             user = User(email=values["email_address"],
-                         first_name=values["first_name"],
-                         surname=values["surname"],
-                         crsid=auth_decorator.principal)
+                first_name=values["first_name"],
+                surname=values["surname"],
+                crsid=auth_decorator.principal)
 
             db.session.add(user)
             db.session.commit()
@@ -173,13 +188,7 @@ def register():
 
     else:
         # defaults
-        values = {
-            "first_name": "",
-            "surname": "",
-            "email_address": "",
-            "dpa": False,
-            "tos": False
-        }
+        values = { "first_name": "", "surname": "", "email_address": "", "dpa": False, "tos": False }
 
-        return render_template("home/register.html", page_title="Register",
-                           crsid=crsid, errors={}, **values)
+        return render_template("home/register.html", page_title="Register", crsid=crsid, errors={}, **values)
+

@@ -11,7 +11,7 @@
   <meta property="og:description" content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
   <meta property="og:url" content="{{ request.base_url }}" />
   <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
-  
+
   <title>SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}</title>
   <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
@@ -23,31 +23,6 @@
 </head>
 
 <body class="layout-footer">
-  <nav class="navbar navbar-expand-md navbar-light fixed-top">
-    <div class="container">
-      <h1 class="navbar-brand">
-        <a href="{{ url_for('home.home') }}">
-          <img src="https://www.srcf.net/_srcf/images/logo.svg">
-          <span>
-            <span class="text-danger">Student-Run</span>
-            <span class="text-primary">Computing Facility</span>
-            <span class="text-muted">&mdash; {{ _("Virtual Freshers' Fair") }}</span>
-          </span>
-        </a>
-      </h1>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav ml-auto">
-          {% if crsid %}
-            <div class="text-muted">{{ crsid }} <a href="{{ url_for('home.logout') }}">(Log out)</a></div>
-          {% endif %}
-        </ul>
-      </div>
-    </div>
-  </nav>
   <main role="main" class="container">
     {%- if page_title is defined %}
     <h2>
