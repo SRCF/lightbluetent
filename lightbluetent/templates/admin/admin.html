@@ -56,16 +56,14 @@
             </div>
             {% endif %}
             {% if has_directory_page %}
-            <div class="form-group-row">
-                <label class="col col-form-label" for="short_description">{{ _("Society summary") }}</label>
-                <div class="col-lg-10 col-md-9 col-sm-8">
-                    <textarea id="short_description" name="short_description" maxlength=200 rows=5
-                        class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
-                    {%- if errors.short_description is defined %}
-                    <small class="invalid-feedback">{{ errors.short_description }}</small>
-                    {%- endif %}
-                    <small class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
-                </div>
+            <div class="form-group">
+                <label for="short_description">{{ _("Society summary") }}</label>
+                <textarea id="short_description" name="short_description" maxlength=200 rows=5
+                    class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
+                {%- if errors.short_description is defined %}
+                <small class="invalid-feedback">{{ errors.short_description }}</small>
+                {%- endif %}
+                <small class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
             </div>
             {% endif %}
             <div class="form-group">
@@ -194,7 +192,7 @@
             {%- if errors.new_admin_crsid is defined %}
             <small class="text-danger">{{ errors.new_admin_crsid }}</small>
             {%- endif %}
-            <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once a admin has been added, they cannot be removed.") }}</b></small>
+            <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an admin has been added, they cannot be removed.") }}</b></small>
         </div>
     </div>
     <hr />
