@@ -227,7 +227,6 @@ def admin(uid):
 
             # fetch all social fields from values, as we generate the uid in jinja
             social_forms = {k: v for (k,v) in request.form.items() if ("social-" in k)}
-            flash(social_forms)
             for id, value in social_forms.items():
                 # is the value form filled?
                 if value:
@@ -289,8 +288,6 @@ def admin(uid):
             "mute_on_start": society.mute_on_start,
             "disable_private_chat": society.disable_private_chat
         }
-
-        flash(society.socials)
 
     return render_template("admin/admin.html",
                            page_title=f"Stall administration for { society.name }",
