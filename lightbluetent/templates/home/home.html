@@ -24,10 +24,8 @@
               <a href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
             </li>
             <li>
-              {% for admin in society.admins %}
                 <i class="fa fa-li fa-users" title="Administrator"></i>
-                {{ admin.crsid }}
-              {% endfor %}
+                {{ society.admins | selectattr("crsid") | join(", ") }}
             </li>
           </ul>
         </div>
