@@ -1,13 +1,13 @@
 import os
 import copy
 
-from operator import itemgetter
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
-from lightbluetent.utils import gen_unique_string
+from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id
 from PIL import Image
 from datetime import time
+from sqlalchemy.orm.attributes import flag_modified
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -107,7 +107,6 @@ def admin(uid):
         for key in ("soc_name", "website", "description",
                     "welcome_text", "logo", "banner_text",
                     "banner_color", "new_admin_crsid",
-                    "social_1", "social_2",
                     "new_session_day", "new_session_start",
                     "new_session_end"):
             values[key] = request.form.get(key, "").strip()
@@ -225,8 +224,27 @@ def admin(uid):
         else:
             society.name = values["soc_name"]
             society.website = values["website"]
-            society.social_1 = values["social_1"]
-            society.social_2 = values["social_2"]
+
+            # fetch all social fields from values, as we generate the uid in jinja
+            social_forms = {k: v for (k,v) in request.form.items() if ("social-" in k)}
+            for id, value in social_forms.items():
+                # is the value form filled?
+                if value:
+                    try_social = get_social_by_id(id, society.socials)
+                    # do we have this social already?
+                    if try_social:
+                        # has the value changed?
+                        if try_social["url"] != value:
+                            try_social["url"] = value
+                            try_social["type"] = match_social(value)
+                            flag_modified(society, 'sessions')
+                    else:
+                        # create a new social field
+                        social_type = match_social(value)
+                        social_data = {"id": id, "url": value, "type": social_type }
+                        society.socials.append(social_data)
+                        flag_modified(society, 'socials')
+
             society.description = values["description"]
             society.welcome_text = values["welcome_text"]
             society.banner_text = values["banner_text"]
@@ -238,16 +256,12 @@ def admin(uid):
                 society.admins.append(new_admin)
 
             if is_new_session:
-
-                sessions = copy.deepcopy(society.sessions)
-
-                sessions.append({"id": gen_unique_string(),
+                society.sessions.append({"id": gen_unique_string(),
                                  "day": values["new_session_day"],
                                  "start": values["new_session_start"],
                                  "end": values["new_session_end"]})
-
-                society.sessions = sorted(sessions, key=itemgetter("start"))
-
+                # we need this to ensure that sqlalchemy updates the val
+                flag_modified(society, 'sessions')
 
             db.session.commit()
 
@@ -266,8 +280,6 @@ def admin(uid):
         values = {
             "soc_name": society.name,
             "website": society.website,
-            "social_1": society.social_1,
-            "social_2": society.social_2,
             "description": society.description,
             "welcome_text": society.welcome_text,
             "banner_text": society.banner_text,
