@@ -1,0 +1,16 @@
+/* Pulsing red video camera icon for when stalls are in session */
+@keyframes red-pulse {
+  0% {
+    color: #00000000
+  }
+  50% {
+    color: #c01c28;
+  }
+  100% {
+    color: #00000000;
+  }
+}
+
+.fa-video-camera {
+  animation: red-pulse 1300ms infinite;
+}

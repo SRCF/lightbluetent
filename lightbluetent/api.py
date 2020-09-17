@@ -9,7 +9,7 @@ import xmltodict
 # Usage is something like this (error handling omitted):
 #
 #   meeting = AttendeeMeeting("meeting1234", "password1234")
-#   success, url = meeting.join("John Smith")
+#   url = meeting.get_join_url("John Smith")
 #   redirect to url
 
 class AttendeeMeeting:
@@ -20,15 +20,25 @@ class AttendeeMeeting:
         self.bbb = BBB()
 
 
-    # Join the meeting with a given full name.
-    # Returns (True, "[join_url]") on success, (False, "[error_msg]") on failure.
-    def join(self, full_name):
+    # Builds and returns the join URL for the meeting. Does not check that the
+    # meeting is running.
+    def get_join_url(self, full_name):
         params = {}
         params["fullName"] = full_name
         params["meetingID"] = self.meeting_id
         params["password"] = self.attendee_pw
+        params["redirect"] = "true"
 
-        return self.bbb.join(params)
+        return self.bbb.build_url("join", params)
+
+
+    # Returns True if meeting is running,
+    # False if meeting is not running or on error.
+    def is_running(self):
+        params = {}
+        params["meetingID"] = self.meeting_id
+
+        return self.bbb.is_meeting_running(params)
 
 
 # Represents a meeting from moderator's viewpoint.
@@ -39,7 +49,7 @@ class AttendeeMeeting:
 #   if not meeting.is_running():
 #       success, message = meeting.create()
 #
-#   success, url = meeting.join("John Smith")
+#   url = meeting.get_join_url("John Smith")
 #   redirect to url
 #   ...
 #   when bored:
@@ -84,12 +94,15 @@ class ModeratorMeeting:
         return self.bbb.create(params)
 
 
-    # Returns (True, "[join_url]") on success, (False, "[error_msg]") on failure.
-    def join(self, full_name):
+    # Builds and returns the join URL for the meeting. Does not check that the
+    # meeting is running.
+    def get_join_url(self, full_name):
         params = {}
         params["fullName"] = full_name
         params["meetingID"] = self.meeting_id
         params["password"] = self.moderator_pw
+        params["redirect"] = "true"
+        return self.bbb.build_url("join", params)
 
         return self.bbb.join(params)
 
@@ -135,32 +148,6 @@ class BBB:
                 created = True
 
         return (created, message)
-
-
-    # Join a call.
-    # Returns (True, "[call_url]") if successful, otherwise
-    # (False, "[error_message]").
-    def join(self, params):
-        joined = False
-        message = ""
-        call_url = ""
-        response = self.request("join", params)
-
-        if "returncode" not in response or "message" not in response:
-            joined = False
-            message = "Error: Malformed response from server."
-        else:
-            message = response["message"]
-            if response["returncode"] != "SUCCESS":
-                joined = False
-            else:
-                joined = True
-                call_url = response["url"]
-
-        if joined:
-            return (joined, call_url)
-        else:
-            return (joined, message)
 
 
     # End a meeting.
