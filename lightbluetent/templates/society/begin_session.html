@@ -10,7 +10,11 @@
     <div class="col-md-6 px-5">
         <div class="form-group">
             <label for="full_name">Enter the name you would like to use in your stall:</label>
-            <input type="full_name" id="full_name" name="full_name" placeholder="Your name" class="form-control" required>
+            <input type="full_name" id="full_name" name="full_name" placeholder="Your name"
+                    class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}" required>
+            {%- if errors.full_name is defined %}
+            <small class="invalid-feedback">{{ errors.full_name }}</small>
+            {%- endif %}
             <!-- TODO: explain what it means to be a moderator. -->
             <small class="form-text text-muted">You will join the meeting as a moderator.</small>
 

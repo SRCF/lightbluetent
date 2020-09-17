@@ -40,6 +40,16 @@ def welcome(uid):
 
         full_name = request.form.get("full_name", "").strip()
 
+        errors = {}
+        if len(full_name) <= 1:
+            errors["full_name"] = "That name is too short."
+
+        if errors:
+            return render_template("society/welcome.html", page_title=f"{ society.name }",
+                           society=society, desc_paragraphs=desc_paragraphs,
+                           sessions_data=sessions_data, has_logo=has_logo, running=running,
+                           errors=errors)
+
         if not running:
             abort(500)
 
@@ -53,7 +63,8 @@ def welcome(uid):
 
     return render_template("society/welcome.html", page_title=f"{ society.name }",
                            society=society, desc_paragraphs=desc_paragraphs,
-                           sessions_data=sessions_data, has_logo=has_logo, running=running)
+                           sessions_data=sessions_data, has_logo=has_logo, running=running,
+                           errors={})
 
 
 # Check if a meeting is running. If it's not, create it. Redirect to the URL to
@@ -85,9 +96,23 @@ def begin_session(uid):
 
     running = meeting.is_running()
 
+    if running:
+        page_title = "Join session"
+    else:
+        page_title = "Begin session"
+
+
     if request.method == "POST":
 
         full_name = request.form.get("full_name", "").strip()
+
+        errors = {}
+        if len(full_name) <= 1:
+            errors["full_name"] = "That name is too short."
+
+        if errors:
+            return render_template("society/begin_session.html", page_title=page_title,
+                           crsid=crsid, running=running, page_parent=url_for("home.home"), errors=errors)
 
         if not running:
             success, message = meeting.create()
@@ -107,10 +132,5 @@ def begin_session(uid):
             current_app.logger.info(f"Moderator '{ full_name }' with CRSid '{ crsid }' joined stall for '{ society.name }', bbb_id: '{ society.bbb_id }'")
             return redirect(url)
 
-    if running:
-        page_title = "Join session"
-    else:
-        page_title = "Begin session"
-
     return render_template("society/begin_session.html", page_title=page_title,
-                           crsid=crsid, running=running, page_parent=url_for("home.home"))
+                           crsid=crsid, running=running, page_parent=url_for("home.home"), errors={})
