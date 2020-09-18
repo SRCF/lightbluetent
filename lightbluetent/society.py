@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, flash, abort, redirect, u
 from lightbluetent.models import db, Society, User
 from lightbluetent.home import auth_decorator
 from lightbluetent.api import ModeratorMeeting, AttendeeMeeting
+from flask_babel import _
 
 bp = Blueprint("society", __name__, url_prefix="/s")
 
@@ -83,11 +84,16 @@ def begin_session(uid):
     if society not in user.societies:
         abort(403)
 
+    join_url = url_for('society.welcome', uid=society.uid, _external=True)
+
+    moderator_only_message = _("To invite others into this session, share your stall link: %(join_url)s", join_url=join_url)
+
     meeting = ModeratorMeeting(society.name,
                                society.bbb_id,
                                society.attendee_pw,
                                society.moderator_pw,
                                society.welcome_text,
+                               moderator_only_message,
                                society.logo,
                                society.banner_text,
                                society.banner_color,

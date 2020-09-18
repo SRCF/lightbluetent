@@ -58,7 +58,7 @@ class AttendeeMeeting:
 class ModeratorMeeting:
 
     def __init__(self, meeting_name, meeting_id, attendee_pw, moderator_pw, \
-            welcome_text, logo, banner_text, banner_color, mute_on_start, \
+            welcome_text, moderator_only_message, logo, banner_text, banner_color, mute_on_start, \
             disable_private_chat):
 
         # Boilerplate.
@@ -67,6 +67,7 @@ class ModeratorMeeting:
         self.attendee_pw = attendee_pw
         self.moderator_pw = moderator_pw
         self.welcome_text = welcome_text
+        self.moderator_only_message = moderator_only_message
         self.logo = logo
         self.banner_text = banner_text
         self.banner_color = banner_color
@@ -85,6 +86,7 @@ class ModeratorMeeting:
         params["attendeePW"] = self.attendee_pw
         params["moderatorPW"] = self.moderator_pw
         params["welcome"] = self.welcome_text
+        params["moderatorOnlyMessage"] = self.moderator_only_message
         params["logo"] = self.logo
         params["bannerText"] = self.banner_text
         params["bannerColor"] = self.banner_color
