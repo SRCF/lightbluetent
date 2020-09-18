@@ -21,6 +21,16 @@ class Config(object):
     HAS_DIRECTORY_PAGE = False
     NUMBER_OF_DAYS = 2
 
+    DEFAULT_LOGO = "default_logo.png"
+    DEFAULT_BBB_LOGO = "default_bbb_logo.png"
+    LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
+    IMAGES_DIR = "lightbluetent/static/images"
+
+
+
+
+
+
 class ProductionConfig(Config):
     """Production configuration"""
 

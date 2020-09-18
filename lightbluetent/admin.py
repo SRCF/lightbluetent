@@ -12,15 +12,12 @@ from sqlalchemy.orm.attributes import flag_modified
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
-LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
-IMAGES_DIR = "lightbluetent/static/images"
-DEFAULT_LOGO = "default_logo.png"
-DEFAULT_BBB_LOGO = "default_bbb_logo.png"
-
 def remove_logo(path):
 
-    if not os.path.isdir(IMAGES_DIR):
-        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+    images_dir = current_app.config["IMAGES_DIR"]
+
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
         abort(500)
 
     if not os.path.isfile(path):
@@ -33,15 +30,17 @@ def remove_logo(path):
 # Delete logo on disk for the society with given uid
 def delete_society_logo(uid):
 
+    images_dir = current_app.config["IMAGES_DIR"]
+
     society = Society.query.filter_by(uid=uid).first()
 
-    if society.logo == DEFAULT_LOGO:
+    if society.logo == current_app.config["DEFAULT_LOGO"]:
         return
     else:
         current_app.logger.info(f"For uid='{ society.uid }': deleting logo...")
-        old_logo = os.path.join(IMAGES_DIR, society.logo)
+        old_logo = os.path.join(images_dir, society.logo)
         remove_logo(old_logo)
-        society.logo = DEFAULT_LOGO
+        society.logo = current_app.config["DEFAULT_LOGO"]
         db.session.commit()
         return
 
@@ -50,13 +49,15 @@ def delete_society_bbb_logo(uid):
 
     society = Society.query.filter_by(uid=uid).first()
 
-    if society.bbb_logo == DEFAULT_BBB_LOGO:
+    images_dir = current_app.config["IMAGES_DIR"]
+
+    if society.bbb_logo == current_app.config["DEFAULT_BBB_LOGO"]:
         return
     else:
         current_app.logger.info(f"For uid='{ society.uid }': deleting bbb_logo")
-        old_logo = os.path.join(IMAGES_DIR, society.bbb_logo)
+        old_logo = os.path.join(images_dir, society.bbb_logo)
         remove_logo(old_logo)
-        society.bbb_logo = DEFAULT_BBB_LOGO
+        society.bbb_logo = current_app.config["DEFAULT_BBB_LOGO"]
         db.session.commit()
         return
 
@@ -132,18 +133,20 @@ def admin(uid):
             logo_filename, logo_extension = os.path.splitext(logo.filename)
             bbb_logo_filename, bbb_logo_extension = os.path.splitext(bbb_logo.filename)
 
+            images_dir = current_app.config["IMAGES_DIR"]
+
             if logo and logo_filename != "":
-                if logo_extension in LOGO_ALLOWED_EXTENSIONS:
+                if logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
 
                     # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
                     static_filename = society.uid + "_" + gen_unique_string() + logo_extension
-                    path = os.path.join(IMAGES_DIR, static_filename)
+                    path = os.path.join(images_dir, static_filename)
 
                     current_app.logger.info(f"For uid='{ society.uid }': changing logo...")
-                    if not os.path.isdir(IMAGES_DIR):
-                        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+                    if not os.path.isdir(images_dir):
+                        current_app.logger.info(f"'{ images_dir }':  no such directory.")
                         abort(500)
 
                     logo_img = Image.open(logo)
@@ -159,17 +162,17 @@ def admin(uid):
                     errors["logo"] = "Invalid file."
 
             if bbb_logo and bbb_logo_filename != "":
-                if bbb_logo_extension in LOGO_ALLOWED_EXTENSIONS:
+                if bbb_logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
 
                     # Delete the old logo if it's not the default
                     delete_society_bbb_logo(uid)
 
                     static_filename = society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
-                    path = os.path.join(IMAGES_DIR, static_filename)
+                    path = os.path.join(images_dir, static_filename)
 
                     current_app.logger.info(f"For uid='{ society.uid }': changing bbb_logo...")
-                    if not os.path.isdir(IMAGES_DIR):
-                        current_app.logger.info(f"'{ IMAGES_DIR }':  no such directory.")
+                    if not os.path.isdir(images_dir):
+                        current_app.logger.info(f"'{ images_dir }':  no such directory.")
                         abort(500)
 
                     bbb_logo_img = Image.open(bbb_logo)
@@ -417,6 +420,8 @@ def delete(uid):
 
             db.session.delete(society)
             db.session.commit()
+
+            current_app.logger.info(f"Deleted society with uid='{ society.uid }'")
 
             return redirect(url_for("home.home"))
 

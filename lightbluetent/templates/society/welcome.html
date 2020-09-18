@@ -68,11 +68,13 @@
                 <hr>
                 {% endif %}
                 <div class="row no-gutters rounded overflow-hidden flex-md-row h-md-250 position-relative">
+                    {% if has_logo %}
                     <div class="col-auto d-none d-lg-block p-2">
                         <img width="200" height="250" class="rounded img-fluid"
                             src="{{ url_for('static', filename=logo) }}" alt="Logo" role="img"
                             aria-label="Placeholder: Thumbnail">
                     </div>
+                    {% endif %}
                     <div class="col p-4 d-flex flex-column position-static">
                         {% if society.description %}
                         <div class="mb-1 text-muted">{{ _("Society description") }}</div>
@@ -96,7 +98,7 @@
                 <h6 class="card-title">Day {{n}}</h6>
                 <ul class="fa-ul">
                     {% for session in society.sessions %}
-                    {% if session["day"] == n %}
+                    {% if session["day"]|int == n %}
                     {% set ns.found = true %}
                     <li>
                         <i class="fa fa-li fa-clock-o" title="Session"></i>

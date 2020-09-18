@@ -20,8 +20,12 @@ def welcome(uid):
     if society.description is not None:
         desc_paragraphs=society.description.split("\n")
 
-    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}    
+    sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
+
+    has_logo = True
+    if society.logo == current_app.config["DEFAULT_LOGO"]:
+        has_logo = False
 
     return render_template("society/welcome.html", page_title=f"{ society.name }",
                            society=society, desc_paragraphs=desc_paragraphs,
-                           sessions_data=sessions_data)
+                           sessions_data=sessions_data, has_logo=has_logo)
