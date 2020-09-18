@@ -15,8 +15,6 @@ python-dotenv = "*"
 flask-talisman = "*"
 Flask-Babel = "*"
 Jinja2 = "*"
-requests = "*"
-xmltodict = "*"
 
 [dev-packages]
 pytest = "*"
