@@ -1,6 +1,7 @@
 from os import getenv
 from urllib.parse import urlencode
 from hashlib import sha1
+from flask import current_app
 
 import requests
 import xmltodict
@@ -139,13 +140,19 @@ class BBB:
         message = ""
         response = self.request("create", params)
 
-        if "returncode" not in response or "message" not in response:
+        if response is None:
             created = False
             message = "Error: Malformed response from server."
+            current_app.logger.info("create: malformed response from server")
+        elif "returncode" not in response or "message" not in response:
+            created = False
+            message = "Error: Malformed response from server."
+            current_app.logger.info("create: malformed response from server")
         else:
             if response["returncode"] != "SUCCESS":
                 created = False
                 message = response["message"]
+                current_app.logger.info(f"create: error: { response.message }")
             else:
                 created = True
 
@@ -159,13 +166,19 @@ class BBB:
         message = ""
         response = self.request("end", params)
 
-        if "returncode" not in response or "message" not in response:
+        if response is None:
             ended = False
             message = "Error: Malformed response from server."
+            current_app.logger.info(f"end: malformed response from server")
+        elif "returncode" not in response or "message" not in response:
+            ended = False
+            message = "Error: Malformed response from server."
+            current_app.logger.info("end: malformed response from server")
         else:
             if response["returncode"] != "SUCCESS":
                 ended = False
                 message = response["message"]
+                current_app.logger.info(f"end: error: { response.message }")
             else:
                 ended = True
 
@@ -180,11 +193,16 @@ class BBB:
         running = False
         response = self.request("isMeetingRunning", params)
 
-        if "returncode" not in response:
+        if response is None:
             success = False
+            current_app.logger.info(f"isMeetingRunning: malformed response from server")
+        elif "returncode" not in response:
+            success = False
+            current_app.logger.info("isMeetingRunning: malformed response from server")
         else:
             if response["returncode"] != "SUCCESS":
                 success = False
+                current_app.logger.info(f"isMeetingRunning: error: { response.message } ")
             else:
                 success = True
                 if response["running"] == "true":
@@ -195,10 +213,21 @@ class BBB:
 
     def request(self, call, params):
         url = self.build_url(call, params)
-        res = requests.get(url, timeout=(0.5, 10))
+
+        try:
+            res = requests.get(url, timeout=(0.5, 10))
+
+        except requests.exceptions.ReadTimeout:
+            current_app.logger.info(f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
+            return None
+
         xml = xmltodict.parse(res.text)
 
-        return xml["response"]
+        if "response" not in xml:
+            current_app.logger.info(f"Malformed response from server: { xml }")
+            return None
+        else:
+            return xml["response"]
 
 
     def generate_checksum(self, call, query):
