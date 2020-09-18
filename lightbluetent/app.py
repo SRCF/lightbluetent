@@ -9,12 +9,12 @@ from .utils import gen_unique_string, ordinal, sif
 def create_app(config_name=None):
 
     if config_name == None:
-        config_name = "Production"
+        config_name = "production"
 
     app = Flask(__name__, template_folder="templates")
 
     # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
-    if(config_name == "Production"):
+    if(config_name == "production"):
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
