@@ -144,7 +144,7 @@ def admin(uid):
                     static_filename = society.uid + "_" + gen_unique_string() + logo_extension
                     path = os.path.join(images_dir, static_filename)
 
-                    current_app.logger.info(f"For uid='{ society.uid }': changing logo...")
+                    current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing logo...")
                     if not os.path.isdir(images_dir):
                         current_app.logger.info(f"'{ images_dir }':  no such directory.")
                         abort(500)
@@ -170,7 +170,7 @@ def admin(uid):
                     static_filename = society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
                     path = os.path.join(images_dir, static_filename)
 
-                    current_app.logger.info(f"For uid='{ society.uid }': changing bbb_logo...")
+                    current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing bbb_logo...")
                     if not os.path.isdir(images_dir):
                         current_app.logger.info(f"'{ images_dir }':  no such directory.")
                         abort(500)
@@ -196,7 +196,7 @@ def admin(uid):
         # Adding a new admin
         if values["new_admin_crsid"] != "":
 
-            current_app.logger.info(f"For uid='{ society.uid }': adding new admin { values['new_admin_crsid'] }...")
+            current_app.logger.info(f"For uid='{ society.uid }': { crsid } is adding new admin { values['new_admin_crsid'] }...")
             new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
             if not new_admin:
                 errors["new_admin_crsid"] = "That user is not registered yet. Users must register before being added as administrators."
@@ -281,7 +281,7 @@ def admin(uid):
                 current_app.logger.info(f"For uid='{ society.uid }': added new admin { new_admin }.")
 
             if is_new_session:
-                current_app.logger.info(f"For uid='{ society.uid }': added new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]")
+                current_app.logger.info(f"For uid='{ society.uid }': { crsid } added new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]")
 
             flash("Settings saved.")
 
@@ -348,6 +348,8 @@ def delete_logo(uid):
     if society not in user.societies:
         abort(403)
 
+    current_app.logger.info(f"User { crsid } deleting logo { society.logo } for uid '{ society.uid }'...")
+
     delete_society_logo(uid)
 
     return redirect(url_for("admin.admin", uid=society.uid))
@@ -367,6 +369,8 @@ def delete_bbb_logo(uid):
     if society not in user.societies:
         abort(403)
 
+    current_app.logger.info(f"User { crsid } deleting bbb_logo { society.bbb_logo } for uid '{ society.uid }'...")
+
     delete_society_bbb_logo(uid)
 
     return redirect(url_for("admin.admin", uid=society.uid))
@@ -381,6 +385,9 @@ def delete_session(uid, session_id):
         abort(404)
 
     crsid = auth_decorator.principal
+
+    current_app.logger.info(f"User { crsid } deleting session { session_id } for uid '{ society.uid }'...")
+
     user = User.query.filter_by(crsid=crsid).first()
 
     if society not in user.societies:
@@ -421,7 +428,7 @@ def delete(uid):
             db.session.delete(society)
             db.session.commit()
 
-            current_app.logger.info(f"Deleted society with uid='{ society.uid }'")
+            current_app.logger.info(f"User { crsid } deleted society with uid='{ society.uid }'")
 
             return redirect(url_for("home.home"))
 
