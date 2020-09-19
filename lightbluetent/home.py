@@ -60,20 +60,13 @@ def home():
     if not user:
         return redirect(url_for("home.register"))
 
-    if user.societies:
-        user_societies = user.societies
+    running_meetings = {}
 
-        running_meetings = {}
+    for society in user.societies:
+        meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+        running_meetings[society.bbb_id] = meeting.is_running()
 
-        for society in user.societies:
-            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
-            running_meetings[society.bbb_id] = meeting.is_running()
-
-        return render_template("home/home.html", page_title="Home", user_societies=user_societies, running_meetings=running_meetings, crsid=crsid)
-
-    else:
-        return render_template("home/home.html", page_title="Home", user_societies={}, running_meetings={}, crsid=crsid)
-
+    return render_template("home/home.html", page_title="Home", user_societies=user.societies, running_meetings=running_meetings, crsid=crsid)
 
 
 @bp.route("/register_soc", methods=("GET", "POST"))
