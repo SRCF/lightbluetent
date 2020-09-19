@@ -1,4 +1,5 @@
 import re
+import os
 
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
 from lightbluetent.models import db, Society, User
@@ -29,7 +30,7 @@ def welcome(uid):
     if society.logo == current_app.config["DEFAULT_LOGO"]:
         has_logo = False
 
-    meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+    meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw, society.bbb_logo)
     running = meeting.is_running()
 
     if request.method == "POST":
@@ -84,8 +85,7 @@ def begin_session(uid):
     if society not in user.societies:
         abort(403)
 
-    join_url = url_for('society.welcome', uid=society.uid, _external=True)
-
+    join_url = url_for("society.welcome", uid=society.uid, _external=True)
     moderator_only_message = _("To invite others into this session, share your stall link: %(join_url)s", join_url=join_url)
 
     meeting = ModeratorMeeting(society.name,
@@ -94,7 +94,7 @@ def begin_session(uid):
                                society.moderator_pw,
                                society.welcome_text,
                                moderator_only_message,
-                               society.logo,
+                               society.bbb_logo,
                                society.banner_text,
                                society.banner_color,
                                society.mute_on_start,

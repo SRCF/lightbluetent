@@ -15,10 +15,16 @@ import xmltodict
 
 class AttendeeMeeting:
 
-    def __init__(self, meeting_id, attendee_pw):
+    def __init__(self, meeting_id, attendee_pw, logo):
         self.meeting_id = meeting_id
         self.attendee_pw = attendee_pw
         self.bbb = BBB()
+
+        # self.logo is None if the default logo is used
+        if logo != current_app.config["DEFAULT_BBB_LOGO"]:
+            self.logo = logo
+        else:
+            self.logo = None
 
 
     # Builds and returns the join URL for the meeting. Does not check that the
@@ -29,6 +35,17 @@ class AttendeeMeeting:
         params["meetingID"] = self.meeting_id
         params["password"] = self.attendee_pw
         params["redirect"] = "true"
+
+        if self.logo is not None:
+
+            #logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            #params["logo"] = url_for("static", filename=logo_path, _external=True)
+            params["logo"] = "https://i.ibb.co/ykXhVYY/elos.png"
+
+            params["userdata-bbb_display_branding_area"] = "true"
+
+            # Custom styling to make the bbb_logo look better
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
 
         return self.bbb.build_url("join", params)
 
@@ -69,11 +86,16 @@ class ModeratorMeeting:
         self.moderator_pw = moderator_pw
         self.welcome_text = welcome_text
         self.moderator_only_message = moderator_only_message
-        self.logo = logo
         self.banner_text = banner_text
         self.banner_color = banner_color
         self.mute_on_start = mute_on_start
         self.disable_private_chat = disable_private_chat
+
+        # self.logo is None if the default logo is used
+        if logo != current_app.config["DEFAULT_BBB_LOGO"]:
+            self.logo = logo
+        else:
+            self.logo = None
 
         # Create BBB.
         self.bbb = BBB()
@@ -81,6 +103,7 @@ class ModeratorMeeting:
 
     # Returns (True, "") on success, (False, "[error_msg]") on failure.
     def create(self):
+
         params = {}
         params["name"] = self.meeting_name
         params["meetingID"] = self.meeting_id
@@ -88,7 +111,6 @@ class ModeratorMeeting:
         params["moderatorPW"] = self.moderator_pw
         params["welcome"] = self.welcome_text
         params["moderatorOnlyMessage"] = self.moderator_only_message
-        params["logo"] = self.logo
         params["bannerText"] = self.banner_text
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
@@ -105,9 +127,19 @@ class ModeratorMeeting:
         params["meetingID"] = self.meeting_id
         params["password"] = self.moderator_pw
         params["redirect"] = "true"
-        return self.bbb.build_url("join", params)
 
-        return self.bbb.join(params)
+        if self.logo is not None:
+
+            #logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            #params["logo"] = url_for("static", filename=logo_path, _external=True)
+            params["logo"] = "https://i.ibb.co/ykXhVYY/elos.png"
+
+            params["userdata-bbb_display_branding_area"] = "true"
+
+            # Custom styling to make the bbb_logo look better
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
+
+        return self.bbb.build_url("join", params)
 
 
     # Returns (True, "") on success, (False, "[error_msg]") on failure.

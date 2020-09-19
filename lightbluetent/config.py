@@ -26,6 +26,11 @@ class Config(object):
     LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
     IMAGES_DIR = "lightbluetent/static/images"
 
+    # Since using url_for(static", ...) prepends lightbluetent/static to the URL
+    # for us, we have the relative path to the images directory from the static folder.
+    # I couldn't think of a better way of doing this. Required in society.py for
+    # getting the URL of the bbb_logo to pass to BBB.
+    IMAGES_DIR_FROM_STATIC = "images"
 
 
 

@@ -28,7 +28,9 @@ def index():
 
         running_meetings = {}
         for society in societies:
-            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+            # TODO: we pass the logo as "" because it doesn't actually matter here.
+            # At some point the API should be refactored so we only have to specify the society uid.
+            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw, "")
             running_meetings[society.bbb_id] = meeting.is_running()
 
         # Shuffle the socs so they all have a chance of being near the top
@@ -64,7 +66,7 @@ def home():
         running_meetings = {}
 
         for society in user.societies:
-            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw, "")
             running_meetings[society.bbb_id] = meeting.is_running()
 
         return render_template("home/home.html", page_title="Home", user_societies=user_societies, running_meetings=running_meetings, crsid=crsid)
