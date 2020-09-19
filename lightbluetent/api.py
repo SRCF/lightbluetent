@@ -15,7 +15,7 @@ import xmltodict
 
 class AttendeeMeeting:
 
-    def __init__(self, meeting_id, attendee_pw, logo):
+    def __init__(self, meeting_id, attendee_pw, logo=""):
         self.meeting_id = meeting_id
         self.attendee_pw = attendee_pw
         self.bbb = BBB()
@@ -250,6 +250,9 @@ class BBB:
         except requests.exceptions.ReadTimeout:
             current_app.logger.info(f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
             return None
+
+        if res.status_code != requests.codes.ok:
+            current_app.logger.info(f"Error { res.status_code } from server: { res.text }")
 
         xml = xmltodict.parse(res.text)
 
