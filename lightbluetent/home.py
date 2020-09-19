@@ -3,7 +3,7 @@ import re
 from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.utils import gen_unique_string, validate_email
-from lightbluetent.api import AttendeeMeeting
+from lightbluetent.api import Meeting
 from datetime import datetime
 from flask_babel import _
 
@@ -28,9 +28,7 @@ def index():
 
         running_meetings = {}
         for society in societies:
-            # TODO: we pass the logo as "" because it doesn't actually matter here.
-            # At some point the API should be refactored so we only have to specify the society uid.
-            meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+            meeting = Meeting(society)
             running_meetings[society.bbb_id] = meeting.is_running()
 
         # Shuffle the socs so they all have a chance of being near the top
@@ -63,7 +61,7 @@ def home():
     running_meetings = {}
 
     for society in user.societies:
-        meeting = AttendeeMeeting(society.bbb_id, society.attendee_pw)
+        meeting = Meeting(society)
         running_meetings[society.bbb_id] = meeting.is_running()
 
     return render_template("home/home.html", page_title="Home", user_societies=user.societies, running_meetings=running_meetings, crsid=crsid)
