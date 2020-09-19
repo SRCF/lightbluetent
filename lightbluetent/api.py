@@ -38,9 +38,8 @@ class AttendeeMeeting:
 
         if self.logo is not None:
 
-            #logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
-            #params["logo"] = url_for("static", filename=logo_path, _external=True)
-            params["logo"] = "https://i.ibb.co/ykXhVYY/elos.png"
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            params["logo"] = url_for("static", filename=logo_path, _external=True)
 
             params["userdata-bbb_display_branding_area"] = "true"
 
@@ -130,9 +129,8 @@ class ModeratorMeeting:
 
         if self.logo is not None:
 
-            #logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
-            #params["logo"] = url_for("static", filename=logo_path, _external=True)
-            params["logo"] = "https://i.ibb.co/ykXhVYY/elos.png"
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            params["logo"] = url_for("static", filename=logo_path, _external=True)
 
             params["userdata-bbb_display_branding_area"] = "true"
 
