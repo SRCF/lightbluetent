@@ -21,7 +21,11 @@
     {% if social.type == "email"%}
     <a href="mailto:{{ social.url }}">{{ social.url }}</a>
     {% else %}
-    <a href="{{ social.url }}">{{ social.url}}</a>
+        {% if social.url.startswith("https://") or social.url.startswith("http://") %}
+        <a href="{{ social.url }}">{{ social.url}}</a>
+        {% else %}
+        <a href="http://{{ social.url }}">{{ social.url}}</a>
+        {% endif %}
     {% endif %}
 </li>
 {%- endmacro %}
@@ -38,7 +42,11 @@
                     {% if society.website %}
                     <li>
                         <i class="fa fa-li fa-globe" title="Website"></i>
+                        {% if society.website.startswith("http://") or society.website.startswith("https://") %}
                         <a href="{{ society.website }}">{{ society.website }}</a>
+                        {% else %}
+                        <a href="http://{{ society.website }}">{{ society.website }}</a>
+                        {% endif %}
                     </li>
                     {% endif %}
                     {% for social in society.socials %}
