@@ -51,7 +51,7 @@ class Meeting:
             return (False, error)
 
         if response["returncode"] != "SUCCESS":
-            current_app.logger.info(f"Error creating meeting: { response.message }")
+            current_app.logger.error(f"Error creating meeting: { response.message }")
             return (False, f"Error creating meeting: { response.message }")
 
         return (True, "")
@@ -102,7 +102,7 @@ class Meeting:
             return False
 
         if response["returncode"] != "SUCCESS":
-            current_app.logger.info(f"Error checking meeting status: { response.message }")
+            current_app.logger.error(f"Error checking meeting status: { response.message }")
             return False
 
         return True if response["running"] == "true" else False
@@ -122,20 +122,20 @@ class Meeting:
             res = requests.get(url, timeout=(0.5, 10))
 
         except requests.exceptions.ReadTimeout:
-            current_app.logger.info(f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
+            current_app.logger.error(f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
             return (None, f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
 
         if res.status_code != requests.codes.ok:
-            current_app.logger.info(f"Error { res.status_code } from server: { res.text }")
+            current_app.logger.error(f"Error { res.status_code } from server: { res.text }")
             return (None, f"Error { res.status_code } from server: { res.text }")
 
         xml = xmltodict.parse(res.text)
 
         if "response" not in xml:
-            current_app.logger.info(f"Malformed response from server: { xml }")
+            current_app.logger.error(f"Malformed response from server: { xml }")
             return (None, f"Malformed response from server: { xml }")
         if "returncode" not in xml["response"]:
-            current_app.logger.info(f"Malformed response from server: { xml }: no returncode")
+            current_app.logger.error(f"Malformed response from server: { xml }: no returncode")
             return (None, f"Malformed response from server: { xml }: no returncode")
         else:
             return (xml["response"], "")
