@@ -176,7 +176,7 @@ def admin(uid):
                         abort(500)
 
                     bbb_logo_img = Image.open(bbb_logo)
-                    bbb_logo_resized = bbb_logo_img.resize((512, 256))
+                    bbb_logo_resized = bbb_logo_img.resize((100, 30))
                     bbb_logo_resized.save(path)
 
                     current_app.logger.info(f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'")

@@ -1,215 +1,144 @@
 from os import getenv
 from urllib.parse import urlencode
 from hashlib import sha1
+from flask import current_app, url_for
 
 import requests
 import xmltodict
+import os
 
-# Represents a meeting from an attendee's viewpoint.
-# Usage is something like this (error handling omitted):
-#
-#   meeting = AttendeeMeeting("meeting1234", "password1234")
-#   success, url = meeting.join("John Smith")
-#   redirect to url
+# Represents a stall for a society.
+# Usage:
+# society = Society.query.filter_by(uid=uid).first()
+# meeting = Meeting(society)
+# created, msg = meeting.create("Moderator-only message")
+# if not created:
+#     # do something with msg, e.g. redirect to error page
+# if meeting.is_running:
+#     redirect(meeting.moderator_url(name))
+class Meeting:
 
-class AttendeeMeeting:
+    def __init__(self, society):
 
-    def __init__(self, meeting_id, attendee_pw):
-        self.meeting_id = meeting_id
-        self.attendee_pw = attendee_pw
-        self.bbb = BBB()
-
-
-    # Join the meeting with a given full name.
-    # Returns (True, "[join_url]") on success, (False, "[error_msg]") on failure.
-    def join(self, full_name):
-        params = {}
-        params["fullName"] = full_name
-        params["meetingID"] = self.meeting_id
-        params["password"] = self.attendee_pw
-
-        return self.bbb.join(params)
-
-
-# Represents a meeting from moderator's viewpoint.
-# Usage is something like this (error handling omitted):
-#
-#   meeting = ModeratorMeeting("My Meeting", "meeting1234", ... )
-#
-#   if not meeting.is_running():
-#       success, message = meeting.create()
-#
-#   success, url = meeting.join("John Smith")
-#   redirect to url
-#   ...
-#   when bored:
-#       success, message = meeting.end()
-
-class ModeratorMeeting:
-
-    def __init__(self, meeting_name, meeting_id, attendee_pw, moderator_pw, \
-            welcome_text, logo, banner_text, banner_color, mute_on_start, \
-            disable_private_chat):
-
-        # Boilerplate.
-        self.meeting_name = meeting_name
-        self.meeting_id = meeting_id
-        self.attendee_pw = attendee_pw
-        self.moderator_pw = moderator_pw
-        self.welcome_text = welcome_text
-        self.logo = logo
-        self.banner_text = banner_text
-        self.banner_color = banner_color
-        self.mute_on_start = mute_on_start
-        self.disable_private_chat = disable_private_chat
-
-        # Create BBB.
-        self.bbb = BBB()
+        self.meeting_name = society.name
+        self.meeting_id = society.bbb_id
+        self.moderator_pw = society.moderator_pw
+        self.attendee_pw = society.attendee_pw
+        self.welcome_text = society.welcome_text
+        self.banner_text = society.banner_text
+        self.logo = society.logo
+        self.banner_color = society.banner_color
+        self.mute_on_start = society.mute_on_start
+        self.disable_private_chat = society.disable_private_chat
 
 
-    # Returns (True, "") on success, (False, "[error_msg]") on failure.
-    def create(self):
+    def create(self, moderator_only_message=""):
         params = {}
         params["name"] = self.meeting_name
         params["meetingID"] = self.meeting_id
         params["attendeePW"] = self.attendee_pw
         params["moderatorPW"] = self.moderator_pw
         params["welcome"] = self.welcome_text
-        params["logo"] = self.logo
+        params["moderatorOnlyMessage"] = moderator_only_message
         params["bannerText"] = self.banner_text
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
 
-        return self.bbb.create(params)
+        response, error = self.request("create", params)
+
+        if response is None:
+            return (False, error)
+
+        if response["returncode"] != "SUCCESS":
+            current_app.logger.info(f"Error creating meeting: { response.message }")
+            return (False, f"Error creating meeting: { response.message }")
+
+        return (True, "")
 
 
-    # Returns (True, "[join_url]") on success, (False, "[error_msg]") on failure.
-    def join(self, full_name):
+    def moderator_url(self, full_name):
         params = {}
         params["fullName"] = full_name
         params["meetingID"] = self.meeting_id
         params["password"] = self.moderator_pw
+        params["redirect"] = "true"
 
-        return self.bbb.join(params)
+        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            params["logo"] = url_for("static", filename=logo_path, _external=True)
+            params["userdata-bbb_display_branding_area"] = "true"
+
+            # Custom styling to make the bbb_logo look better
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
+
+        return self.build_url("join", params)
 
 
-    # Returns (True, "") on success, (False, "[error_msg]") on failure.
-    def end(self):
+    def attendee_url(self, full_name):
         params = {}
+        params["fullName"] = full_name
         params["meetingID"] = self.meeting_id
-        params["password"] = self.moderator_pw
+        params["password"] = self.attendee_pw
+        params["redirect"] = "true"
 
-        return self.bbb.end(params)
+        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+            params["logo"] = url_for("static", filename=logo_path, _external=True)
+            params["userdata-bbb_display_branding_area"] = "true"
 
+            # Custom styling to make the bbb_logo look better
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
 
-    # Returns True if meeting is running,
-    # False if meeting is not running or on error.
+        return self.build_url("join", params)
+
     def is_running(self):
         params = {}
         params["meetingID"] = self.meeting_id
 
-        return self.bbb.is_meeting_running(params)
+        response, error = self.request("isMeetingRunning", params)
+
+        if response is None:
+            return False
+
+        if response["returncode"] != "SUCCESS":
+            current_app.logger.info(f"Error checking meeting status: { response.message }")
+            return False
+
+        return True if response["running"] == "true" else False
 
 
-# Basic BBB API functions.
-# Internal use only, not for individual resale.
+    # Private API #
 
-class BBB:
-
-    # Create a new call.
-    # Returns (True, "") if successful, otherwise (False, "[error_message]").
-    def create(self, params):
-        created = False
-        message = ""
-        response = self.request("create", params)
-
-        if "returncode" not in response or "message" not in response:
-            created = False
-            message = "Error: Malformed response from server."
-        else:
-            if response["returncode"] != "SUCCESS":
-                created = False
-                message = response["message"]
-            else:
-                created = True
-
-        return (created, message)
-
-
-    # Join a call.
-    # Returns (True, "[call_url]") if successful, otherwise
-    # (False, "[error_message]").
-    def join(self, params):
-        joined = False
-        message = ""
-        call_url = ""
-        response = self.request("join", params)
-
-        if "returncode" not in response or "message" not in response:
-            joined = False
-            message = "Error: Malformed response from server."
-        else:
-            message = response["message"]
-            if response["returncode"] != "SUCCESS":
-                joined = False
-            else:
-                joined = True
-                call_url = response["url"]
-
-        if joined:
-            return (joined, call_url)
-        else:
-            return (joined, message)
-
-
-    # End a meeting.
-    # Returns (True, "") if successful, otherwise (False, "[error_message]").
-    def end(self, params):
-        ended = False
-        message = ""
-        response = self.request("end", params)
-
-        if "returncode" not in response or "message" not in response:
-            ended = False
-            message = "Error: Malformed response from server."
-        else:
-            if response["returncode"] != "SUCCESS":
-                ended = False
-                message = response["message"]
-            else:
-                ended = True
-
-        return (ended, message)
-
-
-    # Check if a meeting is running (based on meetingID).
-    # Returns true if the meeting is running, and false otherwise.
-    # Any error causes a return value of False.
-    def is_meeting_running(self, params):
-        success = False
-        running = False
-        response = self.request("isMeetingRunning", params)
-
-        if "returncode" not in response:
-            success = False
-        else:
-            if response["returncode"] != "SUCCESS":
-                success = False
-            else:
-                success = True
-                if response["running"] == "true":
-                    running = True
-
-        return (success and running)
-
-
+    # Make a request. Returns None, error_msg if
+    #   a) the request timed out, or
+    #   b) an error response was received, or
+    #   c) the reponse was malformed, or
+    #   d) the reponse was not a valid BBB response (i.e. missing returncode key).
     def request(self, call, params):
         url = self.build_url(call, params)
-        res = requests.get(url, timeout=(0.5, 10))
+
+        try:
+            res = requests.get(url, timeout=(0.5, 10))
+
+        except requests.exceptions.ReadTimeout:
+            current_app.logger.info(f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
+            return (None, f"Timeout timed out! Requests.exceptions.ReadTimeout when making API call { call }")
+
+        if res.status_code != requests.codes.ok:
+            current_app.logger.info(f"Error { res.status_code } from server: { res.text }")
+            return (None, f"Error { res.status_code } from server: { res.text }")
+
         xml = xmltodict.parse(res.text)
 
-        return xml["response"]
+        if "response" not in xml:
+            current_app.logger.info(f"Malformed response from server: { xml }")
+            return (None, f"Malformed response from server: { xml }")
+        if "returncode" not in xml["response"]:
+            current_app.logger.info(f"Malformed response from server: { xml }: no returncode")
+            return (None, f"Malformed response from server: { xml }: no returncode")
+        else:
+            return (xml["response"], "")
 
 
     def generate_checksum(self, call, query):

@@ -96,12 +96,21 @@
                 {% endfor %}
 
                 <h6 class="card-title text-muted">Join the live session</h6>
-                <form>
+
+                <form method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
                     <div class="form-group">
-                        <input type="name" class="form-control" id="name" placeholder="Enter your name..." disabled>
+                        <input type="name" class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}"
+                                name="full_name" id="full_name" placeholder="Enter your name..." {% if not running %}disabled{% endif %}>
+                        {%- if errors.full_name is defined %}
+                        <small class="invalid-feedback">{{ errors.full_name }}</small>
+                        {%- endif %}
                     </div>
+
+                    <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                            {% if not running %}style="pointer-events: none;"{% endif %} value="{{ _('Join session') }}">
                 </form>
-                <a href="#" class="btn btn-primary disabled" aria-disabled="true">Join session</a>
             </div>
         </div>
     </div>

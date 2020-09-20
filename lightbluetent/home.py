@@ -3,6 +3,7 @@ import re
 from flask import Blueprint, render_template, request, flash, session, url_for, redirect, abort, current_app
 from lightbluetent.models import db, User, Society
 from lightbluetent.utils import gen_unique_string, validate_email
+from lightbluetent.api import Meeting
 from datetime import datetime
 from flask_babel import _
 
@@ -25,10 +26,15 @@ def index():
     if has_directory_page:
         societies = Society.query.all()
 
+        running_meetings = {}
+        for society in societies:
+            meeting = Meeting(society)
+            running_meetings[society.bbb_id] = meeting.is_running()
+
         # Shuffle the socs so they all have a chance of being near the top
         random.shuffle(societies)
         home_url = url_for('home.register')
-        return render_template("home/directory.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"), societies=societies, home_url=home_url)
+        return render_template("home/directory.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"), societies=societies, running_meetings=running_meetings, home_url=home_url)
     else:
         return render_template("home/index.html", page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"))
 
@@ -52,14 +58,13 @@ def home():
     if not user:
         return redirect(url_for("home.register"))
 
-    if user.societies:
-        user_societies = user.societies
+    running_meetings = {}
 
-        return render_template("home/home.html", page_title="Home", user_societies=user_societies, crsid=crsid)
+    for society in user.societies:
+        meeting = Meeting(society)
+        running_meetings[society.bbb_id] = meeting.is_running()
 
-    else:
-        return render_template("home/home.html", page_title="Home", user_societies={}, crsid=crsid)
-
+    return render_template("home/home.html", page_title="Home", user_societies=user.societies, running_meetings=running_meetings, crsid=crsid)
 
 
 @bp.route("/register_soc", methods=("GET", "POST"))

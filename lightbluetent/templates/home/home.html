@@ -27,10 +27,21 @@
                 <i class="fa fa-li fa-users" title="Administrator"></i>
                 {{ society.admins|map(attribute="crsid")|join(", ") }}
             </li>
+            {% if running_meetings[society.bbb_id] %}
+            <li>
+                <i class="fa fa-li fa-video-camera"></i>
+                {{ _("Session in progress!") }}
+            </li>
+            {% endif %}
           </ul>
         </div>
         <div class="card-footer">
           <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
+          {% if running_meetings[society.bbb_id] %}
+          <a href="{{ url_for('society.begin_session', uid=society.uid) }}" class="btn btn-outline-success">{{ _("Join session") }}</a>
+          {% else %}
+          <a href="{{ url_for('society.begin_session', uid=society.uid) }}" class="btn btn-outline-success">{{ _("Begin session") }}</a>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
