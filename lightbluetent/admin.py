@@ -146,7 +146,7 @@ def admin(uid):
 
                     current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing logo...")
                     if not os.path.isdir(images_dir):
-                        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+                        current_app.logger.error(f"'{ images_dir }':  no such directory.")
                         abort(500)
 
                     logo_img = Image.open(logo)
@@ -172,7 +172,7 @@ def admin(uid):
 
                     current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing bbb_logo...")
                     if not os.path.isdir(images_dir):
-                        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+                        current_app.logger.error(f"'{ images_dir }':  no such directory.")
                         abort(500)
 
                     bbb_logo_img = Image.open(bbb_logo)

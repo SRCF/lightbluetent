@@ -110,8 +110,8 @@ def begin_session(uid):
                 return redirect(url)
             else:
                 # For some reason the meeting wasn't created.
-                current_app.logger.info(f"Creation of stall failed: { message }")
-                flash(f"The session could not be created. Please contact an administrator and include the following: { message }")
+                current_app.logger.error(f"Creation of stall failed: { message }")
+                flash(f"The session could not be created. Please contact an administrator at support@srcf.net and include the following: { message }")
 
         else:
             url = meeting.moderator_url(full_name)
