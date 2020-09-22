@@ -51,8 +51,8 @@ class Meeting:
             return (False, error)
 
         if response["returncode"] != "SUCCESS":
-            current_app.logger.error(f"Error creating meeting: { response.message }")
-            return (False, f"Error creating meeting: { response.message }")
+            current_app.logger.error(f"Error creating meeting: { response['message'] }")
+            return (False, f"Error creating meeting: { response['message'] }")
 
         return (True, "")
 
