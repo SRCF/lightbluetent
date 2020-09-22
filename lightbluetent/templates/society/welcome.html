@@ -31,7 +31,7 @@
 {%- endmacro %}
 
 <div class="row">
-    <div class="col-md">
+    <div class="col-lg">
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ society.name }} <small
                     class="text-muted">{{ society.short_name }}</small></h4>
@@ -55,17 +55,17 @@
                 </ul>
                 <hr>
                 {% endif %}
-                <div class="row no-gutters rounded overflow-hidden flex-md-row h-md-250 position-relative">
+                <div class="row no-gutters rounded overflow-hidden">
                     {% if has_logo %}
-                    <div class="col-auto d-none d-lg-block p-2">
-                        <img width="200" height="250" class="rounded img-fluid"
+                    <div class="col-auto mx-auto p-2">
+                        <img width="150" class="rounded float-left"
                             src="{{ url_for('static', filename=logo) }}" alt="Logo" role="img"
                             aria-label="Placeholder: Thumbnail">
                     </div>
                     {% endif %}
-                    <div class="col p-4 d-flex flex-column position-static">
+                    <div class="col px-4 mt-2 mt-sm-0">
                         {% if society.description %}
-                        <div class="mb-1 text-muted">{{ _("Society description") }}</div>
+                        <div class="sr-only mb-1 text-muted">{{ _("Society description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}
                             <p>{{ paragraph }}</p>
@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md">
+    <div class="col-lg">
         <div class="card my-3 shadow-sm">
             <h5 class="card-header">Session times</h5>
             <div class="card-body">
