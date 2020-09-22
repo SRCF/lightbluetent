@@ -9,13 +9,8 @@
     <meta property="og:type" content="website" />
 
     {% if society.description is not none %}
-      {% if society.description | length > 100 %}
-        <meta property="og:description"
-          content="{{ society.description[0:99] }}..." />
-      {% else %}
-        <meta property="og:description"
-          content="{{ society.description }}" />
-      {% endif %}
+    <meta property="og:description"
+      content="{{ society.description | truncate(100) }}" />
     {% else %}
       <meta property="og:description"
         content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
