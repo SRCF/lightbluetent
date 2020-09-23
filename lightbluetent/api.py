@@ -38,9 +38,9 @@ class Meeting:
         params["meetingID"] = self.meeting_id
         params["attendeePW"] = self.attendee_pw
         params["moderatorPW"] = self.moderator_pw
-        params["welcome"] = self.welcome_text
+        params["welcome"] = self.welcome_text if self.welcome_text != None else ""
         params["moderatorOnlyMessage"] = moderator_only_message
-        params["bannerText"] = self.banner_text
+        params["bannerText"] = self.banner_text if self.banner_text != None else ""
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"

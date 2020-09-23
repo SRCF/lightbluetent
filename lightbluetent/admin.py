@@ -290,7 +290,7 @@ def admin(uid):
             )
         else:
             society.name = values["soc_name"]
-            society.website = values["website"]
+            society.website = values["website"] if values["website"] != "" else None
 
             # fetch all social fields from values, as we generate the uid in jinja
             social_forms = {k: v for (k, v) in request.form.items() if ("social-" in k)}
@@ -314,10 +314,10 @@ def admin(uid):
                         society.socials.append(social_data)
                         flag_modified(society, "socials")
 
-            society.description = values["description"]
-            society.short_description = values["short_description"]
-            society.welcome_text = values["welcome_text"]
-            society.banner_text = values["banner_text"]
+            society.description = values["description"] if values["description"] != "" else None
+            society.short_description = values["short_description"] if values["short_description"] != "" else None
+            society.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
+            society.banner_text = values["banner_text"] if values["banner_text"] != "" else None
             society.banner_color = values["banner_color"]
             society.mute_on_start = values["mute_on_start"]
             society.disable_private_chat = values["disable_private_chat"]

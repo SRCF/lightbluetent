@@ -87,6 +87,8 @@ def begin_session(uid):
     else:
         page_title = "Begin session"
 
+    print(society.banner_text)
+
     if request.method == "POST":
 
         full_name = request.form.get("full_name", "").strip()
