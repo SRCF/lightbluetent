@@ -20,6 +20,7 @@ class Meeting:
 
     def __init__(self, society):
 
+        self.uid = society.uid
         self.meeting_name = society.name
         self.meeting_id = society.bbb_id
         self.moderator_pw = society.moderator_pw
@@ -38,12 +39,15 @@ class Meeting:
         params["meetingID"] = self.meeting_id
         params["attendeePW"] = self.attendee_pw
         params["moderatorPW"] = self.moderator_pw
-        params["welcome"] = self.welcome_text
+        params["welcome"] = self.welcome_text if self.welcome_text != None else ""
         params["moderatorOnlyMessage"] = moderator_only_message
-        params["bannerText"] = self.banner_text
+        params["bannerText"] = self.banner_text if self.banner_text != None else ""
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
+        params["logoutURL"] = url_for('society.welcome', uid=self.uid, _external=True)
+
+        print(params["logoutURL"])
 
         response, error = self.request("create", params)
 
