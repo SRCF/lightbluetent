@@ -57,13 +57,13 @@
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     {% if has_logo %}
-                    <div class="col-auto mx-auto d-flex align-items-center justify-content-center"
+                    <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
                         <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"
                             alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
                     </div>
                     {% endif %}
-                    <div class="col px-4 mt-3 mt-sm-0">
+                    <div class="col-sm px-4 mt-3 mt-sm-0">
                         {% if society.description %}
                         <div class="sr-only mb-1 text-muted">{{ _("Society description") }}</div>
                         <div class="card-text mb-auto">
