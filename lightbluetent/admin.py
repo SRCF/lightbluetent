@@ -1,7 +1,16 @@
 import os
 import copy
 
-from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    flash,
+    abort,
+    redirect,
+    url_for,
+    current_app,
+)
 from lightbluetent.models import db, User, Society
 from lightbluetent.home import auth_decorator
 from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id
@@ -11,6 +20,7 @@ from datetime import time
 from sqlalchemy.orm.attributes import flag_modified
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
+
 
 def remove_logo(path):
 
@@ -26,6 +36,7 @@ def remove_logo(path):
 
     os.remove(path)
     current_app.logger.info(f"Deleted logo '{ path }'")
+
 
 # Delete logo on disk for the society with given uid
 def delete_society_logo(uid):
@@ -43,6 +54,7 @@ def delete_society_logo(uid):
         society.logo = current_app.config["DEFAULT_LOGO"]
         db.session.commit()
         return
+
 
 # Delete logo on disk for the society with given uid
 def delete_society_bbb_logo(uid):
@@ -67,17 +79,20 @@ def delete_society_bbb_logo(uid):
 def delete_society_session(uid, session_id):
     society = Society.query.filter_by(uid=uid).first()
     sessions = copy.deepcopy(society.sessions)
-    session_to_delete = next((session for session in sessions if session["id"] == session_id), None)
+    session_to_delete = next(
+        (session for session in sessions if session["id"] == session_id), None
+    )
 
     if session_to_delete is None:
         return
     else:
-        current_app.logger.info(f"For uid='{ society.uid }': deleting session [ day: { session_to_delete['day'] }, start: { session_to_delete['start'] }, end: { session_to_delete['end'] } ]")
+        current_app.logger.info(
+            f"For uid='{ society.uid }': deleting session [ day: { session_to_delete['day'] }, start: { session_to_delete['start'] }, end: { session_to_delete['end'] } ]"
+        )
         sessions.remove(session_to_delete)
         society.sessions = sessions
         db.session.commit()
         return
-
 
 
 @bp.route("/<uid>", methods=("GET", "POST"))
@@ -108,11 +123,20 @@ def admin(uid):
 
         values = {}
 
-        for key in ("soc_name", "website", "description", "short_description",
-                    "welcome_text", "logo", "banner_text",
-                    "banner_color", "new_admin_crsid",
-                    "new_session_day", "new_session_start",
-                    "new_session_end"):
+        for key in (
+            "soc_name",
+            "website",
+            "description",
+            "short_description",
+            "welcome_text",
+            "logo",
+            "banner_text",
+            "banner_color",
+            "new_admin_crsid",
+            "new_session_day",
+            "new_session_start",
+            "new_session_end",
+        ):
             values[key] = request.form.get(key, "").strip()
 
         for key in ("mute_on_start", "disable_private_chat"):
@@ -141,19 +165,32 @@ def admin(uid):
                     # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
-                    static_filename = society.uid + "_" + gen_unique_string() + logo_extension
+                    static_filename = (
+                        society.uid + "_" + gen_unique_string() + logo_extension
+                    )
                     path = os.path.join(images_dir, static_filename)
 
-                    current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing logo...")
+                    current_app.logger.info(
+                        f"For user { crsid }, society uid='{ society.uid }': changing logo..."
+                    )
                     if not os.path.isdir(images_dir):
-                        current_app.logger.error(f"'{ images_dir }':  no such directory.")
+                        current_app.logger.error(
+                            f"'{ images_dir }':  no such directory."
+                        )
                         abort(500)
 
+                    maxwidth, maxheight = current_app.config["MAX_LOGO_SIZE"]
                     logo_img = Image.open(logo)
-                    logo_resized = logo_img.resize((512, 512))
+                    ratio = min(maxwidth / logo_img.width, maxheight / logo_img.height)
+                    # possible optimization with reduce here?
+                    logo_resized = logo_img.resize(
+                        (round(logo_img.width * ratio), round(logo_img.height * ratio))
+                    )
                     logo_resized.save(path)
 
-                    current_app.logger.info(f"For uid='{ society.uid }': saved new logo '{ path }'")
+                    current_app.logger.info(
+                        f"For uid='{ society.uid }': saved new logo '{ path }'"
+                    )
 
                     society.logo = static_filename
                     db.session.commit()
@@ -167,23 +204,33 @@ def admin(uid):
                     # Delete the old logo if it's not the default
                     delete_society_bbb_logo(uid)
 
-                    static_filename = society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                    static_filename = (
+                        society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                    )
                     path = os.path.join(images_dir, static_filename)
 
-                    current_app.logger.info(f"For user { crsid }, society uid='{ society.uid }': changing bbb_logo...")
+                    current_app.logger.info(
+                        f"For user { crsid }, society uid='{ society.uid }': changing bbb_logo..."
+                    )
                     if not os.path.isdir(images_dir):
-                        current_app.logger.error(f"'{ images_dir }':  no such directory.")
+                        current_app.logger.error(
+                            f"'{ images_dir }':  no such directory."
+                        )
                         abort(500)
 
                     bbb_logo_img = Image.open(bbb_logo)
                     bbb_logo_resized = bbb_logo_img.resize((100, 30))
                     bbb_logo_resized.save(path)
 
-                    current_app.logger.info(f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'")
+                    current_app.logger.info(
+                        f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
+                    )
 
                     society.bbb_logo = static_filename
                     db.session.commit()
-                    current_app.logger.info(f"For uid='{ society.uid }': updated bbb_logo.")
+                    current_app.logger.info(
+                        f"For uid='{ society.uid }': updated bbb_logo."
+                    )
                 else:
                     errors["bbb_logo"] = "Invalid file."
 
@@ -196,14 +243,18 @@ def admin(uid):
         # Adding a new admin
         if values["new_admin_crsid"] != "":
 
-            current_app.logger.info(f"For uid='{ society.uid }': { crsid } is adding new admin { values['new_admin_crsid'] }...")
+            current_app.logger.info(
+                f"For uid='{ society.uid }': { crsid } is adding new admin { values['new_admin_crsid'] }..."
+            )
             new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
             if not new_admin:
-                errors["new_admin_crsid"] = "That user is not registered yet. Users must register before being added as administrators."
+                errors[
+                    "new_admin_crsid"
+                ] = "That user is not registered yet. Users must register before being added as administrators."
             is_new_admin = True
 
         # Add a new session
-        if (values["new_session_start"] and values["new_session_end"]):
+        if values["new_session_start"] and values["new_session_end"]:
 
             start_time = [int(nstr) for nstr in values["new_session_start"].split(":")]
             end_time = [int(nstr) for nstr in values["new_session_end"].split(":")]
@@ -213,23 +264,30 @@ def admin(uid):
             t2 = time(hour=end_time[0], minute=end_time[1])
 
             if t1 > t2:
-                errors["new_session_start"] = "Unfortunately, time travel is not possible."
+                errors[
+                    "new_session_start"
+                ] = "Unfortunately, time travel is not possible."
 
             is_new_session = True
 
-        elif (values["new_session_start"]):
+        elif values["new_session_start"]:
             errors["new_session_end"] = "No end time specified."
-        elif (values["new_session_end"]):
+        elif values["new_session_end"]:
             errors["new_session_start"] = "No start time specified."
 
         if errors:
             flash("There are errors with the information you provided.")
-            return render_template("admin/admin.html",
-                                   page_title=f"Stall administration for { society.name }",
-                                   society=society, crsid=crsid, errors=errors,
-                                   sessions_data=sessions_data,
-                                   page_parent=url_for("home.home"), has_directory_page=has_directory_page,
-                                   **values)
+            return render_template(
+                "admin/admin.html",
+                page_title=f"Stall administration for { society.name }",
+                society=society,
+                crsid=crsid,
+                errors=errors,
+                sessions_data=sessions_data,
+                page_parent=url_for("home.home"),
+                has_directory_page=has_directory_page,
+                **values,
+            )
         else:
             society.name = values["soc_name"]
             society.website = values["website"]
@@ -246,15 +304,15 @@ def admin(uid):
                         else:
                             found_social["url"] = value
                             found_social["type"] = match_social(value)
-                    flag_modified(society, 'socials')
+                    flag_modified(society, "socials")
                 else:
                     # create a new social field
                     # and check if its empty
                     if value:
                         social_type = match_social(value)
-                        social_data = {"id": id, "url": value, "type": social_type }
+                        social_data = {"id": id, "url": value, "type": social_type}
                         society.socials.append(social_data)
-                        flag_modified(society, 'socials')
+                        flag_modified(society, "socials")
 
             society.description = values["description"]
             society.short_description = values["short_description"]
@@ -268,20 +326,28 @@ def admin(uid):
                 society.admins.append(new_admin)
 
             if is_new_session:
-                society.sessions.append({"id": gen_unique_string(),
-                                 "day": values["new_session_day"],
-                                 "start": values["new_session_start"],
-                                 "end": values["new_session_end"]})
+                society.sessions.append(
+                    {
+                        "id": gen_unique_string(),
+                        "day": values["new_session_day"],
+                        "start": values["new_session_start"],
+                        "end": values["new_session_end"],
+                    }
+                )
                 # we need this to ensure that sqlalchemy updates the val
-                flag_modified(society, 'sessions')
+                flag_modified(society, "sessions")
 
             db.session.commit()
 
             if is_new_admin:
-                current_app.logger.info(f"For uid='{ society.uid }': added new admin { new_admin }.")
+                current_app.logger.info(
+                    f"For uid='{ society.uid }': added new admin { new_admin }."
+                )
 
             if is_new_session:
-                current_app.logger.info(f"For uid='{ society.uid }': { crsid } added new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]")
+                current_app.logger.info(
+                    f"For uid='{ society.uid }': { crsid } added new session [ day: { values['new_session_day'] }, start: { values['new_session_start'] }, end: { values['new_session_end'] } ]"
+                )
 
             flash("Settings saved.")
 
@@ -299,15 +365,21 @@ def admin(uid):
             "banner_color": society.banner_color,
             "logo": society.logo,
             "mute_on_start": society.mute_on_start,
-            "disable_private_chat": society.disable_private_chat
+            "disable_private_chat": society.disable_private_chat,
         }
 
-    return render_template("admin/admin.html",
-                           page_title=f"Stall administration for { society.name }",
-                           society=society, crsid=crsid, errors={},
-                           sessions_data=sessions_data,
-                           page_parent=url_for("home.home"), has_directory_page=has_directory_page,
-                           **values)
+    return render_template(
+        "admin/admin.html",
+        page_title=f"Stall administration for { society.name }",
+        society=society,
+        crsid=crsid,
+        errors={},
+        sessions_data=sessions_data,
+        page_parent=url_for("home.home"),
+        has_directory_page=has_directory_page,
+        **values,
+    )
+
 
 @bp.route("/<uid>/reset_banner")
 @auth_decorator
@@ -333,6 +405,7 @@ def reset_banner(uid):
 
     return redirect(url_for("admin.admin", uid=society.uid))
 
+
 @bp.route("/<uid>/delete_logo")
 @auth_decorator
 def delete_logo(uid):
@@ -348,11 +421,14 @@ def delete_logo(uid):
     if society not in user.societies:
         abort(403)
 
-    current_app.logger.info(f"User { crsid } deleting logo { society.logo } for uid '{ society.uid }'...")
+    current_app.logger.info(
+        f"User { crsid } deleting logo { society.logo } for uid '{ society.uid }'..."
+    )
 
     delete_society_logo(uid)
 
     return redirect(url_for("admin.admin", uid=society.uid))
+
 
 @bp.route("/<uid>/delete_bbb_logo")
 @auth_decorator
@@ -369,11 +445,14 @@ def delete_bbb_logo(uid):
     if society not in user.societies:
         abort(403)
 
-    current_app.logger.info(f"User { crsid } deleting bbb_logo { society.bbb_logo } for uid '{ society.uid }'...")
+    current_app.logger.info(
+        f"User { crsid } deleting bbb_logo { society.bbb_logo } for uid '{ society.uid }'..."
+    )
 
     delete_society_bbb_logo(uid)
 
     return redirect(url_for("admin.admin", uid=society.uid))
+
 
 @bp.route("/<uid>/delete_session/<session_id>")
 @auth_decorator
@@ -386,7 +465,9 @@ def delete_session(uid, session_id):
 
     crsid = auth_decorator.principal
 
-    current_app.logger.info(f"User { crsid } deleting session { session_id } for uid '{ society.uid }'...")
+    current_app.logger.info(
+        f"User { crsid } deleting session { session_id } for uid '{ society.uid }'..."
+    )
 
     user = User.query.filter_by(crsid=crsid).first()
 
@@ -396,6 +477,7 @@ def delete_session(uid, session_id):
     delete_society_session(uid, session_id)
 
     return redirect(url_for("admin.admin", uid=society.uid))
+
 
 @bp.route("/<uid>/delete", methods=("GET", "POST"))
 @auth_decorator
@@ -421,16 +503,31 @@ def delete(uid):
             errors["soc_short_name"] = "That is the wrong name."
 
         if errors:
-            return render_template("admin/delete.html", page_title=f"Delete { society.name }", crsid=crsid, society=society, errors=errors)
+            return render_template(
+                "admin/delete.html",
+                page_title=f"Delete { society.name }",
+                crsid=crsid,
+                society=society,
+                errors=errors,
+            )
         else:
             delete_society_logo(uid)
 
             db.session.delete(society)
             db.session.commit()
 
-            current_app.logger.info(f"User { crsid } deleted society with uid='{ society.uid }'")
+            current_app.logger.info(
+                f"User { crsid } deleted society with uid='{ society.uid }'"
+            )
 
             return redirect(url_for("home.home"))
 
     else:
-        return render_template("admin/delete.html", page_title=f"Delete { society.name }", crsid=crsid, society=society, errors={})
+        return render_template(
+            "admin/delete.html",
+            page_title=f"Delete { society.name }",
+            crsid=crsid,
+            society=society,
+            errors={},
+        )
+

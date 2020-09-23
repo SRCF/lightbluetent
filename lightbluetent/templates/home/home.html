@@ -13,7 +13,9 @@
         <div class="card-header" style="background-color: {{ society.banner_color }};">
           {% set current_logo = "images/{}".format(society.logo) %}
           {% if society.logo != config["DEFAULT_LOGO"] %}
-            <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right soc_logo_thumbnail">
+          <div class="float-right img-thumbnail d-flex align-items-center justify-content-center" style="width:10vmax;height:10vmax;max-width:128px;max-height:128px;">
+            <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
+          </div>
           {% endif %}
         </div>
         <div class="card-body">

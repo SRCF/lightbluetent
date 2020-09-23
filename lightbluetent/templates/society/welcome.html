@@ -21,11 +21,11 @@
     {% if social.type == "email"%}
     <a href="mailto:{{ social.url }}">{{ social.url }}</a>
     {% else %}
-        {% if social.url.startswith("https://") or social.url.startswith("http://") %}
-        <a href="{{ social.url }}">{{ social.url}}</a>
-        {% else %}
-        <a href="http://{{ social.url }}">{{ social.url}}</a>
-        {% endif %}
+    {% if social.url.startswith("https://") or social.url.startswith("http://") %}
+    <a href="{{ social.url }}">{{ social.url}}</a>
+    {% else %}
+    <a href="http://{{ social.url }}">{{ social.url}}</a>
+    {% endif %}
     {% endif %}
 </li>
 {%- endmacro %}
@@ -50,20 +50,20 @@
                     </li>
                     {% endif %}
                     {% for social in society.socials %}
-                        {{social_match(social)}}
+                    {{social_match(social)}}
                     {% endfor %}
                 </ul>
                 <hr>
                 {% endif %}
-                <div class="row no-gutters rounded overflow-hidden">
+                <div class="row no-gutters overflow-hidden">
                     {% if has_logo %}
-                    <div class="col-auto mx-auto p-2">
-                        <img width="150" class="rounded float-left"
-                            src="{{ url_for('static', filename=logo) }}" alt="Logo" role="img"
-                            aria-label="Placeholder: Thumbnail">
+                    <div class="col-auto mx-auto d-flex align-items-center justify-content-center"
+                        style="width:100%;max-width:150px;max-height:150px;">
+                        <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"
+                            alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
                     </div>
                     {% endif %}
-                    <div class="col px-4 mt-2 mt-sm-0">
+                    <div class="col px-4 mt-3 mt-sm-0">
                         {% if society.description %}
                         <div class="sr-only mb-1 text-muted">{{ _("Society description") }}</div>
                         <div class="card-text mb-auto">
@@ -109,15 +109,17 @@
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group">
-                        <input type="name" class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}"
-                                name="full_name" id="full_name" placeholder="Enter your name..." {% if not running %}disabled{% endif %}>
+                        <input type="name"
+                            class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}"
+                            name="full_name" id="full_name" placeholder="Enter your name..."
+                            {% if not running %}disabled{% endif %}>
                         {%- if errors.full_name is defined %}
                         <small class="invalid-feedback">{{ errors.full_name }}</small>
                         {%- endif %}
                     </div>
 
                     <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
-                            {% if not running %}style="pointer-events: none;"{% endif %} value="{{ _('Join session') }}">
+                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join session') }}">
                 </form>
             </div>
         </div>

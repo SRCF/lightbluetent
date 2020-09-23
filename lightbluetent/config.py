@@ -23,6 +23,7 @@ class Config(object):
 
     DEFAULT_LOGO = "default_logo.png"
     DEFAULT_BBB_LOGO = "default_bbb_logo.png"
+    MAX_LOGO_SIZE = (512, 512)
     LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
     IMAGES_DIR = "lightbluetent/static/images"
 
