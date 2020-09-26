@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 
 {% block meta %}
-<meta property="og:title" content="{{ _("SRCF Timeout - Virtual Freshers' Fair") }}" />
+<meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("Virtual Freshers' Fair") }}" />
 <meta property="og:type" content="website" />
+{% if society.description %}
 <meta property="og:description"
-    content="{{ society.description | truncate(120)}}" />
+  content="{{ society.description | truncate(200) }}" />
+{% else %}
+  <meta property="og:description"
+    content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
+{% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
 {% set logo = 'images/' + society.logo %}
 <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
@@ -15,9 +20,17 @@
 {% endblock %}
 
 {% block static %}
-<link href="{{ url_for('static', filename='welcome.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
 <link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/svg">
+{% endblock %}
+
+{% block nav %}
+<header></header>
+{% endblock %}
+
+{% block heading %}
+<div></div>
 {% endblock %}
 
 {% block body %}
