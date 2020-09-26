@@ -4,17 +4,18 @@ from . import admin, home, society
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-from .utils import gen_unique_string, ordinal, sif
+from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error
+
 
 def create_app(config_name=None):
 
     if config_name == None:
-        config_name = "Production"
+        config_name = "production"
 
     app = Flask(__name__, template_folder="templates")
 
     # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
-    if(config_name == "Production"):
+    if(config_name == "production"):
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
@@ -56,6 +57,8 @@ def create_app(config_name=None):
     app.register_blueprint(admin.bp)
     app.register_blueprint(home.bp)
     app.register_blueprint(society.bp)
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, server_error)
 
     @app.context_processor
     def inject_gh_rev():

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-15 22:18+0100\n"
+"POT-Creation-Date: 2020-09-17 11:42+0100\n"
 "PO-Revision-Date: 2020-09-15 16:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,27 +18,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: lightbluetent/admin.py:129
+#: lightbluetent/admin.py:124
 msgid "Society name is too short."
 msgstr ""
 
-#: lightbluetent/admin.py:132
+#: lightbluetent/admin.py:127
 msgid "This description is too long."
 msgstr ""
 
-#: lightbluetent/home.py:26 lightbluetent/home.py:28
+#: lightbluetent/home.py:37 lightbluetent/home.py:39
 msgid "Welcome to the 2020 Virtual Freshers' Fair!"
 msgstr ""
 
-#: lightbluetent/home.py:97
+#: lightbluetent/home.py:117
 msgid "Your society short name must not contain spaces."
 msgstr ""
 
-#: lightbluetent/home.py:100
+#: lightbluetent/home.py:120
 msgid "That society short name is already in use."
 msgstr ""
 
-#: lightbluetent/home.py:103 lightbluetent/home.py:124
+#: lightbluetent/home.py:123 lightbluetent/home.py:144
 msgid "Register a society"
 msgstr ""
 
@@ -56,68 +56,75 @@ msgid ""
 "Virtual Freshers' Fair"
 msgstr ""
 
-#: lightbluetent/templates/base.html:34
+#: lightbluetent/templates/base.html:35
 #: lightbluetent/templates/society/base.html:17
 msgid "Virtual Freshers' Fair"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:13
+#: lightbluetent/templates/admin/admin.html:21
 msgid "Society name"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:19
+#: lightbluetent/templates/admin/admin.html:28
 msgid "This is the full name of your society."
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:53
-msgid ""
-"Here you can add URLs to your social media pages, or any other contact "
-"information you would like to be made available."
+#: lightbluetent/templates/admin/admin.html:46
+#: lightbluetent/templates/admin/admin.html:55
+msgid "Add multiple URLs and emails to spruce up your main page."
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:62
+#: lightbluetent/templates/admin/admin.html:60
 msgid "Society summary"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:68
+#: lightbluetent/templates/admin/admin.html:66
 msgid ""
 "A short summary of your society. This will appear on the directory page. "
 "Maximum 200 characters."
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:75
-#: lightbluetent/templates/society/welcome.html:77
+#: lightbluetent/templates/admin/admin.html:70
+#: lightbluetent/templates/society/welcome.html:60
 msgid "Society description"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:81
+#: lightbluetent/templates/admin/admin.html:76
 msgid ""
 "Write a bit about your society here. What do you do? How often do you "
 "meet? How many members do you have?"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:103
-msgid ""
-"Your logo must be a PNG, JPEG or GIF file smaller than 1 MB. <br /> This "
-"logo will be displayed on your society's welcome page."
+#: lightbluetent/templates/admin/admin.html:93
+msgid "This logo will be displayed on your society's welcome page."
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:209
+#: lightbluetent/templates/admin/admin.html:181
 msgid "Society admins"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:223
+#: lightbluetent/templates/admin/admin.html:195
 msgid ""
 "Enter another user's CRSid to grant them administrative privileges. This "
 "will allow them to change anything on this page, <b>including deleting "
-"the society</b>."
+"the society</b>. The user should already be registered with us. <b>Once "
+"an admin has been added, they cannot be removed."
+msgstr ""
+
+#: lightbluetent/templates/admin/admin.html:269
+msgid "Delete society"
 msgstr ""
 
 #: lightbluetent/templates/home/directory.html:7
 msgid "There are no registered societies."
 msgstr ""
 
-#: lightbluetent/templates/home/directory.html:29
+#: lightbluetent/templates/home/directory.html:23
+#: lightbluetent/templates/home/home.html:33
+msgid "Session in progress!"
+msgstr ""
+
+#: lightbluetent/templates/home/directory.html:37
 #, python-format
 msgid "Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>"
 msgstr ""
@@ -131,6 +138,17 @@ msgid "You currently have no registered societies."
 msgstr ""
 
 #: lightbluetent/templates/home/home.html:41
+#: lightbluetent/templates/society/begin_session.html:20
+#: lightbluetent/templates/society/welcome.html:107
+msgid "Join session"
+msgstr ""
+
+#: lightbluetent/templates/home/home.html:43
+#: lightbluetent/templates/society/begin_session.html:22
+msgid "Begin session"
+msgstr ""
+
+#: lightbluetent/templates/home/home.html:50
 msgid "Add a society"
 msgstr ""
 
@@ -163,7 +181,7 @@ msgid ""
 "href=\"https://cambridgesu.co.uk/\">freshers' fair main page.</a>"
 msgstr ""
 
-#: lightbluetent/templates/society/base.html:56
+#: lightbluetent/templates/society/base.html:58
 msgid ""
 "This service is run by <a href=\"https://www.srcf.net\" "
 "target=\"_blank\">the SRCF</a>, a volunteer student society that provides"
@@ -208,5 +226,36 @@ msgstr ""
 #~ "Are you a stall manager? <a "
 #~ "class=\"btn btn-outline-primary btn-sm\""
 #~ " href=\"%(url)s\">Log in here.</a>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Here you can add URLs to your "
+#~ "social media pages, or any other "
+#~ "contact information you would like to"
+#~ " be made available."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Your logo must be a PNG, JPEG "
+#~ "or GIF file smaller than 1 MB. "
+#~ "<br /> This logo will be displayed"
+#~ " on your society's welcome page."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Enter another user's CRSid to grant "
+#~ "them administrative privileges. This will "
+#~ "allow them to change anything on "
+#~ "this page, <b>including deleting the "
+#~ "society</b>."
+#~ msgstr ""
+
+#~ msgid "Here are the stalls for your societies."
+#~ msgstr ""
+
+#~ msgid "You currently have no registered societies."
+#~ msgstr ""
+
+#~ msgid "Add a society"
 #~ msgstr ""
 

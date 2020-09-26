@@ -1,6 +1,10 @@
 import uuid
 import re
+import sys
 from jinja2 import is_undefined
+from flask import render_template
+import traceback
+from werkzeug.exceptions import NotFound, Forbidden, HTTPException
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 
@@ -77,7 +81,16 @@ def ordinal(value):
         value = int(value)
     except (TypeError, ValueError):
         return value
-    suffixes = ('th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th')
+    suffixes = ("th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th")
     if value % 100 in (11, 12, 13):  # special case
         return "%d%s" % (value, suffixes[0])
     return "%d%s" % (value, suffixes[value % 10])
+
+
+def page_not_found(e):
+    return render_template("error.html", error=e), 404
+
+
+def server_error(e):
+    tb = traceback.format_exception(*sys.exc_info())
+    return render_template("error.html", error=e, tb=tb), 500

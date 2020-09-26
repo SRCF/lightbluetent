@@ -1,6 +1,84 @@
 # SRCF LightBlueTent
 
-A simple Flask webapp to power the 2020 University of Cambridge Freshers' Fair via Timeout
+A simple and elegant Flask webapp that turns managing society fairs and events into a piece of cake!
+
+Features:
+
+* user signup (via Raven) and management
+* individual group/society webpages (stalls) for event/fair
+* shared editing capabilities for users
+* connects directly to Timeout (BigBlueButton)
+* society directory
+
+Upcoming features:
+
+* integration with other video platforms
+* administrator panel
+* further customization of main page
+* streamlined user sign-up process
+* pre-signups (interested list) to events/fairs
+
+Known events:
+
+* Cambridge Students' Union Freshers' Fair 2020
+* Queens' College JCR society fair
+
+## Installation
+
+### Requirements
+
+* reverse proxy, eg. Apache/nginx
+* pipenv
+* python >3.8
+* a relational database supported by `psycopg2`
+
+### Instructions
+
+1. Clone the repository's `master` branch
+2. Copy the `.sample-env` file to `.env` and set variables
+3. Copy the `lbt.service` file to the relevant `systemd` location*
+4. Copy `.htaccess` to your `public_html` or `www` folder
+5. Configure any settings needed in `lightbluetent/config.py`
+6. Install the dependencies with `pipenv install`
+7. Spawn a shell with the right environment variables `pipenv shell` and initialize and upgrade the database: `flask db init` and `flask db upgrade`
+8. Edit the `run.sh` script to match directories of choice for the UNIX socket
+9. Start the service
+
+* For deployment on SRCF group accounts, follow instructions here: https://docs.srcf.net/app-hosting/index.html?highlight=systemctl
+  
+## Customization
+
+### Strings
+
+All strings have been pulled out into a file for easy customization. 
+
+* Modify the required strings in `lightbluetent/translations/en/LC_MESSAGES/messages.po`
+* `pybabel compile -d translations` to compile the translations
+* Further infomation for using flask-babel is [here](https://flask-babel.tkte.ch/)
+
+### Environment variables
+
+The existing variables are set for development. Remove them and uncomment the ones meant for production. The BigBlueButton server provided is for testing so you should request a secret from mw781.
+
+* `FLASK_ENV` defaults to production
+* `FLASK_CONFIG=production` sets which config file to load
+* `POSTGRES_DB` leave this field empty, it's meant for `docker-compose`
+* Database variables; edit accordingly
+  
+```env
+POSTGRES_USER=postgres
+POSTGRES_HOSTNAME=postgres
+POSTGRES_PASSWORD=
+APPLICATION_DB=lightbluetent
+```
+
+* `SQLALCHEMY_URI="postgresql+psycopg2://user@host:port/table"` this overrides the above database variables if provided
+* `FLASK_TRUSTED_HOSTS` set this to the domain that will be used
+* `FLASK_SECRET_KEY` secret key needed by flask; generate however
+
+### Logging
+
+Logs are made available in `production.log` and the log level can be set accordingly in `run.sh`.
 
 ## Development
 
@@ -33,16 +111,6 @@ git clone https://github.com/SRCF/lightbluetent.git
 
 ## Workflow
 
-### Production
-
-1. Clone repository
-2. `pipenv install`
-3. Move .htaccess into public_html
-4. Move lbt.service into the right place (https://docs.srcf.net/app-hosting/index.html?highlight=systemctl)
-5. `systemctl --user enable lbt`
-6. Set the ENV vars and copy .sample-env
-7. `systemctl --user start lbt`
-8. Logs in production.log
 
 ### Testing
 
@@ -68,13 +136,6 @@ DB data is preserved in a docker volume. To remove the volume, `docker volume ls
 * `flask db init` to fill the `lightbluetent` database with our schema
 * `flask db migrate -m "your message"` and `flask db upgrade` to complete a database migration, do this every time you change the DB structure
 
-#### Customising strings
-
-* Modify the required strings in `lightbluetent/translations/en/LC_MESSAGES/messages.po`
-* `pybabel compile -d translations` to compile the translations
-* Further infomation for using flask-babel is [here](https://flask-babel.tkte.ch/)
-
 Note: make sure to spawn a shell with the right env vars before running these commands
-
 
 Project structure and base code based on [this tutorial](https://www.thedigitalcatonline.com/blog/2020/07/06/flask-project-setup-tdd-docker-postgres-and-more-part-2/)

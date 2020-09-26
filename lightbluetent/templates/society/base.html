@@ -7,9 +7,15 @@
 
     <meta property="og:title" content="{{ _("SRCF Timeout - Virtual Freshers' Fair") }}" />
     <meta property="og:type" content="website" />
-    <!--TODO: ADD SOCIETY DESCRIPTION HERE-->
+
+    {% if society.description is not none %}
     <meta property="og:description"
+      content="{{ society.description | truncate(200) }}" />
+    {% else %}
+      <meta property="og:description"
         content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
+    {% endif %}
+
     <meta property="og:url" content="{{ request.base_url }}" />
     {% set logo = 'images/' + society.logo %}
     <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />

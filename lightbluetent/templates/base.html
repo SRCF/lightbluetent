@@ -5,7 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+<<<<<<< HEAD
     {% block meta %}
+=======
+>>>>>>> develop
     <meta property="og:title" content="{{ _("SRCF Timeout - Virtual Freshers' Fair") }}" />
     <meta property="og:type" content="website" />
     <!--TODO: ADD SOCIETY DESCRIPTION HERE-->
@@ -13,6 +16,7 @@
         content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
     <meta property="og:url" content="{{ request.base_url }}" />
     <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
+<<<<<<< HEAD
     {% endblock %}
 
     {% block title %}
@@ -23,17 +27,30 @@
     <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
     
     {% block static %}
+=======
+    <title>{% block title %}SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}
+        {% endblock %}</title>
+
+    <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
+>>>>>>> develop
     <link href="https://www.srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
     <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
+<<<<<<< HEAD
     {% endblock %}
 
+=======
+>>>>>>> develop
     {% block head %}{% endblock %}
 </head>
 
 <body class="layout-footer">
+<<<<<<< HEAD
     {% block nav %}
+=======
+>>>>>>> develop
     <nav class="navbar navbar-expand-md navbar-light fixed-top">
         <div class="container">
             <h1 class="navbar-brand">
@@ -80,11 +97,30 @@
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
+<<<<<<< HEAD
         </div>
         {% endfor %}
         {% endwith %}
         {% block body %}{% endblock %}
     </main>
+=======
+        </div>
+        {% endfor %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+    </main>
+    <div id="action-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="container">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <div id="action-modal-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+>>>>>>> develop
     <footer class="footer pt-3">
         <p class="text-center mb-1">
             This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a volunteer student

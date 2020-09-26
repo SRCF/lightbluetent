@@ -45,7 +45,8 @@
                 {{social_field(n, id=social.id, url=social.url)}}
                 {% endfor %}
                 {{social_field(n)}}
-                <small class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
+                <small
+                    class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
             </div>
             {% else %}
             {% set social_defaults = ["e.g. https://facebook.com/srcf.net", "e.g. spqr2@srcf.net"] %}
@@ -54,7 +55,8 @@
                 {% for n in range(2) %}
                 {{social_field(n, social_defaults[n])}}
                 {% endfor %}
-                <small class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
+                <small
+                    class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
             </div>
             {% endif %}
             {% if has_directory_page %}
@@ -65,7 +67,8 @@
                 {%- if errors.short_description is defined %}
                 <small class="invalid-feedback">{{ errors.short_description }}</small>
                 {%- endif %}
-                <small class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
+                <small
+                    class="form-text text-muted">{{ _("A short summary of your society. This will appear on the directory page. Maximum 200 characters.") }}</small>
             </div>
             {% endif %}
             <div class="form-group">
@@ -75,14 +78,18 @@
                 {%- if errors.description is defined %}
                 <small class="invalid-feedback">{{ errors.description }}</small>
                 {%- endif %}
-                <small class="form-text text-muted">{{ _("Write a bit about your society here. What do you do? How often do you meet? How many members do you have?") }}</small>
+                <small
+                    class="form-text text-muted">{{ _("Write a bit about your society here. What do you do? How often do you meet? How many members do you have?") }}</small>
             </div>
         </div>
         <div class="col-md-6 px-5">
             <div class="form-group">
                 {% set current_logo = "images/{}".format(society.logo) %}
-                <img width="50%" height="250" src="{{ url_for('static', filename=current_logo) }}" alt="Society logo"
-                    class="img-thumbnail mx-auto d-block">
+                <div class="mx-auto img-thumbnail d-flex align-items-center justify-content-center"
+                    style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
+                    <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}"
+                        alt="Society logo" />
+                </div>
             </div>
             <div class="form-group">
                 <label for="logo">Logo</label>
@@ -92,7 +99,8 @@
                 <small class="invalid-feedback">{{ errors.logo }}</small>
                 {%- endif %}
                 <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
-                <small class="form-text text-muted">{{ _("This logo will be displayed on your society's welcome page.") }}</small>
+                <small
+                    class="form-text text-muted">{{ _("This logo will be displayed on your society's welcome page.") }}</small>
                 <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete
                         logo</a></small>
             </div>
@@ -177,7 +185,7 @@
         </div>
     </div>
     <hr />
-  
+
     <div class="form-row px-5">
         <div class="form-group">
             <label for="new_admin_crsid">{{ _("Society admins") }}</label>
@@ -194,7 +202,8 @@
             {%- if errors.new_admin_crsid is defined %}
             <small class="text-danger">{{ errors.new_admin_crsid }}</small>
             {%- endif %}
-            <small class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an admin has been added, they cannot be removed.") }}</b></small>
+            <small
+                class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an admin has been added, they cannot be removed.") }}</b></small>
         </div>
     </div>
     <hr />
@@ -268,7 +277,8 @@
 
     <div class="form-group form-row px-5 float-right">
         <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('admin.delete', uid=society.uid) }}" class="btn btn-outline-danger float-right">{{ _("Delete society") }}</a>
+        <a href="{{ url_for('admin.delete', uid=society.uid) }}"
+            class="btn btn-outline-danger float-right">{{ _("Delete society") }}</a>
     </div>
 </form>
 {% endblock %}

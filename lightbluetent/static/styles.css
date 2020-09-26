@@ -79,9 +79,26 @@ ul.traceback li {
 
 .footer {
     margin: 0px;
-    color: #9aa0ac;
+    color: #6e7076;
     font-size: 0.875rem;
     background-color: #ffffff !important;
     width: 100%;
     height: 65px;
+}
+
+/* Pulsing red video camera icon for when stalls are in session */
+@keyframes red-pulse {
+  0% {
+    color: #00000000
+  }
+  50% {
+    color: #c01c28;
+  }
+  100% {
+    color: #00000000;
+  }
+}
+
+.fa-video-camera {
+  animation: red-pulse 1300ms infinite;
 }

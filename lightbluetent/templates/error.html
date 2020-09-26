@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found{% endblock %}
+{% block body %}
+<div class="container text-center pt-9">
+    <div class="display-1 text-primary mb-5">
+        {% if error %}
+        Oops...
+        {% endif %}
+    </div>
+    <h1 class="h2 mb-3">{{error.code}}: {{error.name}}</h1>
+    <p class="h4 text-muted font-weight-normal mb-4">
+        {% if error.code == 404 %}
+        What you were looking for is just not there.
+        {% else %}
+        A server error ocurred. We're sorry for this. If this error persists, please email support@srcf.net with the
+        following below.
+        {% endif %}
+    </p>
+    <a class="btn btn-primary" href="{{ url_for('home.index') }}">
+        <i class="fa fa-arrow-left mr-2"></i>Go somewhere nice
+    </a>
+    {%- if tb %}
+    <ul class="traceback">
+        {%- for line in tb %}
+        <li>{{ line }}</li>
+        {%- else %}
+        <li>{{ error.__class__.__name__ }}{{ error.args }}</li>
+        {%- endfor %}
+    </ul>
+    {%- endif %}
+</div>
+{% endblock %}

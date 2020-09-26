@@ -17,8 +17,16 @@
           {% endif %}
         </div>
         <div class="card-body">
-            <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
-            {% if society.short_description %}
+          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
+          {% if running_meetings[society.bbb_id] %}
+          <ul class="fa-ul">
+              <li>
+                  <i class="fa fa-li fa-video-camera"></i>
+                  {{ _("Session in progress!") }}
+              </li>
+          </ul>
+          {% endif %}
+          {% if society.short_description %}
             <p>{{ society.short_description }}</p>
             {% elif society.description %}
             <p>{{ society.description | truncate(200)}}</p>
