@@ -1,6 +1,6 @@
 import os, subprocess, logging
 from flask import Flask
-from . import admin, home, society
+from . import rooms, home, society
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
@@ -54,7 +54,7 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    app.register_blueprint(admin.bp)
+    app.register_blueprint(rooms.bp)
     app.register_blueprint(home.bp)
     app.register_blueprint(society.bp)
     app.register_error_handler(404, page_not_found)

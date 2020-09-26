@@ -11,7 +11,7 @@
 # FLASK_SECRET_KEY=dummy_secret_key
 # SQLALCHEMY_URI="postgresql+psycopg2://mw781@postgres:5432/mw781"
 # set to "lbt" or a prefix of choice to avoid table name clashes
-# DB_PREFIX=
+# LBT_FEATURES=signups,recording
 
 # DEVELOPMENT CONFIG
 

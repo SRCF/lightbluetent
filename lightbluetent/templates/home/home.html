@@ -31,8 +31,8 @@
                             href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
                     </li>
                     <li>
-                        <i class="fa fa-li fa-users" title="Administrator"></i>
-                        {{ society.admins|map(attribute="crsid")|join(", ") }}
+                        <i class="fa fa-li fa-users" title="Owners"></i>
+                        {{ society.owners|map(attribute="crsid")|join(", ") }}
                     </li>
                     {% if running_meetings[society.bbb_id] %}
                     <li>
@@ -43,7 +43,7 @@
                 </ul>
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
+                <a href="{{ url_for('rooms.manage', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
                 {% if running_meetings[society.bbb_id] %}
                 <a href="{{ url_for('society.begin_session', uid=society.uid) }}"
                     class="btn btn-outline-success">{{ _("Join session") }}</a>

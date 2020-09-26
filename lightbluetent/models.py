@@ -7,7 +7,7 @@ migrate = Migrate()
 
 # Association table for many-to-many relationship between admins and societies.
 user_society = db.Table("user_society",
-                  db.Column("admin_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+                  db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
                   db.Column("society_id", db.Integer, db.ForeignKey("societies.id"), primary_key=True))
 
 class User(db.Model):
@@ -32,7 +32,7 @@ class Society(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
-    admins = db.relationship("User", secondary=user_society, lazy=True, backref=db.backref('societies', lazy=True))
+    owners = db.relationship("User", secondary=user_society, lazy=True, backref=db.backref('societies', lazy=True))
     short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -59,3 +59,17 @@ class Society(db.Model):
 
     def __repr__(self):
         return f"Society('{self.name}', '{self.admins}')"
+
+
+class Settings(db.Model):
+    __tablename__ = "settings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=False, nullable=False)
+    value = db.Column(db.String, unique=False, nullable=True)
+    enabled = db.Column(db.Boolean, nullable=True, default=False)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Setting('{self.name}', '{self.enabled}')"
+

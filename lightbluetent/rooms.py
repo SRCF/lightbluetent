@@ -19,7 +19,7 @@ from flask_babel import _
 from datetime import time
 from sqlalchemy.orm.attributes import flag_modified
 
-bp = Blueprint("admin", __name__, url_prefix="/admin")
+bp = Blueprint("rooms", __name__, url_prefix="/r")
 
 
 def remove_logo(path):
@@ -97,7 +97,7 @@ def delete_society_session(uid, session_id):
 
 @bp.route("/<uid>", methods=("GET", "POST"))
 @auth_decorator
-def admin(uid):
+def manage(uid):
 
     has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
 
@@ -116,7 +116,7 @@ def admin(uid):
 
     if request.method == "POST":
 
-        is_new_admin = False
+        is_new_owner = False
         is_new_session = False
 
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
@@ -132,7 +132,7 @@ def admin(uid):
             "logo",
             "banner_text",
             "banner_color",
-            "new_admin_crsid",
+            "new_owner_crsid",
             "new_session_day",
             "new_session_start",
             "new_session_end",
@@ -240,18 +240,18 @@ def admin(uid):
         if len(values["banner_text"]) > 100:
             errors["banner_text"] = "Banner text is too long."
 
-        # Adding a new admin
-        if values["new_admin_crsid"] != "":
+        # Adding a new owner
+        if values["new_owner_crsid"] != "":
 
             current_app.logger.info(
-                f"For uid='{ society.uid }': { crsid } is adding new admin { values['new_admin_crsid'] }..."
+                f"For uid='{ society.uid }': { crsid } is adding new owner { values['new_owner_crsid'] }..."
             )
-            new_admin = User.query.filter_by(crsid=values["new_admin_crsid"]).first()
-            if not new_admin:
+            new_owner = User.query.filter_by(crsid=values["new_owner_crsid"]).first()
+            if not new_owner:
                 errors[
-                    "new_admin_crsid"
+                    "new_owner_crsid"
                 ] = "That user is not registered yet. Users must register before being added as administrators."
-            is_new_admin = True
+            is_new_owner = True
 
         # Add a new session
         if values["new_session_start"] and values["new_session_end"]:
@@ -278,7 +278,7 @@ def admin(uid):
         if errors:
             flash("There are errors with the information you provided.")
             return render_template(
-                "admin/admin.html",
+                "rooms/manage.html",
                 page_title=f"Stall administration for { society.name }",
                 society=society,
                 crsid=crsid,
@@ -322,8 +322,8 @@ def admin(uid):
             society.mute_on_start = values["mute_on_start"]
             society.disable_private_chat = values["disable_private_chat"]
 
-            if is_new_admin:
-                society.admins.append(new_admin)
+            if is_new_owner:
+                society.owners.append(new_owner)
 
             if is_new_session:
                 society.sessions.append(
@@ -339,9 +339,9 @@ def admin(uid):
 
             db.session.commit()
 
-            if is_new_admin:
+            if is_new_owner:
                 current_app.logger.info(
-                    f"For uid='{ society.uid }': added new admin { new_admin }."
+                    f"For uid='{ society.uid }': added new owner { new_owner }."
                 )
 
             if is_new_session:
@@ -351,7 +351,7 @@ def admin(uid):
 
             flash("Settings saved.")
 
-            return redirect(url_for("admin.admin", uid=society.uid))
+            return redirect(url_for("rooms.manage", uid=society.uid))
 
     else:
         # defaults
@@ -369,7 +369,7 @@ def admin(uid):
         }
 
     return render_template(
-        "admin/admin.html",
+        "rooms/manage.html",
         page_title=f"Stall administration for { society.name }",
         society=society,
         crsid=crsid,
@@ -403,7 +403,7 @@ def reset_banner(uid):
 
     db.session.commit()
 
-    return redirect(url_for("admin.admin", uid=society.uid))
+    return redirect(url_for("rooms.manage", uid=society.uid))
 
 
 @bp.route("/<uid>/delete_logo")
@@ -427,7 +427,7 @@ def delete_logo(uid):
 
     delete_society_logo(uid)
 
-    return redirect(url_for("admin.admin", uid=society.uid))
+    return redirect(url_for("rooms.manage", uid=society.uid))
 
 
 @bp.route("/<uid>/delete_bbb_logo")
@@ -451,7 +451,7 @@ def delete_bbb_logo(uid):
 
     delete_society_bbb_logo(uid)
 
-    return redirect(url_for("admin.admin", uid=society.uid))
+    return redirect(url_for("rooms.manage", uid=society.uid))
 
 
 @bp.route("/<uid>/delete_session/<session_id>")
@@ -476,7 +476,7 @@ def delete_session(uid, session_id):
 
     delete_society_session(uid, session_id)
 
-    return redirect(url_for("admin.admin", uid=society.uid))
+    return redirect(url_for("rooms.manage", uid=society.uid))
 
 
 @bp.route("/<uid>/delete", methods=("GET", "POST"))
@@ -504,7 +504,7 @@ def delete(uid):
 
         if errors:
             return render_template(
-                "admin/delete.html",
+                "rooms/delete.html",
                 page_title=f"Delete { society.name }",
                 crsid=crsid,
                 society=society,
@@ -524,7 +524,7 @@ def delete(uid):
 
     else:
         return render_template(
-            "admin/delete.html",
+            "rooms/delete.html",
             page_title=f"Delete { society.name }",
             crsid=crsid,
             society=society,
