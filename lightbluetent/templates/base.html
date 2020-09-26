@@ -105,7 +105,8 @@
     <script src="https://www.srcf.net/_srcf/vendor/js/jquery.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/popper.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascripts/script.js') }}"></script>
+    {% block scripts %} {% endblock %}
 
 </body>
 

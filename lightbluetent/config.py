@@ -33,6 +33,10 @@ class Config(object):
     # getting the URL of the bbb_logo to pass to BBB.
     IMAGES_DIR_FROM_STATIC = "images"
 
+    SITE_SETTINGS = []
+
+    SITE_SETTINGS.append({"name": "enable_signups", "enabled": os.getenv("ENABLE_SIGNUPS", True)})
+
 
 
 

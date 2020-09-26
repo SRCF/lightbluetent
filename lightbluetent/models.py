@@ -61,7 +61,7 @@ class Society(db.Model):
         return f"Society('{self.name}', '{self.admins}')"
 
 
-class Settings(db.Model):
+class Setting(db.Model):
     __tablename__ = "settings"
 
     id = db.Column(db.Integer, primary_key=True)
