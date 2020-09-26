@@ -17,8 +17,8 @@ class User(db.Model):
     crsid = db.Column(db.String(7), db.CheckConstraint('crsid = lower(crsid)'))
     email = db.Column(db.String, unique=True, nullable=False)
     full_name = db.Column(db.String, unique=False, nullable=False)
-    first_name = db.Column(db.String, unique=False, nullable=False)
-    surname = db.Column(db.String, unique=False, nullable=False)
+    first_name = db.Column(db.String, unique=False, nullable=True)
+    surname = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # will it work if I use the backref here?
