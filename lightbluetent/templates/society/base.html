@@ -10,7 +10,7 @@
 
     {% if society.description is not none %}
     <meta property="og:description"
-      content="{{ society.description | truncate(100) }}" />
+      content="{{ society.description | truncate(200) }}" />
     {% else %}
       <meta property="og:description"
         content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
