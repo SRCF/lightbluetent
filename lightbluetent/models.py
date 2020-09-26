@@ -16,13 +16,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     crsid = db.Column(db.String(7), db.CheckConstraint('crsid = lower(crsid)'))
     email = db.Column(db.String, unique=True, nullable=False)
-    first_name = db.Column(db.String, unique=False, nullable=False)
-    surname = db.Column(db.String, unique=False, nullable=False)
+    full_name = db.Column(db.String, unique=False, nullable=False)
+    first_name = db.Column(db.String, unique=False, nullable=True)
+    surname = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # will it work if I use the backref here?
     def __repr__(self):
-        return f"User('{self.crsid}': '{self.first_name} {self.surname}', '{self.email}')"
+        return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
 
 
 class Society(db.Model):
