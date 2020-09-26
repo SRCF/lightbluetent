@@ -1,10 +1,64 @@
-h2 .fa-arrow-left {
-    margin-right: 0.25rem;
+/* font defaults */
+@import url('https://www.srcf.net/_srcf/fonts.css');
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
 }
 
-.modal-content {
-    padding-top: 15px;
-    padding-bottom: 15px;
+body {
+    /* padding-top: 3.5rem; */
+    color: #000;
+    font-family: D-DIN, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* navbar */
+
+.navbar-brand {
+    font-weight: 500;
+}
+.navbar-brand img {
+    width: 2rem;
+    margin-right: 0.5rem;
+}
+
+.navbar-brand a:hover {
+    text-decoration: none;
+}
+
+.navbar {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: #ccc !important;
+    background-color: #f0f0f0 !important;
+}
+
+/* 
+for a fixed-top navbar
+main > .container {
+    padding: 60px 0;
+} */
+
+/* footer */
+
+.footer {
+    margin: 0px;
+    color: #6e7076;
+    font-size: 0.875rem;
+    background-color: #ffffff;
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-color: #ccc;
+}
+
+h2 .fa-arrow-left {
+    margin-right: 0.25rem;
 }
 
 .card-body .text-muted:last-child {
@@ -14,17 +68,19 @@ h2 .fa-arrow-left {
 table .nowrap {
     white-space: nowrap;
 }
+
 table pre {
     margin-top: 0.25rem;
     margin-bottom: 0;
 }
+
 td .list-inline {
     margin-bottom: 0;
 }
 
 pre.shell {
     background-color: #444;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     color: #ddd;
     padding: 10px;
     white-space: pre-wrap;
@@ -39,7 +95,8 @@ pre.shell b {
 
 .soc_delete_form {
     border-color: #dc3545;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(220, 53, 69, 1);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px rgba(220, 53, 69, 1);
 }
 
 ul.traceback {
@@ -47,7 +104,7 @@ ul.traceback {
     padding: 0.5em;
     background: #eee;
     border: 1px solid #aaa;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     color: #444;
 }
 ul.traceback li {
@@ -61,44 +118,20 @@ ul.traceback li {
     color: #dc3545 !important;
 }
 
-.pagination input {
-    border-radius: 0;
-    width: 70px;
-}
-.pagination form:not(:first-child) input {
-    border-left: 0;
-}
-.pagination form:first-child input {
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-}
-.pagination form:last-child input {
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-}
-
-.footer {
-    margin: 0px;
-    color: #6e7076;
-    font-size: 0.875rem;
-    background-color: #ffffff !important;
-    width: 100%;
-    height: 65px;
-}
-
 /* Pulsing red video camera icon for when stalls are in session */
+
 @keyframes red-pulse {
-  0% {
-    color: #00000000
-  }
-  50% {
-    color: #c01c28;
-  }
-  100% {
-    color: #00000000;
-  }
+    0% {
+        color: #00000000;
+    }
+    50% {
+        color: #c01c28;
+    }
+    100% {
+        color: #00000000;
+    }
 }
 
 .fa-video-camera {
-  animation: red-pulse 1300ms infinite;
+    animation: red-pulse 1300ms infinite;
 }
