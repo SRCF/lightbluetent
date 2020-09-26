@@ -4,50 +4,58 @@
 
 <p>Hello, <b>{{ crsid }}</b>. {{ _("Here are the stalls for your societies.") }}</p>
 
-<div class="card-columns">
-  {% if not user_societies %}
-    <p>{{ _("You currently have no registered societies.") }}</p><br />
-  {% else %}
+{% if not user_societies %}
+<p>{{ _("You currently have no registered societies.") }}</p><br />
+{% else %}
+<div class="row">
     {% for society in user_societies %}
-      <div class="card">
-        <div class="card-header" style="background-color: {{ society.banner_color }};">
-          {% set current_logo = "images/{}".format(society.logo) %}
-          {% if society.logo != config["DEFAULT_LOGO"] %}
-          <div class="float-right img-thumbnail d-flex align-items-center justify-content-center" style="width:10vmax;height:10vmax;max-width:128px;max-height:128px;">
-            <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
-          </div>
-          {% endif %}
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header" style="background-color: {{ society.banner_color }};">
+                {% set current_logo = "images/{}".format(society.logo) %}
+                {% if society.logo != config["DEFAULT_LOGO"] %}
+                <div class="float-right img-thumbnail d-flex align-items-center justify-content-center"
+                    style="width:10vmax;height:10vmax;max-width:128px;max-height:128px;">
+                    <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}"
+                        alt="Society logo" />
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small>
+                </h4>
+                <ul class="fa-ul">
+                    <li>
+                        <i class="fa fa-li fa-link" title="Stall URL"></i>
+                        <a
+                            href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
+                    </li>
+                    <li>
+                        <i class="fa fa-li fa-users" title="Administrator"></i>
+                        {{ society.admins|map(attribute="crsid")|join(", ") }}
+                    </li>
+                    {% if running_meetings[society.bbb_id] %}
+                    <li>
+                        <i class="fa fa-li fa-video-camera"></i>
+                        {{ _("Session in progress!") }}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
+                {% if running_meetings[society.bbb_id] %}
+                <a href="{{ url_for('society.begin_session', uid=society.uid) }}"
+                    class="btn btn-outline-success">{{ _("Join session") }}</a>
+                {% else %}
+                <a href="{{ url_for('society.begin_session', uid=society.uid) }}"
+                    class="btn btn-outline-success">{{ _("Begin session") }}</a>
+                {% endif %}
+            </div>
         </div>
-        <div class="card-body">
-          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
-          <ul class="fa-ul">
-            <li>
-              <i class="fa fa-li fa-link" title="Stall URL"></i>
-              <a href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
-            </li>
-            <li>
-                <i class="fa fa-li fa-users" title="Administrator"></i>
-                {{ society.admins|map(attribute="crsid")|join(", ") }}
-            </li>
-            {% if running_meetings[society.bbb_id] %}
-            <li>
-                <i class="fa fa-li fa-video-camera"></i>
-                {{ _("Session in progress!") }}
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-        <div class="card-footer">
-          <a href="{{ url_for('admin.admin', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
-          {% if running_meetings[society.bbb_id] %}
-          <a href="{{ url_for('society.begin_session', uid=society.uid) }}" class="btn btn-outline-success">{{ _("Join session") }}</a>
-          {% else %}
-          <a href="{{ url_for('society.begin_session', uid=society.uid) }}" class="btn btn-outline-success">{{ _("Begin session") }}</a>
-          {% endif %}
-        </div>
-      </div>
+    </div>
     {% endfor %}
-  {% endif %}
 </div>
+{% endif %}
 <a href="{{ url_for('home.register_soc') }}" class="btn btn-outline-primary">{{ _("Add a society") }}</a>
 {% endblock %}

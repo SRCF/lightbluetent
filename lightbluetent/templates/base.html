@@ -1,102 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    {% block meta %}
     <meta property="og:title" content="{{ _("SRCF Timeout - Virtual Freshers' Fair") }}" />
     <meta property="og:type" content="website" />
-    <!--TODO: ADD SOCIETY DESCRIPTION HERE-->
     <meta property="og:description"
         content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
     <meta property="og:url" content="{{ request.base_url }}" />
     <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
-    <title>{% block title %}SRCF Freshers' Fair &mdash; {% if page_title is defined %}{{ page_title }}{% endif %}
-        {% endblock %}</title>
+    {% endblock %}
+
+    {% block title %}
+    <title>SRCF Freshers' Fair &mdash; {% if page_title %}{{ page_title }}{% endif %}</title>
+    {% endblock %}
 
     <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://www.srcf.net/_srcf/vendor/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://www.srcf.net/_srcf/srcf-bs.css" rel="stylesheet" type="text/css">
+
+    {% block static %}
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
     <link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
+    {% endblock %}
+
     {% block head %}{% endblock %}
 </head>
 
-<body class="layout-footer">
-    <nav class="navbar navbar-expand-md navbar-light fixed-top">
-        <div class="container">
-            <h1 class="navbar-brand">
-                <a href="{{ url_for('home.home') }}">
-                    <img src="https://www.srcf.net/_srcf/images/logo.svg">
-                    <span>
-                        <span class="text-danger">Student-Run</span>
-                        <span class="text-primary">Computing Facility</span>
-                        <span class="text-muted">&mdash; {{ _("Virtual Freshers' Fair") }}</span>
-                    </span>
-                </a>
-            </h1>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav ml-auto">
-                    {% if crsid %}
-                    <div class="text-muted">{{ crsid }} <a href="{{ url_for('home.logout') }}">(Log out)</a></div>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <main role="main" class="container">
-        {%- if page_title is defined %}
-        <h2>
-            {%- if page_parent is defined %}
-            <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
-            {%- endif %}
-            {{ page_title }}
-            {%- if page_subtitle is defined %}
-            <small class="text-muted">{{ page_subtitle }}</small>
-            {%- endif %}
-        </h2>
-        {%- endif %}
-        {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endfor %}
-        {% endwith %}
-        {% block body %}{% endblock %}
-    </main>
-    <div id="action-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="container">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <div id="action-modal-content"></div>
+<body class="d-flex flex-column h-100">
+    {% block nav %}
+    <header>
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <div class="container">
+                <div class="navbar-brand">
+                    <a href="{{ url_for('home.home') }}">
+                        <img src="https://www.srcf.net/_srcf/images/logo.svg">
+                        <span>
+                            <span class="text-danger">Student-Run</span>
+                            <span class="text-primary">Computing Facility</span>
+                            <span class="text-muted">&mdash; {{ _("Virtual Freshers' Fair") }}</span>
+                        </span>
+                    </a>
+                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav ml-auto">
+                        {% block extra_nav %}{% endblock %}
+                        {% if crsid %}
+                        <div class="text-muted">{{ crsid }} <a href="{{ url_for('home.logout') }}">(Log out)</a></div>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
+        </nav>
+    </header>
+    {% endblock %}
+
+    <main role="main" class="flex-shrink-0">
+        <div class="container my-4">
+            {% block heading %}
+            {%- if page_title is defined %}
+            <h2>
+                {%- if page_parent is defined %}
+                <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+                {%- endif %}
+                {{ page_title }}
+                {%- if page_subtitle is defined %}
+                <small class="text-muted">{{ page_subtitle }}</small>
+                {%- endif %}
+            </h2>
+            {%- endif %}
+            {% endblock %}
+
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% block body %}{% endblock %}
         </div>
-    </div>
-    <footer class="footer pt-3">
-        <p class="text-center mb-1">
-            This service is run by <a href="https://www.srcf.net" target="_blank">the SRCF</a>, a volunteer student
-            society that provides free quality and reliable computing services
-            |
-            <a href="https://github.com/SRCF/lightbluetent">{{github_rev}}</a>
-        </p>
+    </main>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container text-center">
+            <span class=" text-muted">
+                {{ _("This service is run by <a href=\"https://www.srcf.net\" target=\"_blank\">the SRCF</a>, a volunteer student society that provides free quality and reliable computing services") }}
+                |
+                <a href="https://github.com/SRCF/lightbluetent">{{github_rev}}</a>
+            </span>
+        </div>
     </footer>
+
     <script src="https://www.srcf.net/_srcf/vendor/js/jquery.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/popper.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 
 </html>

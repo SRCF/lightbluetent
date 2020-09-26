@@ -1,37 +1,49 @@
-{% extends "home/directory_base.html" %}
+{% extends "base.html" %}
+
+{% block nav %}
+<header></header>
+{% endblock %}
 
 {% block body %}
 
-<div class="card-columns">
-  {% if not societies %}
-    <p>{{ _("There are no registered societies.") }}</p><br />
-  {% else %}
-    {% for society in societies %}
-      <div class="card">
-        <div class="card-header" style="background-color: {{ society.banner_color }};">
-          {% set current_logo = "images/{}".format(society.logo) %}
-          {% if society.logo != config["DEFAULT_LOGO"] %}
-            <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" class="img-thumbnail float-right soc_logo_thumbnail">
-          {% endif %}
+<div class="row mt-3">
+    {% if not societies %}
+    <p>{{ _("There are no registered societies.") }}</p>
+    {% else %}
+    <div class="col-md-6">
+        <p>This is the society directory for the SRCF Freshers' Fair.</p>
+        {% for society in societies %}
+        <div class="card mb-3">
+            <div class="card-header" style="background-color: {{ society.banner_color }};">
+                {% set current_logo = "images/{}".format(society.logo) %}
+                {% if society.logo != config["DEFAULT_LOGO"] %}
+                <img src="{{ url_for('static', filename=current_logo) }}" alt="Society logo"
+                    class="img-thumbnail float-right soc_logo_thumbnail">
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small>
+                </h4>
+                {% if running_meetings[society.bbb_id] %}
+                <ul class="fa-ul">
+                    <li>
+                        <i class="fa fa-li fa-video-camera"></i>
+                        {{ _("Session in progress!") }}
+                    </li>
+                </ul>
+                {% endif %}
+                {% if society.short_description %}
+                <p>{{ society.short_description }}</p>
+                {% elif society.description %}
+                <p>{{ society.description | truncate(200)}}</p>
+                {% endif %}
+                <a class="btn btn-outline-primary btn-sm stretched-link"
+                    href="{{ url_for('society.welcome', uid=society.uid) }}">See more...</a>
+            </div>
         </div>
-        <div class="card-body">
-          <h4 class="card-title">{{ society.name }} <small class="text-muted">{{ society.short_name }}</small></h4>
-          {% if running_meetings[society.bbb_id] %}
-          <ul class="fa-ul">
-              <li>
-                  <i class="fa fa-li fa-video-camera"></i>
-                  {{ _("Session in progress!") }}
-              </li>
-          </ul>
-          {% endif %}
-          {% if society.short_description %}
-            <p>{{ society.short_description }}</p>
-          {% endif %}
-          <a class="btn btn-outline-primary btn-sm stretched-link" href="{{ url_for('society.welcome', uid=society.uid) }}">See more...</a>
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 
 <p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url=home_url) }}</p>
