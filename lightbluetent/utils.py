@@ -104,7 +104,6 @@ def fetch_lookup_data(crsid):
         params={"fetch": "email,departingEmail", "format": "json"},
         timeout=(0.5, 10),
     )
-    print(res)
     if res.status_code == 200:
         # request successful
         return res.json()["result"]["person"]

@@ -201,7 +201,7 @@ def register():
         # Input validation from https://github.com/SRCF/control-panel/blob/master/control/webapp/signup.py#L37
 
         values = {}
-        for key in ("first_name", "surname", "email_address"):
+        for key in ("full_name", "email_address"):
             values[key] = request.form.get(key, "").strip()
 
         for key in ("dpa", "tos"):
@@ -209,8 +209,8 @@ def register():
 
         errors = {}
 
-        if len(values["first_name"]) <= 1:
-            errors["first_name"] = "A first name is required."
+        if len(values["full_name"]) <= 1:
+            errors["full_name"] = "A name is required."
 
         email_err = validate_email(crsid, values["email_address"])
         if email_err is not None:
@@ -236,8 +236,7 @@ def register():
 
             user = User(
                 email=values["email_address"],
-                first_name=values["first_name"],
-                surname=values["surname"],
+                full_name=values["full_name"],
                 crsid=auth_decorator.principal,
             )
 
