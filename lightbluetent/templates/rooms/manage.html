@@ -159,7 +159,7 @@
                 <small class="form-text text-muted">This is an optional field that will add a banner to your stall
                     with your chosen banner color.</small>
                 <small class="form-text text-muted"><a
-                        href="{{ url_for('owner.reset_banner', uid=society.uid) }}">Delete banner</a></small>
+                        href="{{ url_for('rooms.reset_banner', uid=society.uid) }}">Delete banner</a></small>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -275,7 +275,7 @@
         </div>
     </div>
 
-    <div class="form-group form-row px-5 float-right">
+    <div class="form-group mt-3 form-row px-5 float-right">
         <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
         <a href="{{ url_for('rooms.delete', uid=society.uid) }}"
             class="btn btn-outline-danger float-right">{{ _("Delete society") }}</a>
