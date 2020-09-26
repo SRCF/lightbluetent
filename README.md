@@ -39,9 +39,10 @@ Known events:
 3. Copy the `lbt.service` file to the relevant `systemd` location*
 4. Copy `.htaccess` to your `public_html` or `www` folder
 5. Configure any settings needed in `lightbluetent/config.py`
-6. Spawn a shell with the right environment variables `pipenv shell` and initialize and upgrade the database: `flask db init` and `flask db upgrade`
-7. Edit the `run.sh` script to match directories of choice for the UNIX socket
-8. Start the service
+6. Install the dependencies with `pipenv install`
+7. Spawn a shell with the right environment variables `pipenv shell` and initialize and upgrade the database: `flask db init` and `flask db upgrade`
+8. Edit the `run.sh` script to match directories of choice for the UNIX socket
+9. Start the service
 
 * For deployment on SRCF group accounts, follow instructions here: https://docs.srcf.net/app-hosting/index.html?highlight=systemctl
   
