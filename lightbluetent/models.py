@@ -59,6 +59,3 @@ class Society(db.Model):
 
     def __repr__(self):
         return f"Society('{self.name}', '{self.admins}')"
-
-
-
