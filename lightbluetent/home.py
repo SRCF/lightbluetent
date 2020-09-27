@@ -11,10 +11,9 @@ from flask import (
     abort,
     current_app,
 )
-from lightbluetent.models import db, User, Society
+from lightbluetent.models import db, User, Society, Setting
 from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
 from lightbluetent.api import Meeting
-from datetime import datetime
 from flask_babel import _
 
 import ucam_webauth
@@ -28,7 +27,6 @@ bp = Blueprint("home", __name__)
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(
     desc="SRCF Lightbluetent", require_ptags=None
 )
-
 
 @bp.route("/")
 def index():
@@ -250,20 +248,27 @@ def register():
             return redirect(url_for("home.home"))
 
     else:
-        # defaults
-        lookup_data = fetch_lookup_data(crsid)
-        values = {
-            "full_name": lookup_data["visibleName"],
-            "email_address": lookup_data["attributes"][0]["value"],
-            "dpa": False,
-            "tos": False,
-        }
 
-        return render_template(
-            "home/register.html",
-            page_title="Register",
-            crsid=crsid,
-            errors={},
-            **values,
-        )
+        if Setting.query.filter_by(name="enabled_signups").enabled:
+            # defaults
+            lookup_data = fetch_lookup_data(crsid)
+            values = {
+                "full_name": lookup_data["visibleName"],
+                "email_address": lookup_data["attributes"][0]["value"],
+                "dpa": False,
+                "tos": False,
+            }
 
+            return render_template(
+                "home/register.html",
+                page_title="Register",
+                crsid=crsid,
+                errors={},
+                **values,
+            )
+
+        else:
+            return render_template(
+                "home/no_signup.html",
+                page_title="Signups are not available",
+            )

@@ -1,5 +1,4 @@
 // change site setting from dropdown
-
 function changeSiteSetting(path, data, token) {
     $.ajax({
         type: "POST",
@@ -15,6 +14,7 @@ function changeSiteSetting(path, data, token) {
     })
 }
 
+// change whether signups should be enabled
 $('#enable-signups .dropdown-menu').on('click', '> *', function () {
     const path = $('#enable-signups').data('path');
     const data = { name: "enable_signups", enabled: $(this).data('action') == "enable" }

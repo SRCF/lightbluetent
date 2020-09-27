@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-09-17 11:42+0100\n"
+"POT-Creation-Date: 2020-09-27 08:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,113 +17,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: lightbluetent/admin.py:124
-msgid "Society name is too short."
-msgstr ""
-
-#: lightbluetent/admin.py:127
-msgid "This description is too long."
-msgstr ""
-
-#: lightbluetent/home.py:37 lightbluetent/home.py:39
+#: lightbluetent/home.py:50 lightbluetent/home.py:58
 msgid "Welcome to the 2020 Virtual Freshers' Fair!"
 msgstr ""
 
-#: lightbluetent/home.py:117
+#: lightbluetent/home.py:141
 msgid "Your society short name must not contain spaces."
 msgstr ""
 
-#: lightbluetent/home.py:120
+#: lightbluetent/home.py:146
 msgid "That society short name is already in use."
 msgstr ""
 
-#: lightbluetent/home.py:123 lightbluetent/home.py:144
+#: lightbluetent/home.py:151 lightbluetent/home.py:181
 msgid "Register a society"
 msgstr ""
 
-#: lightbluetent/templates/base.html:8
-#: lightbluetent/templates/home/directory_base.html:8
-#: lightbluetent/templates/society/base.html:8
+#: lightbluetent/rooms.py:148
+msgid "Society name is too short."
+msgstr ""
+
+#: lightbluetent/rooms.py:151
+msgid "This description is too long."
+msgstr ""
+
+#: lightbluetent/society.py:104
+#, python-format
+msgid "To invite others into this session, share your stall link: %(join_url)s"
+msgstr ""
+
+#: lightbluetent/templates/base.html:9
 msgid "SRCF Timeout - Virtual Freshers' Fair"
 msgstr ""
 
-#: lightbluetent/templates/base.html:11
-#: lightbluetent/templates/home/directory_base.html:11
-#: lightbluetent/templates/society/base.html:12
+#: lightbluetent/templates/base.html:12
+#: lightbluetent/templates/society/welcome.html:11
 msgid ""
 "This is a website for stall management using SRCF Timeout for the 2020 "
 "Virtual Freshers' Fair"
 msgstr ""
 
-#: lightbluetent/templates/base.html:35
-#: lightbluetent/templates/society/base.html:17
+#: lightbluetent/templates/base.html:44
+#: lightbluetent/templates/society/welcome.html:4
+#: lightbluetent/templates/society/welcome.html:19
 msgid "Virtual Freshers' Fair"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:21
-msgid "Society name"
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:28
-msgid "This is the full name of your society."
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:46
-#: lightbluetent/templates/admin/admin.html:55
-msgid "Add multiple URLs and emails to spruce up your main page."
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:60
-msgid "Society summary"
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:66
+#: lightbluetent/templates/base.html:98
 msgid ""
-"A short summary of your society. This will appear on the directory page. "
-"Maximum 200 characters."
+"This service is run by <a href=\"https://www.srcf.net\" "
+"target=\"_blank\">the SRCF</a>, a volunteer student society that provides"
+" free quality and reliable computing services"
 msgstr ""
 
-#: lightbluetent/templates/admin/admin.html:70
-#: lightbluetent/templates/society/welcome.html:60
-msgid "Society description"
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:76
-msgid ""
-"Write a bit about your society here. What do you do? How often do you "
-"meet? How many members do you have?"
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:93
-msgid "This logo will be displayed on your society's welcome page."
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:181
-msgid "Society admins"
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:195
-msgid ""
-"Enter another user's CRSid to grant them administrative privileges. This "
-"will allow them to change anything on this page, <b>including deleting "
-"the society</b>. The user should already be registered with us. <b>Once "
-"an admin has been added, they cannot be removed."
-msgstr ""
-
-#: lightbluetent/templates/admin/admin.html:269
-msgid "Delete society"
-msgstr ""
-
-#: lightbluetent/templates/home/directory.html:7
+#: lightbluetent/templates/home/directory.html:11
 msgid "There are no registered societies."
 msgstr ""
 
-#: lightbluetent/templates/home/directory.html:23
-#: lightbluetent/templates/home/home.html:33
+#: lightbluetent/templates/home/directory.html:31
+#: lightbluetent/templates/home/home.html:40
 msgid "Session in progress!"
 msgstr ""
 
-#: lightbluetent/templates/home/directory.html:37
+#: lightbluetent/templates/home/directory.html:49
 #, python-format
 msgid "Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>"
 msgstr ""
@@ -132,26 +88,26 @@ msgstr ""
 msgid "Here are the stalls for your societies."
 msgstr ""
 
-#: lightbluetent/templates/home/home.html:9
+#: lightbluetent/templates/home/home.html:8
 msgid "You currently have no registered societies."
 msgstr ""
 
-#: lightbluetent/templates/home/home.html:41
-#: lightbluetent/templates/society/begin_session.html:20
-#: lightbluetent/templates/society/welcome.html:107
+#: lightbluetent/templates/home/home.html:49
+#: lightbluetent/templates/society/begin_session.html:23
+#: lightbluetent/templates/society/welcome.html:160
 msgid "Join session"
 msgstr ""
 
-#: lightbluetent/templates/home/home.html:43
-#: lightbluetent/templates/society/begin_session.html:22
+#: lightbluetent/templates/home/home.html:52
+#: lightbluetent/templates/society/begin_session.html:25
 msgid "Begin session"
 msgstr ""
 
-#: lightbluetent/templates/home/home.html:50
+#: lightbluetent/templates/home/home.html:60
 msgid "Add a society"
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:5
+#: lightbluetent/templates/home/index.html:7
 msgid ""
 "This is a platform provided by the SRCF for the 2020 Virtual Freshers' "
 "Fair. For society admins, it allows you to host a custom web page that "
@@ -159,15 +115,15 @@ msgid ""
 "conferencing service, Timeout</a>."
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:6
+#: lightbluetent/templates/home/index.html:8
 msgid "Stall manager login"
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:9
+#: lightbluetent/templates/home/index.html:11
 msgid "For visitors of the fair, you can attend any society's stall."
 msgstr ""
 
-#: lightbluetent/templates/home/index.html:10
+#: lightbluetent/templates/home/index.html:12
 msgid "View the Cambridge SU society registry"
 msgstr ""
 
@@ -180,10 +136,57 @@ msgid ""
 "href=\"https://cambridgesu.co.uk/\">freshers' fair main page.</a>"
 msgstr ""
 
-#: lightbluetent/templates/society/base.html:58
+#: lightbluetent/templates/rooms/manage.html:23
+msgid "Society name"
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:30
+msgid "This is the full name of your society."
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:49
+#: lightbluetent/templates/rooms/manage.html:59
+msgid "Add multiple URLs and emails to spruce up your main page."
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:64
+msgid "Society summary"
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:71
 msgid ""
-"This service is run by <a href=\"https://www.srcf.net\" "
-"target=\"_blank\">the SRCF</a>, a volunteer student society that provides"
-" free quality and reliable computing services"
+"A short summary of your society. This will appear on the directory page. "
+"Maximum 200 characters."
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:75
+#: lightbluetent/templates/society/welcome.html:101
+msgid "Society description"
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:82
+msgid ""
+"Write a bit about your society here. What do you do? How often do you "
+"meet? How many members do you have?"
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:103
+msgid "This logo will be displayed on your society's welcome page."
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:191
+msgid "Society admins"
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:206
+msgid ""
+"Enter another user's CRSid to grant them administrative privileges. This "
+"will allow them to change anything on this page, <b>including deleting "
+"the society</b>. The user should already be registered with us. <b>Once "
+"an owner has been added, they cannot be removed."
+msgstr ""
+
+#: lightbluetent/templates/rooms/manage.html:281
+msgid "Delete society"
 msgstr ""
 
