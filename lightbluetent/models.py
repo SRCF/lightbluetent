@@ -93,9 +93,21 @@ class Role(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    value = db.Column(db.String, unique=False, nullable=True)
-    enabled = db.Column(db.Boolean, nullable=True, default=False)
+    permission_id = db.Column(db.Integer, db.ForeignKey('permissions.id'),
+        nullable=False)
+    description = db.Column(db.String, unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Setting('{self.name}', '{self.enabled}')"
+        return f"Role('{self.name}', '{self.description}')"
+
+
+class Permission(db.Model):
+    __tablename__ = "permissions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=False, nullable=False)
+    roles = db.relationship('Role', backref='permission', lazy=True)
+
+    def __repr__(self):
+        return f"Permission('{self.name}')"

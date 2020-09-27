@@ -15,7 +15,7 @@ def create_app(config_name=None):
     app = Flask(__name__, template_folder="templates")
 
     # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
-    if(config_name == "production"):
+    if config_name == "production":
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
@@ -35,11 +35,7 @@ def create_app(config_name=None):
     csp = {
         "default-src": ["'self'", "www.srcf.net"],
         "img-src": ["'self'", "data:", "www.srcf.net"],
-        'style-src': [
-            '\'self\'',
-            '\'unsafe-inline\'',
-            'www.srcf.net'
-        ]
+        "style-src": ["'self'", "'unsafe-inline'", "www.srcf.net"],
     }
     Talisman(app, content_security_policy=csp)
 
@@ -49,7 +45,7 @@ def create_app(config_name=None):
     app.jinja_env.globals["gen_unique_string"] = gen_unique_string
     app.jinja_env.globals["ordinal"] = ordinal
 
-    from lightbluetent.models import db, migrate, Setting
+    from lightbluetent.models import db, migrate, Setting, Role, Permission
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -73,13 +69,29 @@ def create_app(config_name=None):
     def equalto(value, other):
         return value == other
 
-    # create default values for settings if not already present
     with app.app_context():
+        # create seed values for settings if not already present
         for setting in app.config["SITE_SETTINGS"]:
             has_setting = Setting.query.filter_by(name=setting["name"]).first()
             if not has_setting:
                 new_setting = Setting(name=setting["name"], enabled=setting["enabled"])
                 db.session.add(new_setting)
-                db.session.commit()
+
+        for perm in app.config["DEFAULT_PERMS"]:
+            has_perm = Role.query.filter_by(name=perm["name"]).first()
+            if not has_perm:
+                new_perm = Permission(name=perm["name"])
+                db.session.add(new_perm)
+
+        for role in app.config["DEFAULT_ROLES"]:
+            has_role = Role.query.filter_by(name=role["name"]).first()
+            if not has_role:
+                new_role = Role(name=role["name"], description=role["description"])
+                new_role.permission = Permission.query.filter_by(
+                    name=role["permission"]
+                ).first()
+                db.session.add(new_role)
+
+        db.session.commit()
 
     return app
