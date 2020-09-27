@@ -82,6 +82,10 @@ APPLICATION_DB=lightbluetent
 
 Logs are made available in `production.log` and the log level can be set accordingly in `run.sh`.
 
+### Change a user's role
+
+Make someone an admin by running `flask change-role [list of crsids] administrator` making sure to load the environment variables with `pipenv shell` beforehand.
+
 ## Development
 
 ### Getting started

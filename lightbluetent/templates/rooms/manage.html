@@ -101,7 +101,7 @@
                 <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
                 <small
                     class="form-text text-muted">{{ _("This logo will be displayed on your society's welcome page.") }}</small>
-                <small class="form-text text-muted"><a href="{{ url_for('admin.delete_logo', uid=society.uid) }}">Delete
+                <small class="form-text text-muted"><a href="{{ url_for('rooms.delete_logo', uid=society.uid) }}">Delete
                         logo</a></small>
             </div>
         </div>
@@ -125,7 +125,7 @@
                     MB.</small>
                 <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
                 <small class="form-text text-muted"><a
-                        href="{{ url_for('admin.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
+                        href="{{ url_for('rooms.delete_bbb_logo', uid=society.uid) }}">Delete logo</a></small>
             </div>
         </div>
         <div class="col-md-6 px-5">
@@ -153,13 +153,13 @@
                             value="{{ banner_color }}" required>
                     </div>
                 </div>
-                {%- if errors.new_admin_crsid is defined %}
+                {%- if errors.new_owner_crsid is defined %}
                 <small class="text-danger">{{ errors.banner_text }}</small>
                 {%- endif %}
                 <small class="form-text text-muted">This is an optional field that will add a banner to your stall
                     with your chosen banner color.</small>
                 <small class="form-text text-muted"><a
-                        href="{{ url_for('admin.reset_banner', uid=society.uid) }}">Delete banner</a></small>
+                        href="{{ url_for('rooms.reset_banner', uid=society.uid) }}">Delete banner</a></small>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -188,22 +188,22 @@
 
     <div class="form-row px-5">
         <div class="form-group">
-            <label for="new_admin_crsid">{{ _("Society admins") }}</label>
+            <label for="new_owner_crsid">{{ _("Society admins") }}</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-users"></i></span>
-                    {%- for admin in society.admins %}
-                    <span class="input-group-text">{{ admin.crsid }}</span>
+                    {%- for owner in society.owners %}
+                    <span class="input-group-text">{{ owner.crsid }}</span>
                     {%- endfor %}
                 </div>
-                <input type="text" id="new_admin_crsid" name="new_admin_crsid" class="form-control"
+                <input type="text" id="new_owner_crsid" name="new_owner_crsid" class="form-control"
                     placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
             </div>
-            {%- if errors.new_admin_crsid is defined %}
-            <small class="text-danger">{{ errors.new_admin_crsid }}</small>
+            {%- if errors.new_owner_crsid is defined %}
+            <small class="text-danger">{{ errors.new_owner_crsid }}</small>
             {%- endif %}
             <small
-                class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an admin has been added, they cannot be removed.") }}</b></small>
+                class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the society</b>. The user should already be registered with us. <b>Once an owner has been added, they cannot be removed.") }}</b></small>
         </div>
     </div>
     <hr />
@@ -257,7 +257,7 @@
                             {{ session["start"] }} - {{ session["end"] }}
                             <span class="pull-right">
                                 <a class="text-danger"
-                                    href="{{ url_for('admin.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
+                                    href="{{ url_for('rooms.delete_session', uid=society.uid, session_id=session['id']) }}">Delete</a>
                             </span>
                         </li>
                         {% endif %}
@@ -275,9 +275,9 @@
         </div>
     </div>
 
-    <div class="form-group form-row px-5 float-right">
+    <div class="form-group mt-3 form-row px-5 float-right">
         <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('admin.delete', uid=society.uid) }}"
+        <a href="{{ url_for('rooms.delete', uid=society.uid) }}"
             class="btn btn-outline-danger float-right">{{ _("Delete society") }}</a>
     </div>
 </form>

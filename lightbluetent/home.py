@@ -11,10 +11,9 @@ from flask import (
     abort,
     current_app,
 )
-from lightbluetent.models import db, User, Society
+from lightbluetent.models import db, User, Society, Setting, Role
 from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
 from lightbluetent.api import Meeting
-from datetime import datetime
 from flask_babel import _
 
 import ucam_webauth
@@ -82,6 +81,12 @@ def home():
 
     if not user:
         return redirect(url_for("home.register"))
+
+    # this should be removed once all users have roles
+    # TEMPFIX FOR EXISTING USERS!!!!
+    if not user.role:
+        user.role = Role.query.filter_by(name="User").first()
+        db.session.commit()
 
     running_meetings = {}
 
@@ -238,6 +243,7 @@ def register():
                 email=values["email_address"],
                 full_name=values["full_name"],
                 crsid=auth_decorator.principal,
+                role=Role.query.filter_by(name="User").first(),
             )
 
             db.session.add(user)
@@ -250,20 +256,27 @@ def register():
             return redirect(url_for("home.home"))
 
     else:
-        # defaults
-        lookup_data = fetch_lookup_data(crsid)
-        values = {
-            "full_name": lookup_data["visibleName"],
-            "email_address": lookup_data["attributes"][0]["value"],
-            "dpa": False,
-            "tos": False,
-        }
 
-        return render_template(
-            "home/register.html",
-            page_title="Register",
-            crsid=crsid,
-            errors={},
-            **values,
-        )
+        if Setting.query.filter_by(name="enable_signups").first().enabled:
+            # defaults
+            lookup_data = fetch_lookup_data(crsid)
+            values = {
+                "full_name": lookup_data["visibleName"],
+                "email_address": lookup_data["attributes"][0]["value"],
+                "dpa": False,
+                "tos": False,
+            }
+
+            return render_template(
+                "home/register.html",
+                page_title="Register",
+                crsid=crsid,
+                errors={},
+                **values,
+            )
+
+        else:
+            return render_template(
+                "home/no_signup.html", page_title="Signups are not available",
+            )
 

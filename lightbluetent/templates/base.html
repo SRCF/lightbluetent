@@ -78,7 +78,18 @@
             {%- endif %}
             {% endblock %}
 
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(category_filter=["error"]) %}
+            {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            {% with messages = get_flashed_messages(category_filter=["message"]) %}
             {% for message in messages %}
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 {{ message }}
@@ -105,7 +116,8 @@
     <script src="https://www.srcf.net/_srcf/vendor/js/jquery.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/popper.min.js"></script>
     <script src="https://www.srcf.net/_srcf/vendor/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='javascripts/script.js') }}"></script>
+    {% block scripts %} {% endblock %}
 
 </body>
 

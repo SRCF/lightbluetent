@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/admins.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card my-2">
+            <h5 class="card-header">Site settings</h5>
+            <div class="card-body">
+                <p class="card-text">These settings have a global effect on the operation of LightBlueTent.</p>
+                <div id="enable-signups" class="dropdown p-3 my-3 border-top border-bottom"
+                    data-path="{{ url_for('admins.update_setting') }}" data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
+                    <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
+                        {% set setting = settings | selectattr("name", "equalto", "enable_signups") | first %}
+                        {% if setting.enabled %}
+                        Enabled
+                        {% else %}
+                        Disabled
+                        {% endif %}
+                    </button>
+                    <div class="dropdown-menu">
+                        <a data-action="enable" class="dropdown-item" href="#">Enable</a>
+                        <a data-action="disable" class="dropdown-item" href="#">Disable</a>
+                    </div>
+                    <p style="color: gray" class="mb-0">Toggle whether new users should be allowed to sign up</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card my-2">
+            <h5 class="card-header">Room features</h5>
+            <div class="card-body">
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
