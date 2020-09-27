@@ -100,7 +100,7 @@ def home():
         user_societies=user.societies,
         running_meetings=running_meetings,
         settings=Setting.query.all(),
-        crsid=crsid,
+        full_name=user.full_name,
     )
 
 
