@@ -257,7 +257,7 @@ def register():
 
     else:
 
-        if Setting.query.filter_by(name="enabled_signups").enabled:
+        if Setting.query.filter_by(name="enable_signups").first().enabled:
             # defaults
             lookup_data = fetch_lookup_data(crsid)
             values = {
