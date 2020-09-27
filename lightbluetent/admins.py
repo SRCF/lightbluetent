@@ -11,8 +11,8 @@ from flask import (
 )
 import json
 from datetime import datetime
-
-from lightbluetent.models import db, Setting
+from lightbluetent.home import auth_decorator
+from lightbluetent.models import db, Setting, User
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
@@ -20,11 +20,16 @@ bp = Blueprint("admins", __name__, url_prefix="/admin")
 
 @bp.route("/", methods=("GET", "POST"))
 def manage():
-    return render_template(
-        "admins/index.html",
-        page_title="Administrator panel",
-        settings=Setting.query.all(),
-    )
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    if user.role.permission == "admin":
+        return render_template(
+            "admins/index.html",
+            page_title="Administrator panel",
+            settings=Setting.query.all(),
+        )
+    else:
+        abort(404)
 
 
 @bp.route("/update_setting", methods=["POST"])
