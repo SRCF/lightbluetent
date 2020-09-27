@@ -25,6 +25,9 @@ class User(db.Model):
     first_name = db.Column(db.String, unique=False, nullable=True)
     surname = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # this needs to be made non nullable
+    # TEMPFIX FOR EXISTING USERS!!!
+    role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=True)
 
     # will it work if I use the backref here?
     def __repr__(self):
@@ -93,10 +96,12 @@ class Role(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    permission_id = db.Column(db.Integer, db.ForeignKey('permissions.id'),
-        nullable=False)
+    permission_id = db.Column(
+        db.Integer, db.ForeignKey("permissions.id"), nullable=False
+    )
     description = db.Column(db.String, unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    users = db.relationship("User", backref="role", lazy=True)
 
     def __repr__(self):
         return f"Role('{self.name}', '{self.description}')"
@@ -107,7 +112,7 @@ class Permission(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    roles = db.relationship('Role', backref='permission', lazy=True)
+    roles = db.relationship("Role", backref="permission", lazy=True)
 
     def __repr__(self):
         return f"Permission('{self.name}')"

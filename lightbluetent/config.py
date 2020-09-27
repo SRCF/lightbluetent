@@ -35,12 +35,15 @@ class Config(object):
     # getting the URL of the bbb_logo to pass to BBB.
     IMAGES_DIR_FROM_STATIC = "images"
 
+    # defines the default permissions that comes with the app
+    # for now, only admin as users can access anything else
     DEFAULT_PERMS = []
-
     DEFAULT_PERMS.append({"name": "admin"})
+    DEFAULT_PERMS.append({"name": "user"})
 
+    # defines the default roles that come with the app
+    # a role has a permission associated with it
     DEFAULT_ROLES = []
-
     DEFAULT_ROLES.append(
         {
             "name": "Administrator",
@@ -48,9 +51,15 @@ class Config(object):
             "description": "An administrator can manage site settings and room features for LightBlueTent",
         }
     )
+    DEFAULT_ROLES.append(
+        {
+            "name": "User",
+            "permission": "user",
+            "description": "A user can create rooms",
+        }
+    )
 
     SITE_SETTINGS = []
-
     SITE_SETTINGS.append(
         {"name": "enable_signups", "enabled": os.getenv("ENABLE_SIGNUPS", True)}
     )

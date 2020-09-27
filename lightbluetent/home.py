@@ -11,7 +11,7 @@ from flask import (
     abort,
     current_app,
 )
-from lightbluetent.models import db, User, Society, Setting
+from lightbluetent.models import db, User, Society, Setting, Role
 from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
 from lightbluetent.api import Meeting
 from flask_babel import _
@@ -27,6 +27,7 @@ bp = Blueprint("home", __name__)
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(
     desc="SRCF Lightbluetent", require_ptags=None
 )
+
 
 @bp.route("/")
 def index():
@@ -80,6 +81,12 @@ def home():
 
     if not user:
         return redirect(url_for("home.register"))
+
+    # this should be removed once all users have roles
+    # TEMPFIX FOR EXISTING USERS!!!!
+    if not user.role:
+        user.role = Role.query.filter_by(name="User").first()
+        db.session.commit()
 
     running_meetings = {}
 
@@ -236,6 +243,7 @@ def register():
                 email=values["email_address"],
                 full_name=values["full_name"],
                 crsid=auth_decorator.principal,
+                role=Role.query.filter_by(name="User").first(),
             )
 
             db.session.add(user)
@@ -269,6 +277,6 @@ def register():
 
         else:
             return render_template(
-                "home/no_signup.html",
-                page_title="Signups are not available",
+                "home/no_signup.html", page_title="Signups are not available",
             )
+
