@@ -77,7 +77,7 @@ def create_app(config_name=None):
         with app.app_context():
             for crsid in crsids:
                 user = User.query.filter_by(crsid=crsid).first()
-                role = Role.query.filter_by(name=role).first()
+                role = Role.query.filter_by(name=role.lower()).first()
                 prev_role = user.role
                 if role:
                     user.role = role

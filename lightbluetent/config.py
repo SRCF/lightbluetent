@@ -46,14 +46,14 @@ class Config(object):
     DEFAULT_ROLES = []
     DEFAULT_ROLES.append(
         {
-            "name": "Administrator",
+            "name": "administrator",
             "permission": "admin",
             "description": "An administrator can manage site settings and room features for LightBlueTent",
         }
     )
     DEFAULT_ROLES.append(
         {
-            "name": "User",
+            "name": "user",
             "permission": "user",
             "description": "A user can create rooms",
         }
