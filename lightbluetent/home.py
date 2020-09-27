@@ -262,7 +262,7 @@ def register():
             lookup_data = fetch_lookup_data(crsid)
             values = {
                 "full_name": lookup_data["visibleName"],
-                "email_address": lookup_data["attributes"][0]["value"],
+                "email_address": lookup_data["attributes"][0]["value"] or "",
                 "dpa": False,
                 "tos": False,
             }
