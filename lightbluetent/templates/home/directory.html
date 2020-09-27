@@ -20,14 +20,14 @@
                 <div id="card-intro" class="d-flex justify-content-between">
                     {% set current_logo = "images/{}".format(society.logo) %}
                     {% if society.logo != config["DEFAULT_LOGO"] %}
-                    <div class="order-1 img-thumbnail d-flex align-items-center justify-content-center"
+                    <div class="ml-3 order-1 img-thumbnail d-flex align-items-center justify-content-center"
                         style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
                         <img class="img-fluid" style="max-height:100%"
                             src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
                     </div>
                     {% endif %}
                     <div>
-                        <h4 class="card-title">{{ society.name }} <small
+                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ society.name }} <small
                                 class="text-muted">{{ society.short_name }}</small>
                         </h4>
                         {% if running_meetings[society.bbb_id] %}
