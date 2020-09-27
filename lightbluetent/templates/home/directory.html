@@ -6,13 +6,13 @@
 
 {% block body %}
 
+{% if not societies %}
+<p>{{ _("There are no registered societies.") }}</p>
+{% else %}
+<p>This is the society directory for the SRCF Freshers' Fair.</p>
 <div class="row mt-3">
-    {% if not societies %}
-    <p>{{ _("There are no registered societies.") }}</p>
-    {% else %}
+    {% for society in societies %}
     <div class="col-lg-6">
-        <p>This is the society directory for the SRCF Freshers' Fair.</p>
-        {% for society in societies %}
         <div class="card mb-3">
             <div class="card-header" style="background-color: {{ society.banner_color }};">
             </div>
@@ -20,9 +20,9 @@
                 <div id="card-intro" class="d-flex justify-content-between">
                     {% set current_logo = "images/{}".format(society.logo) %}
                     {% if society.logo != config["DEFAULT_LOGO"] %}
-                    <div class="ml-3 order-1 img-thumbnail d-flex align-items-center justify-content-center"
+                    <div class="flex-shrink-0 ml-3 order-1 d-flex align-items-center justify-content-center"
                         style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
-                        <img class="img-fluid" style="max-height:100%"
+                        <img class="img-fluid img-thumbnail" style="max-height:100%"
                             src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
                     </div>
                     {% endif %}
@@ -50,10 +50,11 @@
                     href="{{ url_for('society.welcome', uid=society.uid) }}">See more...</a>
             </div>
         </div>
-        {% endfor %}
     </div>
-    {% endif %}
+    {% endfor %}
 </div>
+
+{% endif %}
 
 <p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url=home_url) }}</p>
 
