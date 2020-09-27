@@ -4,17 +4,11 @@
 <script src="{{ url_for('static', filename='javascripts/admins.js') }}"></script>
 {% endblock %}
 
-{% block body %}
-<div class="row">
-    <div class="col-md-6">
-        <div class="card my-2">
-            <h5 class="card-header">Site settings</h5>
-            <div class="card-body">
-                <p class="card-text">These settings have a global effect on the operation of LightBlueTent.</p>
-                <div id="enable-signups" class="dropdown p-3 my-3 border-top border-bottom"
+{% macro site_setting(id, name, desc, bb) -%}
+<div id="{{id}}" class="dropdown px-3 my-4"
                     data-path="{{ url_for('admins.update_setting') }}" data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
                     <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
-                        {% set setting = settings | selectattr("name", "equalto", "enable_signups") | first %}
+                        {% set setting = settings | selectattr("name", "equalto", name) | first %}
                         {% if setting.enabled %}
                         Enabled
                         {% else %}
@@ -25,8 +19,20 @@
                         <a data-action="enable" class="dropdown-item" href="#">Enable</a>
                         <a data-action="disable" class="dropdown-item" href="#">Disable</a>
                     </div>
-                    <p style="color: gray" class="mb-0">Toggle whether new users should be allowed to sign up</p>
+                    <p style="color: gray" class="mb-0">{{desc}}</p>
                 </div>
+{%- endmacro %}
+
+
+{% block body %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card my-2">
+            <h5 class="card-header">Site settings</h5>
+            <div class="card-body">
+                <p class="card-text">These settings have a global effect on the operation of LightBlueTent.</p>
+                {{ site_setting("enable-signups", "enable_signups", "Toggle whether new users should be allowed to sign up")}}
+                {{ site_setting("enable-room-creation", "enable_room_creation", "Toggle whether users should be allowed to create rooms")}}
             </div>
         </div>
     </div>

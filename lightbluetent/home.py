@@ -85,7 +85,7 @@ def home():
     # this should be removed once all users have roles
     # TEMPFIX FOR EXISTING USERS!!!!
     if not user.role:
-        user.role = Role.query.filter_by(name="User").first()
+        user.role = Role.query.filter_by(name="user").first()
         db.session.commit()
 
     running_meetings = {}
@@ -99,6 +99,7 @@ def home():
         page_title="Home",
         user_societies=user.societies,
         running_meetings=running_meetings,
+        settings=Setting.query.all(),
         crsid=crsid,
     )
 

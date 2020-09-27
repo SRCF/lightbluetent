@@ -63,5 +63,9 @@
     {% endfor %}
 </div>
 {% endif %}
+
+{% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
+{% if enable_room_creation.enabled %}
 <a href="{{ url_for('home.register_soc') }}" class="btn btn-outline-primary">{{ _("Add a society") }}</a>
+{% endif %}
 {% endblock %}
