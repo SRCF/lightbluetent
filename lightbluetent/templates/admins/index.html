@@ -5,24 +5,36 @@
 {% endblock %}
 
 {% macro site_setting(id, name, desc, bb) -%}
-<div id="{{id}}" class="dropdown px-3 my-4"
-                    data-path="{{ url_for('admins.update_setting') }}" data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
-                    <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
-                        {% set setting = settings | selectattr("name", "equalto", name) | first %}
-                        {% if setting.enabled %}
-                        Enabled
-                        {% else %}
-                        Disabled
-                        {% endif %}
-                    </button>
-                    <div class="dropdown-menu">
-                        <a data-action="enable" class="dropdown-item" href="#">Enable</a>
-                        <a data-action="disable" class="dropdown-item" href="#">Disable</a>
-                    </div>
-                    <p style="color: gray" class="mb-0">{{desc}}</p>
-                </div>
+<div id="{{id}}" class="dropdown p-3" data-path="{{ url_for('admins.update_setting') }}"
+    data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
+    <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
+        {% set setting = settings | selectattr("name", "equalto", name) | first %}
+        {% if setting.enabled %}
+        Enabled
+        {% else %}
+        Disabled
+        {% endif %}
+    </button>
+    <div class="dropdown-menu">
+        <a data-action="enable" class="dropdown-item" href="#">Enable</a>
+        <a data-action="disable" class="dropdown-item" href="#">Disable</a>
+    </div>
+    <p style="color: gray" class="mb-0">{{desc}}</p>
+</div>
 {%- endmacro %}
 
+{% macro society_entry(society) -%}
+<a href="{{ url_for('society.welcome', uid=society.uid) }}"
+    class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100  justify-content-between">
+        <h5 class="mb-1 mr-1 text-truncate">{{society.name}}        <small class="text-muted">{{ society.short_name }}</small>
+        </h5>
+        <small>Last updated {{society.updated_at.strftime("%b %d %H:%M")}}</small>
+    </div>
+    <p class="mb-1">{{society.description | truncate(200) }}</p>
+    <small>{{society.owners | length}} owner(s)</small>
+</a>
+{%- endmacro %}
 
 {% block body %}
 <div class="row">
@@ -31,8 +43,10 @@
             <h5 class="card-header">Site settings</h5>
             <div class="card-body">
                 <p class="card-text">These settings have a global effect on the operation of LightBlueTent.</p>
-                {{ site_setting("enable-signups", "enable_signups", "Toggle whether new users should be allowed to sign up")}}
-                {{ site_setting("enable-room-creation", "enable_room_creation", "Toggle whether users should be allowed to create rooms")}}
+                <section class="lbt-site-setting">
+                    {{ site_setting("enable-signups", "enable_signups", "Toggle whether new users should be allowed to sign up")}}
+                    {{ site_setting("enable-room-creation", "enable_room_creation", "Toggle whether users should be allowed to create rooms")}}
+                </section>
             </div>
         </div>
     </div>
@@ -42,6 +56,21 @@
             <div class="card-body">
                 <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card my-2">
+            <h5 class="card-header">Deployment overview</h5>
+            <div class="card-body">
+                <p class="card-text">There are currently {{societies | length}} registered societies.</p>
+                <div class="list-group">
+                    {% for soc in societies%}
+                    {{society_entry(soc)}}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

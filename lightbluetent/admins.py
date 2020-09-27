@@ -12,7 +12,7 @@ from flask import (
 import json
 from datetime import datetime
 from lightbluetent.home import auth_decorator
-from lightbluetent.models import db, Setting, User
+from lightbluetent.models import db, Setting, User, Society
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
@@ -26,11 +26,13 @@ def manage():
     if not user:
         return redirect(url_for("home.register"))
 
+    # TO-DO: PAGINATION
     if user.role.permission.name == "admin":
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",
             settings=Setting.query.all(),
+            societies=Society.query.all()
         )
     else:
         abort(404)

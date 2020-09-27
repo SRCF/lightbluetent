@@ -16,7 +16,7 @@ from lightbluetent.home import auth_decorator
 from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id
 from PIL import Image
 from flask_babel import _
-from datetime import time
+from datetime import time, datetime
 from sqlalchemy.orm.attributes import flag_modified
 
 bp = Blueprint("rooms", __name__, url_prefix="/r")
@@ -337,6 +337,7 @@ def manage(uid):
                 # we need this to ensure that sqlalchemy updates the val
                 flag_modified(society, "sessions")
 
+            society.updated_at = datetime.now()
             db.session.commit()
 
             if is_new_owner:

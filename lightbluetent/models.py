@@ -49,6 +49,7 @@ class Society(db.Model):
     short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     # uid:    A short name for the society. Duplicate of short_name for now,
     #         but stored as lower case.
