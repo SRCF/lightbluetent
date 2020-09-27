@@ -5,13 +5,13 @@ import requests
 from jinja2 import is_undefined
 from flask import render_template
 import traceback
-from flask_sqlalchemy import SQLAlchemy as sa
+from lightbluetent.models import db
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 
 
 def table_exists(name):
-    ret = sa.engine.dialect.has_table(sa.engine, name)
+    ret = db.engine.dialect.has_table(db.engine, name)
     return ret
 
 
