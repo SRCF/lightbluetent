@@ -16,5 +16,5 @@ jobs:
       run: python -m pip install pipenv
     - name: Bootstrap
       run: pipenv install --dev
-    - name: Test
-      run: pipenv run ./manage.py test
+    # - name: Test
+    #   run: pipenv run pytest --capture=no --verbosity=2 --cov=application --cov-report=term-missing

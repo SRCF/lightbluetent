@@ -1,4 +1,37 @@
-{% extends "society/base.html" %}
+{% extends "base.html" %}
+
+{% block meta %}
+<meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("Virtual Freshers' Fair") }}" />
+<meta property="og:type" content="website" />
+{% if society.description %}
+<meta property="og:description"
+  content="{{ society.description | truncate(200) }}" />
+{% else %}
+  <meta property="og:description"
+    content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
+{% endif %}
+<meta property="og:url" content="{{ request.base_url }}" />
+{% set logo = 'images/' + society.logo %}
+<meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
+{% endblock %}
+
+{% block title %}
+<title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("Virtual Freshers' Fair") }}</title>
+{% endblock %}
+
+{% block static %}
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+<link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/svg">
+{% endblock %}
+
+{% block nav %}
+<header></header>
+{% endblock %}
+
+{% block heading %}
+<div></div>
+{% endblock %}
 
 {% block body %}
 
@@ -57,6 +90,7 @@
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     {% if has_logo %}
+                    {% set logo = 'images/' + society.logo %}
                     <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
                         <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"

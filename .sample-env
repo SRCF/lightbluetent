@@ -1,3 +1,5 @@
+# PRODUCTION CONFIG
+
 # FLASK_ENV=
 # FLASK_CONFIG=production
 # POSTGRES_DB=
@@ -8,6 +10,10 @@
 # FLASK_TRUSTED_HOSTS=localhost
 # FLASK_SECRET_KEY=dummy_secret_key
 # SQLALCHEMY_URI="postgresql+psycopg2://mw781@postgres:5432/mw781"
+# set to "lbt" or a prefix of choice to avoid table name clashes
+# LBT_FEATURES=signups,recording
+
+# DEVELOPMENT CONFIG
 
 FLASK_ENV=development
 FLASK_CONFIG=development
@@ -20,5 +26,5 @@ FLASK_TRUSTED_HOSTS=localhost
 FLASK_SECRET_KEY=dummy_secret_key
 
 
-BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api
+BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
 BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6

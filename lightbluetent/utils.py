@@ -1,12 +1,18 @@
 import uuid
 import re
 import sys
+import requests
 from jinja2 import is_undefined
 from flask import render_template
 import traceback
-from werkzeug.exceptions import NotFound, Forbidden, HTTPException
+from lightbluetent.models import db
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
+
+
+def table_exists(name):
+    ret = db.engine.dialect.has_table(db.engine, name)
+    return ret
 
 
 def gen_unique_string():
@@ -94,3 +100,31 @@ def page_not_found(e):
 def server_error(e):
     tb = traceback.format_exception(*sys.exc_info())
     return render_template("error.html", error=e, tb=tb), 500
+
+
+def fetch_lookup_data(crsid):
+    url = f"https://www.lookup.cam.ac.uk/api/v1/person/crsid/{crsid}"
+    res = requests.get(
+        url,
+        params={"fetch": "email,departingEmail", "format": "json"},
+        timeout=(0.5, 10),
+    )
+    if res.status_code == 200:
+        # request successful
+        return res.json()["result"]["person"]
+    elif res.status_code == 401:
+        # not authorized, we're outside of the cudn
+        return {
+            "cancelled": False,
+            "identifier": {"scheme": "crsid", "value": "mug99"},
+            "displayName": "Testing Software",
+            "registeredName": "Software Testing",
+            "surname": "Software Testing",
+            "visibleName": "Testing Software",
+            "attributes": [{"value": "mug99@cam.ac.uk"}],
+            "staff": True,
+            "student": False,
+        }
+    else:
+        # something bad happened, don't prefill any fields
+        return None
