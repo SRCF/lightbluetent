@@ -78,7 +78,18 @@
             {%- endif %}
             {% endblock %}
 
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(category_filter=["error"]) %}
+            {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            {% with messages = get_flashed_messages(category_filter=["message"]) %}
             {% for message in messages %}
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 {{ message }}

@@ -12,7 +12,7 @@
             <div class="card-body">
                 <p class="card-text">These settings have a global effect on the operation of LightBlueTent.</p>
                 <div id="enable-signups" class="dropdown p-3 my-3 border-top border-bottom"
-                    data-path="{{ url_for('admins.update_setting') }}" data-csrf="{{csrf_token()}}">
+                    data-path="{{ url_for('admins.update_setting') }}" data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
                     <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
                         {% set setting = settings | selectattr("name", "equalto", "enable_signups") | first %}
                         {% if setting.enabled %}

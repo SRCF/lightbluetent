@@ -6,15 +6,20 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 # Association table for many-to-many relationship between admins and societies.
-user_society = db.Table("user_society",
-                  db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
-                  db.Column("society_id", db.Integer, db.ForeignKey("societies.id"), primary_key=True))
+user_society = db.Table(
+    "user_society",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column(
+        "society_id", db.Integer, db.ForeignKey("societies.id"), primary_key=True
+    ),
+)
+
 
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    crsid = db.Column(db.String(7), db.CheckConstraint('crsid = lower(crsid)'))
+    crsid = db.Column(db.String(7), db.CheckConstraint("crsid = lower(crsid)"))
     email = db.Column(db.String, unique=True, nullable=False)
     full_name = db.Column(db.String, unique=False, nullable=False)
     first_name = db.Column(db.String, unique=False, nullable=True)
@@ -32,7 +37,12 @@ class Society(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
-    owners = db.relationship("User", secondary=user_society, lazy=True, backref=db.backref('societies', lazy=True))
+    owners = db.relationship(
+        "User",
+        secondary=user_society,
+        lazy=True,
+        backref=db.backref("societies", lazy=True),
+    )
     short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -46,8 +56,12 @@ class Society(db.Model):
     socials = db.Column(db.JSON, nullable=False, default=list)
     sessions = db.Column(db.JSON, nullable=True)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
-    logo = db.Column(db.String, unique=False, nullable=False, default="default_logo.png")
-    bbb_logo = db.Column(db.String, unique=False, nullable=False, default="default_bbb_logo.png")
+    logo = db.Column(
+        db.String, unique=False, nullable=False, default="default_logo.png"
+    )
+    bbb_logo = db.Column(
+        db.String, unique=False, nullable=False, default="default_bbb_logo.png"
+    )
     banner_text = db.Column(db.String, unique=False, nullable=True)
     banner_color = db.Column(db.String, unique=False, nullable=True, default="#e8e8e8")
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
@@ -73,3 +87,15 @@ class Setting(db.Model):
     def __repr__(self):
         return f"Setting('{self.name}', '{self.enabled}')"
 
+
+class Role(db.Model):
+    __tablename__ = "roles"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=False, nullable=False)
+    value = db.Column(db.String, unique=False, nullable=True)
+    enabled = db.Column(db.Boolean, nullable=True, default=False)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Setting('{self.name}', '{self.enabled}')"
