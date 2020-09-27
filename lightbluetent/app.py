@@ -5,6 +5,8 @@ from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
 from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error
+from lightbluetent.models import db, migrate, Setting, Role, Permission, User
+import click
 
 
 def create_app(config_name=None):
@@ -45,8 +47,6 @@ def create_app(config_name=None):
     app.jinja_env.globals["gen_unique_string"] = gen_unique_string
     app.jinja_env.globals["ordinal"] = ordinal
 
-    from lightbluetent.models import db, migrate, Setting, Role, Permission
-
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -68,6 +68,23 @@ def create_app(config_name=None):
     @app.template_test()
     def equalto(value, other):
         return value == other
+
+    @app.cli.command("change-role")
+    @click.argument("crsids", nargs=-1)
+    @click.argument("role", nargs=1)
+    def create_user(crsids, role):
+        """ Allows an admin to change a user's role """
+        with app.app_context():
+            for crsid in crsids:
+                user = User.query.filter_by(crsid=crsid).first()
+                role = Role.query.filter_by(name=role).first()
+                prev_role = user.role
+                if role:
+                    user.role = role
+                    db.session.commit()
+                    click.echo(f"Changed user {user.full_name}'s role from {prev_role.name} to {role.name}")
+                else:
+                    click.echo("Role does not exist")
 
     with app.app_context():
         # create seed values for settings if not already present

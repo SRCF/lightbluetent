@@ -22,7 +22,7 @@ bp = Blueprint("admins", __name__, url_prefix="/admin")
 def manage():
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
-    if user.role.permission == "admin":
+    if user.role.permission.name == "admin":
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",
