@@ -4,7 +4,7 @@ from . import rooms, home, society, admins
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error
+from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error, table_exists
 from lightbluetent.models import db, migrate, Setting, Role, Permission, User
 import click
 
@@ -88,26 +88,29 @@ def create_app(config_name=None):
 
     with app.app_context():
         # create seed values for settings if not already present
-        for setting in app.config["SITE_SETTINGS"]:
-            has_setting = Setting.query.filter_by(name=setting["name"]).first()
-            if not has_setting:
-                new_setting = Setting(name=setting["name"], enabled=setting["enabled"])
-                db.session.add(new_setting)
+        if table_exists("settings"):
+            for setting in app.config["SITE_SETTINGS"]:
+                has_setting = Setting.query.filter_by(name=setting["name"]).first()
+                if not has_setting:
+                    new_setting = Setting(name=setting["name"], enabled=setting["enabled"])
+                    db.session.add(new_setting)
 
-        for perm in app.config["DEFAULT_PERMS"]:
-            has_perm = Role.query.filter_by(name=perm["name"]).first()
-            if not has_perm:
-                new_perm = Permission(name=perm["name"])
-                db.session.add(new_perm)
+        if table_exists("permissions"):
+            for perm in app.config["DEFAULT_PERMS"]:
+                has_perm = Role.query.filter_by(name=perm["name"]).first()
+                if not has_perm:
+                    new_perm = Permission(name=perm["name"])
+                    db.session.add(new_perm)
 
-        for role in app.config["DEFAULT_ROLES"]:
-            has_role = Role.query.filter_by(name=role["name"]).first()
-            if not has_role:
-                new_role = Role(name=role["name"], description=role["description"])
-                new_role.permission = Permission.query.filter_by(
-                    name=role["permission"]
-                ).first()
-                db.session.add(new_role)
+        if table_exists("roles"):
+            for role in app.config["DEFAULT_ROLES"]:
+                has_role = Role.query.filter_by(name=role["name"]).first()
+                if not has_role:
+                    new_role = Role(name=role["name"], description=role["description"])
+                    new_role.permission = Permission.query.filter_by(
+                        name=role["permission"]
+                    ).first()
+                    db.session.add(new_role)
 
         db.session.commit()
 

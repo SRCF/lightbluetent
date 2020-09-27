@@ -5,9 +5,14 @@ import requests
 from jinja2 import is_undefined
 from flask import render_template
 import traceback
-from werkzeug.exceptions import NotFound, Forbidden, HTTPException
+from flask_sqlalchemy import SQLAlchemy as sa
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
+
+
+def table_exists(name):
+    ret = sa.engine.dialect.has_table(sa.engine, name)
+    return ret
 
 
 def gen_unique_string():
