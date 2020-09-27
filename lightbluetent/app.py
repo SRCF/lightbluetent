@@ -82,7 +82,7 @@ def create_app(config_name=None):
                 if role:
                     user.role = role
                     db.session.commit()
-                    click.echo(f"Changed user {user.full_name}'s role from {prev_role.name} to {role.name}")
+                    click.echo(f"Changed user {user.full_name}'s role from {prev_role} to {role}")
                 else:
                     click.echo("Role does not exist")
 
