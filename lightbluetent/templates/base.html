@@ -33,30 +33,48 @@
 <body class="d-flex flex-column h-100">
     {% block nav %}
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <nav class="navbar navbar-expand navbar-light bg-light">
             <div class="container">
                 <div class="navbar-brand">
-                    <a href="{{ url_for('home.home') }}">
+                    <a href="{{ url_for('users.home') }}">
                         <img src="https://www.srcf.net/_srcf/images/logo.svg">
-                        <span>
+                        <span class="d-none d-lg-inline">
                             <span class="text-danger">Student-Run</span>
                             <span class="text-primary">Computing Facility</span>
-                            <span class="text-muted">&mdash; {{ _("Virtual Freshers' Fair") }}</span>
+                        </span>
+                        <span class="text-muted d-none d-lg-inline"> &mdash;</span>
+                        <span class="text-muted d-none d-md-inline">{{ _("Virtual Freshers' Fair") }}
                         </span>
                     </a>
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <ul class="navbar-nav ml-auto">
-                        {% block extra_nav %}{% endblock %}
-                        {% if crsid %}
-                        <div class="text-muted">{{ crsid }} <a href="{{ url_for('home.logout') }}">(Log out)</a></div>
-                        {% endif %}
-                    </ul>
-                </div>
+                <ul class="navbar-nav">
+                    {% block extra_nav %}{% endblock %}
+                    {% if user %}
+                    <li class="nav-item dropdown ml-auto">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown">
+                            <i class="fa fa-fw fa-user-circle-o" aria-hidden="true"></i>
+                            <span class="d-none d-md-inline">{{ user.full_name }}</span>
+                        </a>
+                        <div class=" dropdown-menu">
+                            <a class="dropdown-item" href="{{ url_for('users.profile') }}"><i
+                                    class="fa fa-fw fa-id-card mr-3" aria-hidden="true"></i>Profile</a>
+                            {% if user.role.permission.name == "admin" %}
+                            <a class="dropdown-item" href="{{ url_for('admins.manage') }}"><i
+                                    class="fa fa-fw fa-server mr-3" aria-hidden="true"></i>Administration</a>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item"
+                                href="https://docs.srcf.net/timeout/#reporting-problems-and-getting-help"><i
+                                    class="fa fa-fw fa-exclamation mr-3" aria-hidden="true"></i>Report problem</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ml-2" href="{{ url_for('general.logout') }}"><i class="fa fa-fw fa-sign-out"
+                                aria-hidden="true"></i>(Log out)</a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
         </nav>
     </header>
@@ -81,6 +99,17 @@
             {% with messages = get_flashed_messages(category_filter=["error"]) %}
             {% for message in messages %}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            {% with messages = get_flashed_messages(category_filter=["success"]) %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ message }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>

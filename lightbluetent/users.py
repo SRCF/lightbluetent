@@ -1,11 +1,8 @@
-import re
-
 from flask import (
     Blueprint,
     render_template,
     request,
     flash,
-    session,
     url_for,
     redirect,
     abort,
@@ -15,61 +12,19 @@ from lightbluetent.models import db, User, Society, Setting, Role
 from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
 from lightbluetent.api import Meeting
 from flask_babel import _
+from sqlalchemy.orm.attributes import flag_modified
 
 import ucam_webauth
 import ucam_webauth.raven
 import ucam_webauth.raven.flask_glue
 
-import random
+import json
 
-bp = Blueprint("home", __name__)
+bp = Blueprint("users", __name__, url_prefix="/u")
 
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(
     desc="SRCF Lightbluetent", require_ptags=None
 )
-
-
-@bp.route("/")
-def index():
-
-    has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
-
-    # Check whether the directory page is enabled
-    if has_directory_page:
-        societies = Society.query.all()
-
-        running_meetings = {}
-        for society in societies:
-            meeting = Meeting(society)
-            running_meetings[society.bbb_id] = meeting.is_running()
-
-        # Shuffle the socs so they all have a chance of being near the top
-        random.shuffle(societies)
-        home_url = url_for("home.register")
-        return render_template(
-            "home/directory.html",
-            page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"),
-            societies=societies,
-            running_meetings=running_meetings,
-            home_url=home_url,
-        )
-    else:
-        return render_template(
-            "home/index.html",
-            page_title=_("Welcome to the 2020 Virtual Freshers' Fair!"),
-        )
-
-
-@bp.route("/logout")
-def logout():
-    auth_decorator.logout()
-    return redirect(url_for("home.index"))
-
-
-@bp.route("/log_in")
-@auth_decorator
-def log_in():
-    return redirect(url_for("home.home"))
 
 
 @bp.route("/home")
@@ -80,7 +35,7 @@ def home():
     user = User.query.filter_by(crsid=crsid).first()
 
     if not user:
-        return redirect(url_for("home.register"))
+        return redirect(url_for("users.register"))
 
     # this should be removed once all users have roles
     # TEMPFIX FOR EXISTING USERS!!!!
@@ -95,12 +50,11 @@ def home():
         running_meetings[society.bbb_id] = meeting.is_running()
 
     return render_template(
-        "home/home.html",
+        "users/home.html",
         page_title="Home",
-        user_societies=user.societies,
         running_meetings=running_meetings,
         settings=Setting.query.all(),
-        full_name=user.full_name,
+        user=user,
     )
 
 
@@ -113,7 +67,7 @@ def register_soc():
 
     # Check the user is registered with us, if not redirect to the user reg page
     if not user:
-        return redirect(url_for("home.register"))
+        return redirect(url_for("users.register"))
 
     if request.method == "POST":
 
@@ -155,9 +109,9 @@ def register_soc():
 
         if errors:
             return render_template(
-                "home/register_soc.html",
+                "users/register_soc.html",
                 page_title=_("Register a society"),
-                crsid=crsid,
+                user=user,
                 errors=errors,
                 **values,
             )
@@ -181,13 +135,13 @@ def register_soc():
                 f"User { crsid } registered society {values['uid']}"
             )
 
-            return redirect(url_for("home.home"))
+            return redirect(url_for("users.home"))
 
     else:
         return render_template(
-            "home/register_soc.html",
+            "users/register_soc.html",
             page_title=_("Register a society"),
-            crsid=crsid,
+            user=user,
             errors={},
         )
 
@@ -200,7 +154,7 @@ def register():
 
     existing_user = User.query.filter_by(crsid=crsid).first()
     if existing_user:
-        return redirect(url_for("home.home"))
+        return redirect(url_for("users.home"))
 
     if request.method == "POST":
 
@@ -232,9 +186,9 @@ def register():
 
         if errors:
             return render_template(
-                "home/register.html",
+                "users/register.html",
                 page_title="Register",
-                crsid=crsid,
+                user=user,
                 errors=errors,
                 **values,
             )
@@ -254,7 +208,7 @@ def register():
                 f"Registered user with CRSid {auth_decorator.principal}"
             )
 
-            return redirect(url_for("home.home"))
+            return redirect(url_for("users.home"))
 
     else:
 
@@ -269,15 +223,65 @@ def register():
             }
 
             return render_template(
-                "home/register.html",
+                "users/register.html",
                 page_title="Register",
-                crsid=crsid,
+                user=user,
                 errors={},
                 **values,
             )
 
         else:
             return render_template(
-                "home/no_signup.html", page_title="Signups are not available",
+                "users/no_signup.html", page_title="Signups are not available",
             )
+
+
+@bp.route("/user", methods=("GET", "POST"))
+@auth_decorator
+def profile():
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # Check the user is registered with us, if not redirect to the user reg page
+    if not user:
+        return redirect(url_for("users.register"))
+
+    return render_template(
+        "users/profile.html",
+        user=user,
+        page_title="Profile",
+        page_parent=url_for("users.home"),
+    )
+
+
+@bp.route("/update", methods=["POST"])
+def update():
+    if request.method == "POST":
+        res = request.get_json(force=True)
+        crsid = auth_decorator.principal
+        user = User.query.filter_by(crsid=crsid).first()
+        error = False
+        if res["type"] == "email":
+            email_err = validate_email(crsid, res["value"])
+            if email_err is not None:
+                error = True
+                flash(email_err, "error")
+        if not error:
+            old_field = getattr(user, res["type"])
+            setattr(user, res["type"], res["value"])
+            current_app.logger.info(
+                f"Changing {res['type']} for {auth_decorator.principal} from {old_field} to {res['value']}"
+            )
+            db.session.commit()
+            flash("Your profile was updated successfully", "success")
+    return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
+
+
+@bp.route("/update_error", methods=["POST"])
+def update_error():
+    if request.method == "POST":
+        error = request.get_json(force=True)
+        if error["code"]:
+            flash("User profile was not updated successfully", "error")
+    return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 

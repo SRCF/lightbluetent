@@ -12,7 +12,7 @@ from flask import (
     current_app,
 )
 from lightbluetent.models import db, User, Society
-from lightbluetent.home import auth_decorator
+from lightbluetent.users import auth_decorator
 from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id
 from PIL import Image
 from flask_babel import _
@@ -281,10 +281,10 @@ def manage(uid):
                 "rooms/manage.html",
                 page_title=f"Stall administration for { society.name }",
                 society=society,
-                crsid=crsid,
+                user=user,
                 errors=errors,
                 sessions_data=sessions_data,
-                page_parent=url_for("home.home"),
+                page_parent=url_for("users.home"),
                 has_directory_page=has_directory_page,
                 **values,
             )
@@ -373,10 +373,10 @@ def manage(uid):
         "rooms/manage.html",
         page_title=f"Stall administration for { society.name }",
         society=society,
-        crsid=crsid,
+        user=user,
         errors={},
         sessions_data=sessions_data,
-        page_parent=url_for("home.home"),
+        page_parent=url_for("users.home"),
         has_directory_page=has_directory_page,
         **values,
     )
@@ -507,7 +507,7 @@ def delete(uid):
             return render_template(
                 "rooms/delete.html",
                 page_title=f"Delete { society.name }",
-                crsid=crsid,
+                user=user,
                 society=society,
                 errors=errors,
             )
@@ -521,7 +521,7 @@ def delete(uid):
                 f"User { crsid } deleted society with uid='{ society.uid }'"
             )
 
-            return redirect(url_for("home.home"))
+            return redirect(url_for("users.home"))
 
     else:
         return render_template(

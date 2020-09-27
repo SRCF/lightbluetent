@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/users.js') }}"></script>
+{% endblock %}
+
+{% macro profile_field(field, placeholder, db_field, type="text") -%}
+<div class="form-group">
+    <div class="input-group mb-1">
+        <input id="{{db_field}}-input" type="{{type}}" class="form-control" placeholder="{{placeholder}}" value="{{field}}">
+        <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="button" data-path="{{ url_for('users.update') }}"
+                data-path-error="{{ url_for('users.update_error') }}" data-csrf="{{csrf_token()}}" data-field-type="{{db_field}}">Update</button>
+        </div>
+    </div>
+    {% if kwargs["desc"] %}
+    <small class="text-muted">{{kwargs["desc"]}}</small>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% block body %}
+<p>Edit your profile details.</p>
+<section class="row">
+    <div id="profile-fields" class="col-md-6">
+        {{profile_field(user.full_name, "Your display name", "full_name")}}
+        {{profile_field(user.email, "Your contact email", "email", desc="We will use this email to contact you if needed.", type="email")}}
+    </div>
+</section>
+{% endblock %}

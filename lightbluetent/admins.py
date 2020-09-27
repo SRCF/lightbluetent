@@ -11,20 +11,20 @@ from flask import (
 )
 import json
 from datetime import datetime
-from lightbluetent.home import auth_decorator
+from lightbluetent.users import auth_decorator
 from lightbluetent.models import db, Setting, User, Society
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
 
-
+@auth_decorator
 @bp.route("/", methods=("GET", "POST"))
 def manage():
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
     if not user:
-        return redirect(url_for("home.register"))
+        return redirect(url_for("users.register"))
 
     # TO-DO: PAGINATION
     if user.role.permission.name == "admin":
@@ -32,7 +32,8 @@ def manage():
             "admins/index.html",
             page_title="Administrator panel",
             settings=Setting.query.all(),
-            societies=Society.query.all()
+            societies=Society.query.all(),
+            user=user
         )
     else:
         abort(404)
@@ -49,7 +50,7 @@ def update_setting():
             db.session.commit()
             flash("Site setting updated successfully")
         else:
-            flash("Error occurred when finding entry in database")
+            flash("Error occurred when finding entry in database", 'error')
         return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 
 @bp.route("/update_setting_error", methods=["POST"])

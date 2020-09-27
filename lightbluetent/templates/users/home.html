@@ -2,13 +2,13 @@
 
 {% block body %}
 
-<p>Hello, <b>{{ full_name }}</b>. {{ _("Here are the stalls for your societies.") }}</p>
+<p>Hello, <b>{{ user.full_name }}</b>. {{ _("Here are the stalls for your societies.") }}</p>
 
-{% if not user_societies %}
+{% if not user.societies %}
 <p>{{ _("You currently have no registered societies.") }}</p><br />
 {% else %}
 <div class="row">
-    {% for society in user_societies %}
+    {% for society in user.societies %}
     <div class="col-lg-6">
         <div class="card mb-3">
             <div class="card-header" style="background-color: {{ society.banner_color }};">
@@ -66,6 +66,6 @@
 
 {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
 {% if enable_room_creation.enabled %}
-<a href="{{ url_for('home.register_soc') }}" class="btn btn-outline-primary">{{ _("Add a society") }}</a>
+<a href="{{ url_for('users.register_soc') }}" class="btn btn-outline-primary">{{ _("Add a society") }}</a>
 {% endif %}
 {% endblock %}

@@ -56,6 +56,6 @@
 
 {% endif %}
 
-<p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url=home_url) }}</p>
+<p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url={{url_for("users.register")}}) }}</p>
 
 {% endblock %}

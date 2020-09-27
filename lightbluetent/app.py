@@ -1,6 +1,6 @@
 import os, subprocess, logging
 from flask import Flask
-from . import rooms, home, society, admins
+from . import rooms, users, society, admins, general
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
@@ -50,8 +50,9 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
+    app.register_blueprint(general.bp)
     app.register_blueprint(rooms.bp)
-    app.register_blueprint(home.bp)
+    app.register_blueprint(users.bp)
     app.register_blueprint(society.bp)
     app.register_blueprint(admins.bp)
     app.register_error_handler(404, page_not_found)
@@ -82,7 +83,7 @@ def create_app(config_name=None):
                 if role:
                     user.role = role
                     db.session.commit()
-                    click.echo(f"Changed user {user.full_name}'s role from {prev_role} to {role}")
+                    click.echo(f"Changed {user.full_name}'s role from {prev_role.name} to {role.name}")
                 else:
                     click.echo("Role does not exist")
 

@@ -3,7 +3,7 @@ import os
 
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
 from lightbluetent.models import db, Society, User
-from lightbluetent.home import auth_decorator
+from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
 from flask_babel import _
 
@@ -97,7 +97,7 @@ def begin_session(uid):
 
         if errors:
             return render_template("society/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("home.home"), errors=errors)
+                           user=user, running=running, page_parent=url_for("user.home"), errors=errors)
 
         if not running:
             join_url = url_for("society.welcome", uid=society.uid, _external=True)
@@ -119,4 +119,4 @@ def begin_session(uid):
             return redirect(url)
 
     return render_template("society/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("home.home"), errors={})
+                           user=user, running=running, page_parent=url_for("user.home"), errors={})
