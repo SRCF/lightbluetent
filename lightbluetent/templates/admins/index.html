@@ -31,7 +31,9 @@
         </h5>
         <small>Last updated {{society.updated_at.strftime("%b %d %H:%M")}}</small>
     </div>
+    {% if society.description is not none %}
     <p class="mb-1">{{society.description | truncate(200) }}</p>
+    {% endif %}
     <small>{{society.owners | length}} owner(s)</small>
 </a>
 {%- endmacro %}
