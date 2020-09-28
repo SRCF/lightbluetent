@@ -135,3 +135,7 @@ ul.traceback li {
 .lbt-site-setting :not(:last-child) {
     border-bottom: 1px solid #dee2e6;
 }
+
+.card-body :only-child {
+    margin-bottom: 0;
+}

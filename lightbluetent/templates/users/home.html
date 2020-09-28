@@ -5,7 +5,7 @@
 <p>Hello, <b>{{ user.full_name }}</b>. {{ _("Here are the stalls for your groups.") }}</p>
 
 {% if not user.groups %}
-<p>{{ _("You currently have no registered groups.") }}</p><br />
+<p>{{ _("You currently have no registered groups.") }}</p>
 {% else %}
 <div class="row">
     {% for group in user.groups %}
@@ -66,6 +66,6 @@
 
 {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
 {% if enable_room_creation.enabled %}
-<a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Add a new group") }}</a>
+<a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create a new group") }}</a>
 {% endif %}
 {% endblock %}
