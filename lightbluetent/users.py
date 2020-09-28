@@ -188,7 +188,7 @@ def register():
             return render_template(
                 "users/register.html",
                 page_title="Register",
-                user=user,
+                crsid=crsid,
                 errors=errors,
                 **values,
             )
@@ -212,7 +212,8 @@ def register():
 
     else:
 
-        if Setting.query.filter_by(name="enable_signups").first().enabled:
+        signups = Setting.query.filter_by(name="enable_signups").first()
+        if signups.enabled:
             # defaults
             lookup_data = fetch_lookup_data(crsid)
             values = {
@@ -225,7 +226,7 @@ def register():
             return render_template(
                 "users/register.html",
                 page_title="Register",
-                user=user,
+                crsid=crsid,
                 errors={},
                 **values,
             )
