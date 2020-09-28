@@ -103,7 +103,6 @@ def delete_group_session(uid, session_id):
 @bp.route("/<uid>/update/<update_type>", methods=["POST"])
 @auth_decorator
 def update(uid, update_type):
-    has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
     sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
 
     # check if group exists
@@ -358,7 +357,6 @@ def update(uid, update_type):
             errors=errors,
             sessions_data=sessions_data,
             page_parent=url_for("users.home"),
-            has_directory_page=has_directory_page,
             **values,
         )
     else:
@@ -372,9 +370,6 @@ def update(uid, update_type):
 @bp.route("/<uid>", methods=("GET", "POST"))
 @auth_decorator
 def manage(uid):
-
-    has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
-
     group = Group.query.filter_by(uid=uid).first()
 
     if not group:
@@ -410,7 +405,6 @@ def manage(uid):
         errors={},
         sessions_data=sessions_data,
         page_parent=url_for("users.home"),
-        has_directory_page=has_directory_page,
         **values,
     )
 

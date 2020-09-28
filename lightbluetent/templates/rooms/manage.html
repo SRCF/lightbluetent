@@ -81,7 +81,6 @@
                         class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
                 </div>
                 {% endif %}
-                {% if has_directory_page %}
                 <div class="form-group">
                     <label for="short_description">{{ _("Group summary") }}</label>
                     <textarea id="short_description" name="short_description" maxlength=200 rows=5
@@ -90,9 +89,10 @@
                     <small class="invalid-feedback">{{ errors.short_description }}</small>
                     {%- endif %}
                     <small
-                        class="form-text text-muted">{{ _("A short summary of your group. This will appear on the directory page. Maximum 200 characters.") }}</small>
+                        class="form-text text-muted">{{ _("A short optional summary of your group. Maximum 200 characters. If not set, description will instead be used and truncated to the character limit. ") }}</small>
                 </div>
-                {% endif %}
+            </div>
+            <div class="col-lg-6">
                 <div class="form-group">
                     <label for="description">{{ _("Group description") }}</label>
                     <textarea id="description" name="description" rows=5
@@ -103,8 +103,6 @@
                     <small
                         class="form-text text-muted">{{ _("Write a bit about your group here. What do you do? How often do you meet? How many members do you have?") }}</small>
                 </div>
-            </div>
-            <div class="col-lg-6">
                 <div class="form-group">
                     {% set current_logo = "images/{}".format(group.logo) %}
                     <div class="mx-auto d-flex align-items-center justify-content-center"
