@@ -8,6 +8,7 @@ import traceback
 from lightbluetent.models import db
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
+short_name_re = re.compile(r"\w{1,20}")
 
 
 def table_exists(name):
@@ -43,6 +44,10 @@ def validate_email(crsid, email):
             return "You should use your own university email address."
 
     return None
+
+
+def validate_short_name(short_name):
+    return short_name_re.match(short_name)
 
 
 def sif(variable):

@@ -9,7 +9,12 @@ from flask import (
     current_app,
 )
 from lightbluetent.models import db, User, Group, Setting, Role
-from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
+from lightbluetent.utils import (
+    gen_unique_string,
+    validate_email,
+    fetch_lookup_data,
+    validate_short_name,
+)
 from lightbluetent.api import Meeting
 from flask_babel import _
 from sqlalchemy.orm.attributes import flag_modified
@@ -85,9 +90,10 @@ def register_group():
         if len(values["group_name"]) <= 1:
             errors["group_name"] = "That name is too short."
 
-        if " " in values["group_short_name"]:
+        is_valid_short_name = validate_short_name(values["group_short_name"])
+        if not is_valid_short_name:
             errors["group_short_name"] = _(
-                "Your short name must not contain spaces."
+                "Your short name must be one word less than 20 characters"
             )
 
         if Group.query.filter_by(uid=values["uid"]).first():
@@ -117,9 +123,7 @@ def register_group():
             user.groups.append(group)
             db.session.commit()
 
-            current_app.logger.info(
-                f"User { crsid } registered group {values['uid']}"
-            )
+            current_app.logger.info(f"User { crsid } registered group {values['uid']}")
 
             return redirect(url_for("users.home"))
 
