@@ -82,20 +82,6 @@ def register_group():
         values["moderator_pw"] = gen_unique_string()[0:12]
         values["attendee_pw"] = gen_unique_string()[0:12]
 
-        # TODO: What's the best way of handling the (unlikely) event
-        #       that the passwords are:
-        #    a) non-unique across registered groups
-        #    b) the same
-        #       Currently we abort(500)
-        if values["moderator_pw"] == values["attendee_pw"]:
-            abort(500)
-        elif (
-            Group.query.filter_by(attendee_pw=values["attendee_pw"]).first()
-            or Group.query.filter_by(moderator_pw=values["moderator_pw"]).first()
-            or Group.query.filter_by(bbb_id=values["bbb_id"]).first()
-        ):
-            abort(500)
-
         if len(values["group_name"]) <= 1:
             errors["group_name"] = "That name is too short."
 
