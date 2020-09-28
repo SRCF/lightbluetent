@@ -58,6 +58,13 @@ def sif(variable):
         return ""
 
 
+def get_form_values(request, keys):
+    values = {}
+    for key in keys:
+        values[key] = request.form.get(key, "").strip()
+    return values
+
+
 # write an enum for this?
 def match_social(value):
     if re.search(email_re, value):

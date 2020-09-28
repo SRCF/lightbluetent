@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block meta %}{% endblock %}
-
-{% block body %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
+{% endblock %}
 
 {% macro social_field(n, placeholder="e.g. a social media URL", id=("social-"+gen_unique_string())) -%}
 <div {% if n != 0 %}class="pt-2" {% endif %}>
@@ -14,271 +14,309 @@
 </div>
 {%- endmacro %}
 
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+{% macro submit_button() -%}
+<div class="form-group mt-2 form-row float-right">
+    <input type="submit" class="btn btn-primary" value="Update">
+</div>
+{%- endmacro %}
 
-    <div class="form-row">
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                <label for="group_name">{{ _("Group name") }}</label>
-                <input type="text" id="group_name" name="group_name" placeholder="e.g. Student-Run Computing Facility"
-                    class="form-control{% if errors.group_name is defined %} is-invalid{% endif %}" value="{{ group_name }}"
-                    required>
-                {%- if errors.group_name is defined %}
-                <small class="invalid-feedback">{{ errors.group_name }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">{{ _("This is the full name of your group.") }}</small>
-            </div>
-            <div class="form-group">
-                <label for="website">Website</label>
-                <input type="text" id="website" name="website" placeholder="e.g. https://www.srcf.net/"
-                    class="form-control{% if errors.website is defined %} is-invalid{% endif %}"
-                    value="{% if website is not none %}{{ website }}{% endif %}">
-                {%- if errors.website is defined %}
-                <small class="invalid-feedback">{{ errors.website }}</small>
-                {%- endif %}
-            </div>
-            {% if group.socials %}
-            <div class="form-group">
-                <label>Social media / contact</label>
-                {% for social in group.socials %}
-                {{social_field(n, id=social.id, url=social.url)}}
-                {% endfor %}
-                {{social_field(n)}}
-                <small
-                    class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
-            </div>
-            {% else %}
-            {% set social_defaults = ["e.g. https://facebook.com/srcf.net", "e.g. spqr2@srcf.net"] %}
-            <div class="form-group">
-                <label>Social media / contact</label>
-                {% for n in range(2) %}
-                {{social_field(n, social_defaults[n])}}
-                {% endfor %}
-                <small
-                    class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
-            </div>
-            {% endif %}
-            {% if has_directory_page %}
-            <div class="form-group">
-                <label for="short_description">{{ _("Group summary") }}</label>
-                <textarea id="short_description" name="short_description" maxlength=200 rows=5
-                    class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
-                {%- if errors.short_description is defined %}
-                <small class="invalid-feedback">{{ errors.short_description }}</small>
-                {%- endif %}
-                <small
-                    class="form-text text-muted">{{ _("A short summary of your group. This will appear on the directory page. Maximum 200 characters.") }}</small>
-            </div>
-            {% endif %}
-            <div class="form-group">
-                <label for="description">{{ _("Group description") }}</label>
-                <textarea id="description" name="description" rows=5
-                    class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
-                {%- if errors.description is defined %}
-                <small class="invalid-feedback">{{ errors.description }}</small>
-                {%- endif %}
-                <small
-                    class="form-text text-muted">{{ _("Write a bit about your group here. What do you do? How often do you meet? How many members do you have?") }}</small>
-            </div>
-        </div>
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                {% set current_logo = "images/{}".format(group.logo) %}
-                <div class="mx-auto img-thumbnail d-flex align-items-center justify-content-center"
-                    style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
-                    <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}"
-                        alt="Logo" />
+{% block body %}
+
+<nav class="my-4">
+    <div class="nav nav-tabs justify-content-center" id="nav-tab">
+        <a class="nav-link active" id="nav-room-details-tab" data-toggle="tab" href="#nav-room-details"><i
+                class="fa fa-fw fa-home mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room details</span></a>
+        <a class="nav-link" id="nav-room-times-tab" data-toggle="tab" href="#nav-room-times"><i
+                class="fa fa-fw fa-clock-o mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room times</span></a>
+        <a class="nav-link" id="nav-room-features-tab" data-toggle="tab" href="#nav-room-features"><i
+                class="fa fa-fw fa-check mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room features</span></a>
+        <a class="nav-link" id="nav-advanced-settings-tab" data-toggle="tab" href="#nav-advanced-settings"><i
+                class="fa fa-fw fa-cogs mr-0 mr-md-1"></i><span class="d-none d-md-inline">Advanced settings</span></a>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <form class="tab-pane fade show active" id="nav-room-details" method="post" enctype="multipart/form-data"
+        action="{{url_for("rooms.update", uid=group.short_name, update_type="room_details")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="group_name">{{ _("Group name") }}</label>
+                    <input type="text" id="group_name" name="group_name"
+                        placeholder="e.g. Student-Run Computing Facility"
+                        class="form-control{% if errors.group_name is defined %} is-invalid{% endif %}"
+                        value="{{ group_name }}" required>
+                    {%- if errors.group_name is defined %}
+                    <small class="invalid-feedback">{{ errors.group_name }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">{{ _("This is the full name of your group.") }}</small>
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="text" id="website" name="website" placeholder="e.g. https://www.srcf.net/"
+                        class="form-control{% if errors.website is defined %} is-invalid{% endif %}"
+                        value="{% if website is not none %}{{ website }}{% endif %}">
+                    {%- if errors.website is defined %}
+                    <small class="invalid-feedback">{{ errors.website }}</small>
+                    {%- endif %}
+                </div>
+                {% if group.socials %}
+                <div class="form-group">
+                    <label>Social media / contact</label>
+                    {% for social in group.socials %}
+                    {{social_field(n, id=social.id, url=social.url)}}
+                    {% endfor %}
+                    {{social_field(n)}}
+                    <small
+                        class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
+                </div>
+                {% else %}
+                {% set social_defaults = ["e.g. https://facebook.com/srcf.net", "e.g. spqr2@srcf.net"] %}
+                <div class="form-group">
+                    <label>Social media / contact</label>
+                    {% for n in range(2) %}
+                    {{social_field(n, social_defaults[n])}}
+                    {% endfor %}
+                    <small
+                        class="form-text text-muted">{{ _("Add multiple URLs and emails to spruce up your main page.") }}</small>
+                </div>
+                {% endif %}
+                {% if has_directory_page %}
+                <div class="form-group">
+                    <label for="short_description">{{ _("Group summary") }}</label>
+                    <textarea id="short_description" name="short_description" maxlength=200 rows=5
+                        class="form-control{% if errors.short_description is defined %} is-invalid{% endif %}">{% if short_description is not none %}{{ short_description }}{% endif %}</textarea>
+                    {%- if errors.short_description is defined %}
+                    <small class="invalid-feedback">{{ errors.short_description }}</small>
+                    {%- endif %}
+                    <small
+                        class="form-text text-muted">{{ _("A short summary of your group. This will appear on the directory page. Maximum 200 characters.") }}</small>
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="description">{{ _("Group description") }}</label>
+                    <textarea id="description" name="description" rows=5
+                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
+                    {%- if errors.description is defined %}
+                    <small class="invalid-feedback">{{ errors.description }}</small>
+                    {%- endif %}
+                    <small
+                        class="form-text text-muted">{{ _("Write a bit about your group here. What do you do? How often do you meet? How many members do you have?") }}</small>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="logo">Logo</label>
-                <input type="file" id="logo" name="logo" content="{{ logo }}"
-                    class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
-                {%- if errors.logo is defined %}
-                <small class="invalid-feedback">{{ errors.logo }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1 MB.</small>
-                <small
-                    class="form-text text-muted">{{ _("This logo will be displayed on your group's welcome page.") }}</small>
-                <small class="form-text text-muted"><a href="{{ url_for('rooms.delete_logo', uid=group.uid) }}">Delete
-                        logo</a></small>
-            </div>
-        </div>
-    </div>
-    <hr />
-    <div class="form-row">
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                {% set current_bbb_logo = "images/{}".format(group.bbb_logo) %}
-                <img width="80%" height="250" src="{{ url_for('static', filename=current_bbb_logo) }}"
-                    alt="Wide logo" class="img-thumbnail mx-auto d-block">
-            </div>
-            <div class="form-group">
-                <label for="bbb_logo">Wide logo</label>
-                <input type="file" id="bbb_logo" name="bbb_logo" content="{{ bbb_logo }}"
-                    class="form-control{% if errors.bbb_logo is defined %} is-invalid{% endif %}" accept="image/*">
-                {%- if errors.bbb_logo is defined %}
-                <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1
-                    MB.</small>
-                <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
-                <small class="form-text text-muted"><a
-                        href="{{ url_for('rooms.delete_bbb_logo', uid=group.uid) }}">Delete logo</a></small>
-            </div>
-        </div>
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                <label for="welcome_text">Welcome text</label>
-                <input type="text" id="welcome_text" name="welcome_text"
-                    placeholder="e.g. Welcome to {{ group.name }}!"
-                    class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}"
-                    value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
-                {%- if errors.welcome_text is defined %}
-                <small class="invalid-feedback">{{ errors.welcome_text }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">This message will be shown to all users in the chat when they
-                    join your stand.</small>
-            </div>
-            <div class="form-group">
-                <label for="banner_text">Banner</label>
-                <div class="input-group mb-3">
-                    <input type="text" id="banner_text" name="banner_text" class="form-control"
-                        placeholder="e.g. Welcome to {{ group.name }}!" aria-label="" aria-describedby="basic-addon1"
-                        value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
-                    <div class="input-group-append">
-                        <input type="color" id="banner_color" name="banner_color" style="width: 50px"
-                            class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}"
-                            value="{{ banner_color }}" required>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    {% set current_logo = "images/{}".format(group.logo) %}
+                    <div class="mx-auto d-flex align-items-center justify-content-center"
+                        style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
+                        <img class="img-fluid img-thumbnail" style="max-height:100%"
+                            src="{{ url_for('static', filename=current_logo) }}" alt="Logo" />
                     </div>
                 </div>
-                {%- if errors.new_owner_crsid is defined %}
-                <small class="text-danger">{{ errors.banner_text }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">This is an optional field that will add a banner to your stall
-                    with your chosen banner color.</small>
-                <small class="form-text text-muted"><a
-                        href="{{ url_for('rooms.reset_banner', uid=group.uid) }}">Delete banner</a></small>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %}
-                        checked{% endif %}>
-                    Mute users on joining
-                </label>
-                {%- if errors.mute_on_start is defined %}
-                <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
-                {%- endif %}
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input type="checkbox" name="disable_private_chat" class="form-check-input"
-                        {% if disable_private_chat %} checked{% endif %}>
-                    Disable private chat
-                </label>
-                {%- if errors.disable_private_chat is defined %}
-                <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">Prevent attendees from talking to each other individually</small>
-            </div>
-        </div>
-    </div>
-    <hr />
-
-    <div class="form-row px-5">
-        <div class="form-group">
-            <label for="new_owner_crsid">{{ _("Group admins") }}</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-users"></i></span>
-                    {%- for owner in group.owners %}
-                    <span class="input-group-text">{{ owner.crsid }}</span>
-                    {%- endfor %}
+                <div class="form-group">
+                    <label for="logo">Logo</label>
+                    <input type="file" id="logo" name="logo"
+                        class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
+                    {%- if errors.logo is defined %}
+                    <small class="invalid-feedback">{{ errors.logo }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1
+                        MB.</small>
+                    <small
+                        class="form-text text-muted">{{ _("This logo will be displayed on your group's welcome page.") }}</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('rooms.delete_logo', uid=group.uid) }}">Delete
+                            logo</a></small>
                 </div>
-                <input type="text" id="new_owner_crsid" name="new_owner_crsid" class="form-control"
-                    placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
             </div>
-            {%- if errors.new_owner_crsid is defined %}
-            <small class="text-danger">{{ errors.new_owner_crsid }}</small>
-            {%- endif %}
-            <small
-                class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the group</b>. The user should already be registered with us. <b>Once an owner has been added, they cannot be removed.") }}</b></small>
         </div>
-    </div>
-    <hr />
-    <div class="form-row">
-        <div class="col-md-6 px-5">
-            <h4>Session times</h4>
-            <div class="form-group row">
-                <label class="col-sm-4 col-form-label" for="new_session_day">Add new session:</label>
-                <div class="col-sm-8">
-                    <select class="custom-select" name="new_session_day" id="new_session_day">
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-room-times" method="post"
+        action="{{url_for("rooms.update", uid=group.short_name, update_type="room_times")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="new_session_day">Add new session:</label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" name="new_session_day" id="new_session_day">
+                            {% for n in range(1, sessions_data["days"] + 1) %}
+                            <option value="{{n}}">Day {{n}}</option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.new_session_day is defined %}
+                        <br /><small class="text-danger">{{ errors.new_session_day }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="new_session_day">Start time:</label>
+                    <div class="col-sm-8">
+                        <input type="time" class="form-control" id="new_session_start" name="new_session_start">
+                        {%- if errors.new_session_start is defined %}
+                        <small class="text-danger">{{ errors.new_session_start }}</small>
+                        {%- endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="new_session_day">End time:</label>
+                    <div class="col-sm-8">
+                        <input type="time" class="form-control" id="new_session_end" name="new_session_end">
+                        {%- if errors.new_session_end is defined %}
+                        <small class="text-danger">{{ errors.new_session_end }}</small>
+                        {%- endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card col">
+                    <div class="card-body col">
                         {% for n in range(1, sessions_data["days"] + 1) %}
-                        <option value="{{n}}">Day {{n}}</option>
+                        {% set ns = namespace(found=false) %}
+                        <h4 class="card-title">Day {{n}}</h4>
+                        <ul class="fa-ul">
+                            {% for session in group.sessions %}
+                            {% if session["day"]|int == n %}
+                            {% set ns.found = true %}
+                            <li>
+                                <i class="fa fa-li fa-clock-o" title="Session"></i>
+                                {{ session["start"] }} - {{ session["end"] }}
+                                <span class="pull-right">
+                                    <a class="text-danger"
+                                        href="{{ url_for('rooms.delete_session', uid=group.uid, session_id=session['id']) }}">Delete</a>
+                                </span>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if not ns.found %}
+                            <li>
+                                <i class="fa fa-li fa-times" title="Session"></i>
+                                There are no sessions on the {{ordinal(n)}} day.
+                            </li>
+                            {% endif %}
+                        </ul>
                         {% endfor %}
-                    </select>
-                    {% if errors.new_session_day is defined %}
-                    <br /><small class="text-danger">{{ errors.new_session_day }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-4 col-form-label" for="new_session_day">Start time:</label>
-                <div class="col-sm-8">
-                    <input type="time" class="form-control" id="new_session_start" name="new_session_start">
-                    {%- if errors.new_session_start is defined %}
-                    <small class="text-danger">{{ errors.new_session_start }}</small>
-                    {%- endif %}
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-sm-4 col-form-label" for="new_session_day">End time:</label>
-                <div class="col-sm-8">
-                    <input type="time" class="form-control" id="new_session_end" name="new_session_end">
-                    {%- if errors.new_session_end is defined %}
-                    <small class="text-danger">{{ errors.new_session_end }}</small>
-                    {%- endif %}
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 px-5">
-            <div class="card col">
-                <div class="card-body col">
-                    {% for n in range(1, sessions_data["days"] + 1) %}
-                    {% set ns = namespace(found=false) %}
-                    <h4 class="card-title">Day {{n}}</h4>
-                    <ul class="fa-ul">
-                        {% for session in group.sessions %}
-                        {% if session["day"]|int == n %}
-                        {% set ns.found = true %}
-                        <li>
-                            <i class="fa fa-li fa-clock-o" title="Session"></i>
-                            {{ session["start"] }} - {{ session["end"] }}
-                            <span class="pull-right">
-                                <a class="text-danger"
-                                    href="{{ url_for('rooms.delete_session', uid=group.uid, session_id=session['id']) }}">Delete</a>
-                            </span>
-                        </li>
-                        {% endif %}
-                        {% endfor %}
-                        {% if not ns.found %}
-                        <li>
-                            <i class="fa fa-li fa-times" title="Session"></i>
-                            There are no sessions on the {{ordinal(n)}} day.
-                        </li>
-                        {% endif %}
-                    </ul>
-                    {% endfor %}
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-room-features" method="post" enctype="multipart/form-data"
+        action="{{url_for("rooms.update", uid=group.short_name, update_type="room_features")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    {% set current_bbb_logo = "images/{}".format(group.bbb_logo) %}
+                    <img width="80%" height="250" src="{{ url_for('static', filename=current_bbb_logo) }}"
+                        alt="Wide logo" class="img-thumbnail mx-auto d-block">
+                </div>
+                <div class="form-group">
+                    <label for="bbb_logo">Wide logo</label>
+                    <input type="file" id="bbb_logo" name="bbb_logo"
+                        class="form-control{% if errors.bbb_logo is defined %} is-invalid{% endif %}" accept="image/*">
+                    {%- if errors.bbb_logo is defined %}
+                    <small class="invalid-feedback">{{ errors.bbb_logo }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1
+                        MB.</small>
+                    <small class="form-text text-muted">This logo will be displayed inside your stand.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('rooms.delete_bbb_logo', uid=group.uid) }}">Delete logo</a></small>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="welcome_text">Welcome text</label>
+                    <input type="text" id="welcome_text" name="welcome_text"
+                        placeholder="e.g. Welcome to {{ group.name }}!"
+                        class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}"
+                        value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
+                    {%- if errors.welcome_text is defined %}
+                    <small class="invalid-feedback">{{ errors.welcome_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This message will be shown to all users in the chat when they
+                        join your stand.</small>
+                </div>
+                <div class="form-group">
+                    <label for="banner_text">Banner</label>
+                    <div class="input-group mb-3">
+                        <input type="text" id="banner_text" name="banner_text" class="form-control"
+                            placeholder="e.g. Welcome to {{ group.name }}!" aria-label=""
+                            aria-describedby="basic-addon1"
+                            value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
+                        <div class="input-group-append">
+                            <input type="color" id="banner_color" name="banner_color" style="width: 50px"
+                                class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}"
+                                value="{{ banner_color }}" required>
+                        </div>
+                    </div>
+                    {%- if errors.new_owner_crsid is defined %}
+                    <small class="text-danger">{{ errors.banner_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This is an optional field that will add a banner to your stall
+                        with your chosen banner color.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('rooms.reset_banner', uid=group.uid) }}">Delete
+                            banner</a></small>
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %}
+                            checked{% endif %}>
+                        Mute users on joining
+                    </label>
+                    {%- if errors.mute_on_start is defined %}
+                    <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
+                    {%- endif %}
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" name="disable_private_chat" class="form-check-input"
+                            {% if disable_private_chat %} checked{% endif %}>
+                        Disable private chat
+                    </label>
+                    {%- if errors.disable_private_chat is defined %}
+                    <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Prevent attendees from talking to each other
+                        individually</small>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="form-group mt-3 form-row px-5 float-right">
-        <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('rooms.delete', uid=group.uid) }}"
-            class="btn btn-outline-danger float-right">{{ _("Delete group") }}</a>
-    </div>
-</form>
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-advanced-settings" method="post"
+        action="{{url_for("rooms.update", uid=group.uid, update_type="advanced_settings")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="form-group">
+                <label for="new_owner_crsid">{{ _("Group admins") }}</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-users"></i></span>
+                        {%- for owner in group.owners %}
+                        <span class="input-group-text">{{ owner.crsid }}</span>
+                        {%- endfor %}
+                    </div>
+                    <input type="text" id="new_owner_crsid" name="new_owner_crsid" class="form-control"
+                        placeholder="Add another CRSid" aria-label="" aria-describedby="basic-addon1">
+                </div>
+                {%- if errors.new_owner_crsid is defined %}
+                <small class="text-danger">{{ errors.new_owner_crsid }}</small>
+                {%- endif %}
+                <small
+                    class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the group</b>. The user should already be registered with us. <b>Once an owner has been added, they cannot be removed.") }}</b></small>
+            </div>
+            <div class="form-group">
+                <label class="text-danger"><strong>Danger zone</strong></label>
+                <a href="{{ url_for('rooms.delete', uid=group.uid) }}"
+                    class="btn btn-outline-secondary d-block">{{ _("Delete room") }}</a>
+            </div>
+        </div>
+        {{submit_button()}}
+    </form>
+</div>
 {% endblock %}
