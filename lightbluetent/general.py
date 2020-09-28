@@ -39,7 +39,7 @@ def index():
 @bp.route("/logout")
 def logout():
     auth_decorator.logout()
-    return redirect(url_for("users.index"))
+    return redirect(url_for("general.index"))
 
 
 @bp.route("/log_in")

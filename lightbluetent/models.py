@@ -58,7 +58,7 @@ class Group(db.Model):
 
     website = db.Column(db.String, unique=False, nullable=True)
     socials = db.Column(db.JSON, nullable=False, default=list)
-    sessions = db.Column(db.JSON, nullable=True)
+    sessions = db.Column(db.JSON, nullable=True, default=list)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     logo = db.Column(
         db.String, unique=False, nullable=False, default="default_logo.png"

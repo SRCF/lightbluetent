@@ -76,7 +76,7 @@ def begin_session(uid):
 
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     meeting = Meeting(group)
@@ -97,10 +97,10 @@ def begin_session(uid):
 
         if errors:
             return render_template("group/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("user.home"), errors=errors)
+                           user=user, running=running, page_parent=url_for("users.home"), errors=errors)
 
         if not running:
-            join_url = url_for("group.welcome", uid=group.uid, _external=True)
+            join_url = url_for("groups.welcome", uid=group.uid, _external=True)
             moderator_only_message = _("To invite others into this session, share your stall link: %(join_url)s", join_url=join_url)
             success, message = meeting.create(moderator_only_message)
             current_app.logger.info(f"Moderator '{ full_name }' with CRSid '{ crsid }' created stall for '{ group.name }', bbb_id: '{ group.bbb_id }'")
@@ -119,4 +119,4 @@ def begin_session(uid):
             return redirect(url)
 
     return render_template("group/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("user.home"), errors={})
+                           user=user, running=running, page_parent=url_for("users.home"), errors={})

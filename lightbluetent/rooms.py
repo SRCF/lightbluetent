@@ -109,7 +109,7 @@ def manage(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
@@ -393,7 +393,7 @@ def reset_banner(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     if group.banner_text != None:
@@ -419,7 +419,7 @@ def delete_logo(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     current_app.logger.info(
@@ -443,7 +443,7 @@ def delete_bbb_logo(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     current_app.logger.info(
@@ -472,7 +472,7 @@ def delete_session(uid, session_id):
 
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     delete_group_session(uid, session_id)
@@ -492,7 +492,7 @@ def delete(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
-    if group not in user.societies:
+    if group not in user.groups:
         abort(403)
 
     if request.method == "POST":

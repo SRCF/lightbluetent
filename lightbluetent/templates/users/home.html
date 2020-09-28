@@ -31,7 +31,7 @@
                             <li>
                                 <i class="fa fa-li fa-link" title="Stall URL"></i>
                                 <a
-                                    href="{{ url_for('group.welcome', uid=group.uid) }}">{{ url_for('group.welcome', uid=group.uid, _external=True) }}</a>
+                                    href="{{ url_for('groups.welcome', uid=group.uid) }}">{{ url_for('groups.welcome', uid=group.uid, _external=True) }}</a>
                             </li>
                             <li>
                                 <i class="fa fa-li fa-users" title="Owners"></i>
@@ -51,10 +51,10 @@
             <div class="card-footer">
                 <a href="{{ url_for('rooms.manage', uid=group.uid) }}" class="btn btn-outline-primary">Manage</a>
                 {% if running_meetings[group.bbb_id] %}
-                <a href="{{ url_for('group.begin_session', uid=group.uid) }}"
+                <a href="{{ url_for('groups.begin_session', uid=group.uid) }}"
                     class="btn btn-outline-success">{{ _("Join session") }}</a>
                 {% else %}
-                <a href="{{ url_for('group.begin_session', uid=group.uid) }}"
+                <a href="{{ url_for('groups.begin_session', uid=group.uid) }}"
                     class="btn btn-outline-success">{{ _("Begin session") }}</a>
                 {% endif %}
             </div>

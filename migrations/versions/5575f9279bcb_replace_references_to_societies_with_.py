@@ -54,8 +54,20 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('user_id', 'group_id')
     )
+
+    # we need to drop constraints before renaming
+    op.drop_constraint('user_society_society_id_fkey', 'user_society', type_='foreignkey')
+    op.alter_column('user_society', 'society_id', new_column_name='group_id')
+    op.create_foreign_key(None, 'user_group', 'groups', ['group_id'], ['id'])
+
+    op.alter_column('groups', 'sessions',
+        existing_type=postgresql.JSON(astext_type=sa.Text()),
+        nullable=False,
+        existing_server_default=sa.text("'[]'::json"))
+
     op.drop_table('societies')
     op.drop_table('user_society')
+
     # ### end Alembic commands ###
 
 
