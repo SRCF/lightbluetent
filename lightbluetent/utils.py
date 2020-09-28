@@ -17,7 +17,7 @@ def table_exists(name):
 
 
 def gen_unique_string():
-    return str(uuid.uuid4()).replace("-", "")
+    return str(uuid.uuid4()).replace("-", "")[0:12]
 
 
 # Based on https://github.com/SRCF/control-panel/blob/master/control/webapp/utils.py#L249.

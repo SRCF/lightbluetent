@@ -84,8 +84,8 @@ def register_group():
 
         values["uid"] = values["group_short_name"].lower()
         values["bbb_id"] = gen_unique_string()
-        values["moderator_pw"] = gen_unique_string()[0:12]
-        values["attendee_pw"] = gen_unique_string()[0:12]
+        values["moderator_pw"] = gen_unique_string()
+        values["attendee_pw"] = gen_unique_string()
 
         if len(values["group_name"]) <= 1:
             errors["group_name"] = "That name is too short."
