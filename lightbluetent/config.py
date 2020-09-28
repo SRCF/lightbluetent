@@ -31,7 +31,7 @@ class Config(object):
 
     # Since using url_for(static", ...) prepends lightbluetent/static to the URL
     # for us, we have the relative path to the images directory from the static folder.
-    # I couldn't think of a better way of doing this. Required in society.py for
+    # I couldn't think of a better way of doing this. Required in groups.py for
     # getting the URL of the bbb_logo to pass to BBB.
     IMAGES_DIR_FROM_STATIC = "images"
 

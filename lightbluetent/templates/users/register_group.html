@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block meta %}{% endblock %}
+
+{% block body %}
+<form method="post">
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group">
+        <label for="group_name">Group name</label>
+        <input type="group_name" id="group_name" name="group_name" placeholder="E.g. Student-Run Computing Facility"
+            class="form-control{% if errors.group_name is defined %} is-invalid{% endif %}" value="{{ group_name }}"
+            required>
+        {%- if errors.group_name is defined %}
+        <small class="invalid-feedback">{{ errors.group_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the full name of your group.</small>
+    </div>
+
+    <div class="form-group">
+        <label for="group_short_name">Group short name</label>
+        <input type="group_short_name" id="group_short_name" name="group_short_name" placeholder="E.g. SRCF"
+            class="form-control{% if errors.group_short_name is defined %} is-invalid{% endif %}"
+            value="{{ group_short_name }}" required>
+        {%- if errors.group_short_name is defined %}
+        <small class="invalid-feedback">{{ errors.group_short_name }}</small>
+        {%- endif %}
+        <small class="form-text text-muted">This is the short name or acronym unique to your group. Include "CU"
+            if this is part of your short name. Your short name must not contain spaces. <b>You will not be able to
+                change this once the group is registered.</b></small>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" class="btn btn-outline-primary" value="Register">
+    </div>
+</form>
+
+
+{% endblock %}

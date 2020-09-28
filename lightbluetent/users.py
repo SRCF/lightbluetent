@@ -8,7 +8,7 @@ from flask import (
     abort,
     current_app,
 )
-from lightbluetent.models import db, User, Society, Setting, Role
+from lightbluetent.models import db, User, Group, Setting, Role
 from lightbluetent.utils import gen_unique_string, validate_email, fetch_lookup_data
 from lightbluetent.api import Meeting
 from flask_babel import _
@@ -23,7 +23,7 @@ import json
 bp = Blueprint("users", __name__, url_prefix="/u")
 
 auth_decorator = ucam_webauth.raven.flask_glue.AuthDecorator(
-    desc="SRCF Lightbluetent", require_ptags=None
+    desc=_("SRCF Events"), require_ptags=None
 )
 
 
@@ -45,9 +45,9 @@ def home():
 
     running_meetings = {}
 
-    for society in user.societies:
-        meeting = Meeting(society)
-        running_meetings[society.bbb_id] = meeting.is_running()
+    for group in user.groups:
+        meeting = Meeting(group)
+        running_meetings[group.bbb_id] = meeting.is_running()
 
     return render_template(
         "users/home.html",
@@ -58,9 +58,9 @@ def home():
     )
 
 
-@bp.route("/register_soc", methods=("GET", "POST"))
+@bp.route("/register_group", methods=("GET", "POST"))
 @auth_decorator
-def register_soc():
+def register_group():
     crsid = auth_decorator.principal
 
     user = User.query.filter_by(crsid=crsid).first()
@@ -72,75 +72,75 @@ def register_soc():
     if request.method == "POST":
 
         values = {}
-        for key in ("soc_name", "soc_short_name"):
+        for key in ("group_name", "group_short_name"):
             values[key] = request.form.get(key, "").strip()
 
         errors = {}
 
-        values["uid"] = values["soc_short_name"].lower()
+        values["uid"] = values["group_short_name"].lower()
         values["bbb_id"] = gen_unique_string()
         values["moderator_pw"] = gen_unique_string()[0:12]
         values["attendee_pw"] = gen_unique_string()[0:12]
 
         # TODO: What's the best way of handling the (unlikely) event
         #       that the passwords are:
-        #    a) non-unique across registered societies
+        #    a) non-unique across registered groups
         #    b) the same
         #       Currently we abort(500)
         if values["moderator_pw"] == values["attendee_pw"]:
             abort(500)
         elif (
-            Society.query.filter_by(attendee_pw=values["attendee_pw"]).first()
-            or Society.query.filter_by(moderator_pw=values["moderator_pw"]).first()
-            or Society.query.filter_by(bbb_id=values["bbb_id"]).first()
+            Group.query.filter_by(attendee_pw=values["attendee_pw"]).first()
+            or Group.query.filter_by(moderator_pw=values["moderator_pw"]).first()
+            or Group.query.filter_by(bbb_id=values["bbb_id"]).first()
         ):
             abort(500)
 
-        if len(values["soc_name"]) <= 1:
-            errors["soc_name"] = "Society name is too short."
+        if len(values["group_name"]) <= 1:
+            errors["group_name"] = "That name is too short."
 
-        if " " in values["soc_short_name"]:
-            errors["soc_short_name"] = _(
-                "Your society short name must not contain spaces."
+        if " " in values["group_short_name"]:
+            errors["group_short_name"] = _(
+                "Your short name must not contain spaces."
             )
 
-        if Society.query.filter_by(uid=values["uid"]).first():
-            errors["soc_short_name"] = _("That society short name is already in use.")
+        if Group.query.filter_by(uid=values["uid"]).first():
+            errors["group_short_name"] = _("That short name is already in use.")
 
         if errors:
             return render_template(
-                "users/register_soc.html",
-                page_title=_("Register a society"),
+                "users/register_group.html",
+                page_title=_("Register a group"),
                 user=user,
                 errors=errors,
                 **values,
             )
         else:
-            society = Society(
-                short_name=values["soc_short_name"],
-                name=values["soc_name"],
+            group = Group(
+                short_name=values["group_short_name"],
+                name=values["group_name"],
                 attendee_pw=values["attendee_pw"],
                 moderator_pw=values["moderator_pw"],
                 uid=values["uid"],
                 bbb_id=values["bbb_id"],
             )
 
-            db.session.add(society)
+            db.session.add(group)
             db.session.commit()
 
-            user.societies.append(society)
+            user.groups.append(group)
             db.session.commit()
 
             current_app.logger.info(
-                f"User { crsid } registered society {values['uid']}"
+                f"User { crsid } registered group {values['uid']}"
             )
 
             return redirect(url_for("users.home"))
 
     else:
         return render_template(
-            "users/register_soc.html",
-            page_title=_("Register a society"),
+            "users/register_group.html",
+            page_title=_("Register a group"),
             user=user,
             errors={},
         )
@@ -188,7 +188,7 @@ def register():
             return render_template(
                 "users/register.html",
                 page_title="Register",
-                user=user,
+                crsid=crsid,
                 errors=errors,
                 **values,
             )
@@ -212,7 +212,8 @@ def register():
 
     else:
 
-        if Setting.query.filter_by(name="enable_signups").first().enabled:
+        signups = Setting.query.filter_by(name="enable_signups").first()
+        if signups.enabled:
             # defaults
             lookup_data = fetch_lookup_data(crsid)
             values = {
@@ -225,7 +226,7 @@ def register():
             return render_template(
                 "users/register.html",
                 page_title="Register",
-                user=user,
+                crsid=crsid,
                 errors={},
                 **values,
             )

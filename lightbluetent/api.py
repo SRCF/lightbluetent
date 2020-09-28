@@ -7,10 +7,10 @@ import requests
 import xmltodict
 import os
 
-# Represents a stall for a society.
+# Represents a stall for a group.
 # Usage:
-# society = Society.query.filter_by(uid=uid).first()
-# meeting = Meeting(society)
+# group = Group.query.filter_by(uid=uid).first()
+# meeting = Meeting(group)
 # created, msg = meeting.create("Moderator-only message")
 # if not created:
 #     # do something with msg, e.g. redirect to error page
@@ -18,19 +18,19 @@ import os
 #     redirect(meeting.moderator_url(name))
 class Meeting:
 
-    def __init__(self, society):
+    def __init__(self, group):
 
-        self.uid = society.uid
-        self.meeting_name = society.name
-        self.meeting_id = society.bbb_id
-        self.moderator_pw = society.moderator_pw
-        self.attendee_pw = society.attendee_pw
-        self.welcome_text = society.welcome_text
-        self.banner_text = society.banner_text
-        self.logo = society.logo
-        self.banner_color = society.banner_color
-        self.mute_on_start = society.mute_on_start
-        self.disable_private_chat = society.disable_private_chat
+        self.uid = group.uid
+        self.meeting_name = group.name
+        self.meeting_id = group.bbb_id
+        self.moderator_pw = group.moderator_pw
+        self.attendee_pw = group.attendee_pw
+        self.welcome_text = group.welcome_text
+        self.banner_text = group.banner_text
+        self.logo = group.logo
+        self.banner_color = group.banner_color
+        self.mute_on_start = group.mute_on_start
+        self.disable_private_chat = group.disable_private_chat
 
 
     def create(self, moderator_only_message=""):
@@ -45,7 +45,7 @@ class Meeting:
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
-        params["logoutURL"] = url_for('society.welcome', uid=self.uid, _external=True)
+        params["logoutURL"] = url_for('groups.welcome', uid=self.uid, _external=True)
 
         print(params["logoutURL"])
 

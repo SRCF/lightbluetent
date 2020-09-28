@@ -6,31 +6,31 @@
 
 {% block body %}
 
-{% if not societies %}
-<p>{{ _("There are no registered societies.") }}</p>
+{% if not groups %}
+<p>{{ _("There are no registered groups yet.") }}</p>
 {% else %}
-<p>This is the society directory for the SRCF Freshers' Fair.</p>
+<p>This is the directory containing all events.</p>
 <div class="row mt-3">
-    {% for society in societies %}
+    {% for group in groups %}
     <div class="col-lg-6">
         <div class="card mb-3">
-            <div class="card-header" style="background-color: {{ society.banner_color }};">
+            <div class="card-header" style="background-color: {{ group.banner_color }};">
             </div>
             <div class="card-body">
                 <div id="card-intro" class="d-flex justify-content-between">
-                    {% set current_logo = "images/{}".format(society.logo) %}
-                    {% if society.logo != config["DEFAULT_LOGO"] %}
+                    {% set current_logo = "images/{}".format(group.logo) %}
+                    {% if group.logo != config["DEFAULT_LOGO"] %}
                     <div class="flex-shrink-0 ml-3 order-1 d-flex align-items-center justify-content-center"
                         style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
                         <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
+                            src="{{ url_for('static', filename=current_logo) }}" alt="Logo" />
                     </div>
                     {% endif %}
                     <div>
-                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ society.name }} <small
-                                class="text-muted">{{ society.short_name }}</small>
+                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ group.name }} <small
+                                class="text-muted">{{ group.short_name }}</small>
                         </h4>
-                        {% if running_meetings[society.bbb_id] %}
+                        {% if running_meetings[group.bbb_id] %}
                         <ul class="fa-ul">
                             <li>
                                 <i class="fa fa-li fa-video-camera"></i>
@@ -38,16 +38,16 @@
                             </li>
                         </ul>
                         {% endif %}
-                        {% if society.short_description %}
-                        <p>{{ society.short_description }}</p>
-                        {% elif society.description %}
-                        <p>{{ society.description | truncate(200)}}</p>
+                        {% if group.short_description %}
+                        <p>{{ group.short_description }}</p>
+                        {% elif group.description %}
+                        <p>{{ group.description | truncate(200)}}</p>
                         {% endif %}
                     </div>
                 </div>
 
                 <a class="btn btn-outline-primary btn-sm stretched-link"
-                    href="{{ url_for('society.welcome', uid=society.uid) }}">See more...</a>
+                    href="{{ url_for('group.welcome', uid=group.uid) }}">See more...</a>
             </div>
         </div>
     </div>

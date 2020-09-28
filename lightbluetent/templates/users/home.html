@@ -2,42 +2,42 @@
 
 {% block body %}
 
-<p>Hello, <b>{{ user.full_name }}</b>. {{ _("Here are the stalls for your societies.") }}</p>
+<p>Hello, <b>{{ user.full_name }}</b>. {{ _("Here are the stalls for your groups.") }}</p>
 
-{% if not user.societies %}
-<p>{{ _("You currently have no registered societies.") }}</p><br />
+{% if not user.groups %}
+<p>{{ _("You currently have no registered groups.") }}</p><br />
 {% else %}
 <div class="row">
-    {% for society in user.societies %}
+    {% for group in user.groups %}
     <div class="col-lg-6">
         <div class="card mb-3">
-            <div class="card-header" style="background-color: {{ society.banner_color }};">
+            <div class="card-header" style="background-color: {{ group.banner_color }};">
             </div>
             <div class="card-body">
                 <div id="card-intro" class="d-flex justify-content-between align-items-center">
-                    {% set current_logo = "images/{}".format(society.logo) %}
-                    {% if society.logo != config["DEFAULT_LOGO"] %}
+                    {% set current_logo = "images/{}".format(group.logo) %}
+                    {% if group.logo != config["DEFAULT_LOGO"] %}
                     <div class="ml-3 order-1 d-flex align-items-center justify-content-center"
                         style="width:14vmax;height:14vmax;max-width:128px;max-height:128px;">
                         <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
+                            src="{{ url_for('static', filename=current_logo) }}" alt="Group logo" />
                     </div>
                     {% endif %}
                     <div>
-                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ society.name }} <small
-                                class="text-muted">{{ society.short_name }}</small>
+                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ group.name }} <small
+                                class="text-muted">{{ group.short_name }}</small>
                         </h4>
                         <ul class="fa-ul mb-0">
                             <li>
                                 <i class="fa fa-li fa-link" title="Stall URL"></i>
                                 <a
-                                    href="{{ url_for('society.welcome', uid=society.uid) }}">{{ url_for('society.welcome', uid=society.uid, _external=True) }}</a>
+                                    href="{{ url_for('groups.welcome', uid=group.uid) }}">{{ url_for('groups.welcome', uid=group.uid, _external=True) }}</a>
                             </li>
                             <li>
                                 <i class="fa fa-li fa-users" title="Owners"></i>
-                                {{ society.owners|map(attribute="crsid")|join(", ") }}
+                                {{ group.owners|map(attribute="crsid")|join(", ") }}
                             </li>
-                            {% if running_meetings[society.bbb_id] %}
+                            {% if running_meetings[group.bbb_id] %}
                             <li>
                                 <i class="fa fa-li fa-video-camera"></i>
                                 {{ _("Session in progress!") }}
@@ -49,12 +49,12 @@
 
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('rooms.manage', uid=society.uid) }}" class="btn btn-outline-primary">Manage</a>
-                {% if running_meetings[society.bbb_id] %}
-                <a href="{{ url_for('society.begin_session', uid=society.uid) }}"
+                <a href="{{ url_for('rooms.manage', uid=group.uid) }}" class="btn btn-outline-primary">Manage</a>
+                {% if running_meetings[group.bbb_id] %}
+                <a href="{{ url_for('groups.begin_session', uid=group.uid) }}"
                     class="btn btn-outline-success">{{ _("Join session") }}</a>
                 {% else %}
-                <a href="{{ url_for('society.begin_session', uid=society.uid) }}"
+                <a href="{{ url_for('groups.begin_session', uid=group.uid) }}"
                     class="btn btn-outline-success">{{ _("Begin session") }}</a>
                 {% endif %}
             </div>
@@ -66,6 +66,6 @@
 
 {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
 {% if enable_room_creation.enabled %}
-<a href="{{ url_for('users.register_soc') }}" class="btn btn-outline-primary">{{ _("Add a society") }}</a>
+<a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Add a new group") }}</a>
 {% endif %}
 {% endblock %}

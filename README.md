@@ -8,7 +8,7 @@ Features:
 * individual group/society webpages (stalls) for event/fair
 * shared editing capabilities for users
 * connects directly to Timeout (BigBlueButton)
-* society directory
+* directory of registered groups
 
 Upcoming features:
 
