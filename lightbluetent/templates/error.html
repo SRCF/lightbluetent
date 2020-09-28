@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}<title>SRCF Freshers' Fair &mdash; {{error.code}}: {{error.name}}</title>{% endblock %}
+{% block title %}<title>SRCF Events &mdash; {{error.code}}: {{error.name}}</title>{% endblock %}
 {% block body %}
 <div class="container text-center pt-9">
     <div class="display-1 text-primary mb-5">
@@ -12,7 +12,7 @@
         {% if error.code == 404 %}
         What you were looking for is just not there.
         {% else %}
-        A server error ocurred. We're sorry for this. If this error persists, please email support@srcf.net with the
+        A server error ocurred. We're sorry about this. If this error persists, please email support@srcf.net with the
         following below.
         {% endif %}
     </p>

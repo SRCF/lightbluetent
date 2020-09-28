@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {% block meta %}
-    <meta property="og:title" content="{{ _("SRCF Timeout - Virtual Freshers' Fair") }}" />
+    <meta property="og:title" content="{{ _("SRCF Events") }}" />
     <meta property="og:type" content="website" />
     <meta property="og:description"
-        content="{{ _("This is a website for stall management using SRCF Timeout for the 2020 Virtual Freshers' Fair") }}" />
+        content="{{ _("This is a website for event management using SRCF Timeout") }}" />
     <meta property="og:url" content="{{ request.base_url }}" />
     <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
     {% endblock %}
 
     {% block title %}
-    <title>SRCF Freshers' Fair &mdash; {% if page_title %}{{ page_title }}{% endif %}</title>
+    <title>{{ _("SRCF Events") }} &mdash; {% if page_title %}{{ page_title }}{% endif %}</title>
     {% endblock %}
 
     <link href="https://www.srcf.net/_srcf/vendor/css/bootstrap.min.css" rel="stylesheet">
@@ -43,7 +43,7 @@
                             <span class="text-primary">Computing Facility</span>
                         </span>
                         <span class="text-muted d-none d-lg-inline"> &mdash;</span>
-                        <span class="text-muted d-none d-md-inline">{{ _("Virtual Freshers' Fair") }}
+                        <span class="text-muted d-none d-md-inline">{{ _("SRCF Events") }}
                         </span>
                     </a>
                 </div>

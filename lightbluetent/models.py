@@ -5,12 +5,12 @@ from datetime import datetime
 db = SQLAlchemy()
 migrate = Migrate()
 
-# Association table for many-to-many relationship between admins and societies.
-user_society = db.Table(
-    "user_society",
+# Association table for many-to-many relationship between admins and groups.
+user_group = db.Table(
+    "user_group",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
     db.Column(
-        "society_id", db.Integer, db.ForeignKey("societies.id"), primary_key=True
+        "group_id", db.Integer, db.ForeignKey("groups.id"), primary_key=True
     ),
 )
 
@@ -34,24 +34,24 @@ class User(db.Model):
         return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
 
 
-class Society(db.Model):
-    __tablename__ = "societies"
+class Group(db.Model):
+    __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
     short_name = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, unique=False, nullable=False)
     owners = db.relationship(
         "User",
-        secondary=user_society,
+        secondary=user_group,
         lazy=True,
-        backref=db.backref("societies", lazy=True),
+        backref=db.backref("groups", lazy=True),
     )
     short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # uid:    A short name for the society. Duplicate of short_name for now,
+    # uid:    A short name for the group. Duplicate of short_name for now,
     #         but stored as lower case.
     # bbb_id: Randomly generated UUID. Sent to BBB as the meetingID parameter
     #         on the 'create' API call.
@@ -76,7 +76,7 @@ class Society(db.Model):
     bbb_id = db.Column(db.String, unique=True, nullable=False)
 
     def __repr__(self):
-        return f"Society('{self.name}', '{self.admins}')"
+        return f"Group('{self.name}', '{self.admins}')"
 
 
 class Setting(db.Model):

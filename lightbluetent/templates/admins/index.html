@@ -23,18 +23,18 @@
 </div>
 {%- endmacro %}
 
-{% macro society_entry(society) -%}
-<a href="{{ url_for('society.welcome', uid=society.uid) }}"
+{% macro group_entry(group) -%}
+<a href="{{ url_for('group.welcome', uid=group.uid) }}"
     class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100  justify-content-between">
-        <h5 class="mb-1 mr-1 text-truncate">{{society.name}}        <small class="text-muted">{{ society.short_name }}</small>
+        <h5 class="mb-1 mr-1 text-truncate">{{group.name}}        <small class="text-muted">{{ group.short_name }}</small>
         </h5>
-        <small>Last updated {{society.updated_at.strftime("%b %d %H:%M")}}</small>
+        <small>Last updated {{group.updated_at.strftime("%b %d %H:%M")}}</small>
     </div>
-    {% if society.description is not none %}
-    <p class="mb-1">{{society.description | truncate(200) }}</p>
+    {% if group.description is not none %}
+    <p class="mb-1">{{group.description | truncate(200) }}</p>
     {% endif %}
-    <small>{{society.owners | length}} owner(s)</small>
+    <small>{{group.owners | length}} owner(s)</small>
 </a>
 {%- endmacro %}
 
@@ -67,10 +67,10 @@
         <div class="card my-2">
             <h5 class="card-header">Deployment overview</h5>
             <div class="card-body">
-                <p class="card-text">There are currently {{societies | length}} registered societies.</p>
+                <p class="card-text">There are currently {{groups | length}} registered groups.</p>
                 <div class="list-group">
-                    {% for soc in societies%}
-                    {{society_entry(soc)}}
+                    {% for soc in groups %}
+                    {{group_entry(soc)}}
                     {% endfor %}
                 </div>
             </div>

@@ -12,7 +12,7 @@ from flask import (
 import json
 from datetime import datetime
 from lightbluetent.users import auth_decorator
-from lightbluetent.models import db, Setting, User, Society
+from lightbluetent.models import db, Setting, User, Group
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
@@ -32,7 +32,7 @@ def manage():
             "admins/index.html",
             page_title="Administrator panel",
             settings=Setting.query.all(),
-            societies=Society.query.all(),
+            groups=Group.query.all(),
             user=user
         )
     else:
