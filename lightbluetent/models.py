@@ -86,9 +86,10 @@ class Room(db.Model):
 
     __tablename__ = "rooms"
 
-    id = db.Column(db.String(12), primary_key=True)       # The room's meetingID
+    id = db.Column(db.String(12), primary_key=True)                 # The room's meetingID
 
     name = db.Column(db.String(100), nullable=False)
+    alias = db.Column(db.String(100), nullable=True, unique=True)   # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
     group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=False)
     sessions = db.relationship('Session', backref='room', lazy=True)
     links = db.relationship('Link', backref="room", lazy=True)
