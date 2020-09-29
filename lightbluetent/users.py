@@ -42,24 +42,11 @@ def home():
     if not user:
         return redirect(url_for("users.register"))
 
-    # this should be removed once all users have roles
-    # TEMPFIX FOR EXISTING USERS!!!!
-    if not user.role:
-        user.role = Role.query.filter_by(name="user").first()
-        db.session.commit()
-
-    running_meetings = {}
-
-    for group in user.groups:
-        meeting = Meeting(group)
-        running_meetings[group.bbb_id] = meeting.is_running()
-
     return render_template(
         "users/home.html",
         page_title="Home",
-        running_meetings=running_meetings,
         settings=Setting.query.all(),
-        user=user,
+        user=user
     )
 
 
@@ -82,11 +69,6 @@ def register_group():
 
         errors = {}
 
-        values["uid"] = values["group_short_name"].lower()
-        values["bbb_id"] = gen_unique_string()
-        values["moderator_pw"] = gen_unique_string()
-        values["attendee_pw"] = gen_unique_string()
-
         if len(values["group_name"]) <= 1:
             errors["group_name"] = "That name is too short."
 
@@ -96,8 +78,10 @@ def register_group():
                 "Your short name must be one word less than 20 characters"
             )
 
-        if Group.query.filter_by(uid=values["uid"]).first():
-            errors["group_short_name"] = _("That short name is already in use.")
+        id = values["group_short_name"].lower()
+
+        if Group.query.filter_by(id=id).first():
+            errors["group_short_name"] = _("Short name is already in use.")
 
         if errors:
             return render_template(
@@ -109,12 +93,8 @@ def register_group():
             )
         else:
             group = Group(
-                short_name=values["group_short_name"],
+                id=id,
                 name=values["group_name"],
-                attendee_pw=values["attendee_pw"],
-                moderator_pw=values["moderator_pw"],
-                uid=values["uid"],
-                bbb_id=values["bbb_id"],
             )
 
             db.session.add(group)
@@ -123,7 +103,7 @@ def register_group():
             user.groups.append(group)
             db.session.commit()
 
-            current_app.logger.info(f"User { crsid } registered group {values['uid']}")
+            current_app.logger.info(f"User { crsid } registered group {id}")
 
             return redirect(url_for("users.home"))
 
@@ -188,7 +168,7 @@ def register():
                 email=values["email_address"],
                 full_name=values["full_name"],
                 crsid=auth_decorator.principal,
-                role=Role.query.filter_by(name="User").first(),
+                role=Role.query.filter_by(name="user").first(),
             )
 
             db.session.add(user)

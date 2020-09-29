@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 75413009a1d7
+Revision ID: 48e75b77cac1
 Revises: 
-Create Date: 2020-09-28 23:43:10.220999
+Create Date: 2020-09-29 20:43:52.754299
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '75413009a1d7'
+revision = '48e75b77cac1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,7 +21,6 @@ def upgrade():
     op.create_table('groups',
     sa.Column('id', sa.String(length=12), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('short_description', sa.String(length=200), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('logo', sa.String(), nullable=False),
     sa.Column('time_created', sa.DateTime(), nullable=False),
@@ -53,6 +52,7 @@ def upgrade():
     op.create_table('rooms',
     sa.Column('id', sa.String(length=12), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('alias', sa.String(length=100), nullable=True),
     sa.Column('group_id', sa.String(length=12), nullable=False),
     sa.Column('welcome_text', sa.String(), nullable=True),
     sa.Column('banner_text', sa.String(), nullable=True),
@@ -62,11 +62,11 @@ def upgrade():
     sa.Column('attendee_pw', sa.String(), nullable=False),
     sa.Column('moderator_pw', sa.String(), nullable=False),
     sa.Column('authentication', sa.Enum('PUBLIC', 'RAVEN', 'PASSWORD', 'WHITELIST', name='authentication'), nullable=False),
-    sa.Column('logo', sa.String(), nullable=False),
     sa.Column('time_created', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('alias'),
     sa.UniqueConstraint('attendee_pw'),
     sa.UniqueConstraint('moderator_pw')
     )

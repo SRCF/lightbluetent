@@ -3,20 +3,20 @@
 {% block meta %}
 <meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
 <meta property="og:type" content="website" />
-{% if group.description %}
+{% if room.description %}
 <meta property="og:description"
-  content="{{ group.description | truncate(200) }}" />
+  content="{{ room.description | truncate(200) }}" />
 {% else %}
   <meta property="og:description"
     content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
-{% set logo = 'images/' + group.logo %}
+{% set logo = 'images/' + room.logo %}
 <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
 {% endblock %}
 
 {% block title %}
-<title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("Events") }}</title>
+<title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}</title>
 {% endblock %}
 
 {% block static %}
@@ -35,29 +35,30 @@
 
 {% block body %}
 
-{% macro social_match(social) -%}
+{% macro match_link(link) -%}
+<!-- This isn't very readable, but I'm not sure if we can do enums in Jinja... -->
 <li>
-    {% if social.type == "email"%}
-    <i class="fa fa-li fa-envelope" title="Social {{social.id}}"></i>
-    {% elif social.type == "facebook" %}
-    <i class="fa fa-li fa-facebook-square" title="Social {{social.id}}"></i>
-    {% elif social.type == "twitter" %}
-    <i class="fa fa-li fa-twitter-square" title="Social {{social.id}}"></i>
-    {% elif social.type == "instagram" %}
-    <i class="fa fa-li fa-instagram" title="Social {{social.id}}"></i>
-    {% elif social.type == "youtube" %}
-    <i class="fa fa-li fa-youtube-play" title="Social {{social.id}}"></i>
-    {% else %}
-    <i class="fa fa-li fa-globe" title="Social {{social.id}}"></i>
+    {% if link.type == 1 %} <!-- Email address -->
+    <i class="fa fa-li fa-envelope" title="Link {{link.id}}"></i>
+    {% elif link.type == 2 %} <!-- Facebook -->
+    <i class="fa fa-li fa-facebook-square" title="Link {{link.id}}"></i>
+    {% elif link.type == 3 %} <!-- Twitter -->
+    <i class="fa fa-li fa-twitter-square" title="Link {{link.id}}"></i>
+    {% elif link.type == 4 %} <!-- Instagram -->
+    <i class="fa fa-li fa-instagram" title="Link {{link.id}}"></i>
+    {% elif link.type == 5 %} <!-- Youtube -->
+    <i class="fa fa-li fa-youtube-play" title="Link {{link.id}}"></i>
+    {% else %} <!-- Other -->
+    <i class="fa fa-li fa-globe" title="Link {{link.id}}"></i>
     {% endif %}
 
-    {% if social.type == "email"%}
-    <a href="mailto:{{ social.url }}">{{ social.url }}</a>
+    {% if link.type == 1 %} <!-- Email address -->
+    <a href="mailto:{{ link.url }}">{{ link.url }}</a>
     {% else %}
-    {% if social.url.startswith("https://") or social.url.startswith("http://") %}
-    <a href="{{ social.url }}">{{ social.url}}</a>
+    {% if link.url.startswith("https://") or link.url.startswith("http://") %}
+    <a href="{{ link.url }}">{{ link.url}}</a>
     {% else %}
-    <a href="http://{{ social.url }}">{{ social.url}}</a>
+    <a href="http://{{ link.url }}">{{ link.url}}</a>
     {% endif %}
     {% endif %}
 </li>
@@ -66,31 +67,19 @@
 <div class="row">
     <div class="col-lg">
         <div class="card my-3 shadow-sm">
-            <h4 class="card-header" style="margin-bottom: 0">{{ group.name }} <small
-                    class="text-muted">{{ group.short_name }}</small></h4>
+            <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
-                {% if (group.website
-                or group.socials) %}
+                {% if room.links) %}
                 <ul class="fa-ul">
-                    {% if group.website %}
-                    <li>
-                        <i class="fa fa-li fa-globe" title="Website"></i>
-                        {% if group.website.startswith("http://") or group.website.startswith("https://") %}
-                        <a href="{{ group.website }}">{{ group.website }}</a>
-                        {% else %}
-                        <a href="http://{{ group.website }}">{{ group.website }}</a>
-                        {% endif %}
-                    </li>
-                    {% endif %}
-                    {% for social in group.socials %}
-                    {{social_match(social)}}
+                    {% for link in room.links %}
+                    {{ match_link(link) }}
                     {% endfor %}
                 </ul>
                 <hr>
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     {% if has_logo %}
-                    {% set logo = 'images/' + group.logo %}
+                    {% set logo = 'images/' + room.logo %}
                     <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
                         <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"
@@ -98,8 +87,8 @@
                     </div>
                     {% endif %}
                     <div class="col-sm px-4 mt-3 mt-sm-0">
-                        {% if group.description %}
-                        <div class="sr-only mb-1 text-muted">{{ _("Group description") }}</div>
+                        {% if room.description %}
+                        <div class="sr-only mb-1 text-muted">{{ _("Roomou description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}
                               {% if loop.index == desc_paragraphs | length %}
@@ -124,8 +113,7 @@
                 {% set ns = namespace(found=false) %}
                 <h6 class="card-title">Day {{n}}</h6>
                 <ul class="fa-ul">
-                    {% for session in group.sessions %}
-                    {% if session["day"]|int == n %}
+                    {% for session in room.sessions %}
                     {% set ns.found = true %}
                     <li>
                         <i class="fa fa-li fa-clock-o" title="Session"></i>
@@ -136,7 +124,7 @@
                     {% if not ns.found %}
                     <li>
                         <i class="fa fa-li fa-times" title="Session"></i>
-                        There are no sessions on the {{ordinal(n)}} day.
+                        There are no sessions at the moment.
                     </li>
                     {% endif %}
                 </ul>

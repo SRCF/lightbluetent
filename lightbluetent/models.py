@@ -32,8 +32,6 @@ class User(db.Model):
     crsid = db.Column(db.String(7), db.CheckConstraint("crsid = lower(crsid)"))
     email = db.Column(db.String, unique=True, nullable=False)
     full_name = db.Column(db.String, unique=False, nullable=False)
-    first_name = db.Column(db.String, unique=False, nullable=True)
-    surname = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
 
@@ -53,6 +51,7 @@ class Group(db.Model):
         lazy=True,
         backref=db.backref("groups", lazy=True),
     )
+    rooms = db.relationship('Room', backref="group", lazy=True)
 
     whitelisted_users = db.relationship(
         "User",
@@ -61,12 +60,11 @@ class Group(db.Model):
         backref=db.backref("groups_whitelisted_for", lazy=True)
     )
 
-    short_description = db.Column(db.String(200), unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
     links = db.relationship('Link', backref="group", lazy=True)
 
     logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_logo.png"
+        db.String, unique=False, nullable=False, default="default_group_logo.png"
     )
 
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -96,7 +94,7 @@ class Room(db.Model):
 
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     banner_text = db.Column(db.String, unique=False, nullable=True)
-    banner_color = db.Column(db.String, unique=False, nullable=True, default="#e8e8e8")
+    banner_color = db.Column(db.String, unique=False, nullable=True)
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
     disable_private_chat = db.Column(db.Boolean, nullable=False, default=False)
     attendee_pw = db.Column(db.String, unique=True, nullable=False)
@@ -104,10 +102,6 @@ class Room(db.Model):
 
     sessions = db.relationship("Session", backref="room", lazy=True)
     authentication = db.Column(db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC)
-
-    logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_room_logo.png"
-    )
 
     whitelisted_users = db.relationship(
         "User",
