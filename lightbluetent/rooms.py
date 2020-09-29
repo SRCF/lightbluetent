@@ -13,8 +13,12 @@ from flask import (
 )
 from lightbluetent.models import db, User, Group, Room
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, delete_logo, get_form_values
 from lightbluetent.api import Meeting
+from lightbluetent.utils import (
+    gen_unique_string,
+    delete_logo,
+    get_form_values,
+)
 from PIL import Image
 from flask_babel import _
 from datetime import time, datetime
@@ -63,7 +67,6 @@ def room_home(room_alias):
                            errors=errors)
 
 
-
 @bp.route("/<room_alias>/manage", methods=("GET", "POST"))
 @auth_decorator
 def manage(room_alias):
@@ -77,9 +80,9 @@ def manage(room_alias):
     if not room:
         abort(404)
 
+    # ensure that the user belongs to the group they're editing
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
-
     if group not in user.groups:
         abort(403)
 
@@ -174,4 +177,3 @@ def delete(room_alias):
     )
 
     return redirect(url_for("groups.manage", group_id=group.id))
-

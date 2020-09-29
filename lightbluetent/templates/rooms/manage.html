@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block meta %}{% endblock %}
-
-{% block body %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
+{% endblock %}
 
 {% macro social_field(n, placeholder="e.g. a social media URL", id=("social-"+gen_unique_string())) -%}
 <div {% if n != 0 %}class="pt-2" {% endif %}>
@@ -14,8 +14,11 @@
 </div>
 {%- endmacro %}
 
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+{% macro submit_button() -%}
+<div class="form-group mt-2 form-row float-right">
+    <input type="submit" class="btn btn-primary" value="Update">
+</div>
+{%- endmacro %}
 
     <div class="form-row">
         <div class="col-md-6 px-5">
