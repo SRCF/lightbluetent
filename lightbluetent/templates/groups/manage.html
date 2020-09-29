@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
+{% endblock %}
+
+{% macro submit_button() -%}
+<div class="form-group mt-2 form-row float-right">
+    <input type="submit" class="btn btn-primary" value="Update">
+</div>
+{%- endmacro %}
+
+{% block body %}
+
+<nav class="my-3">
+    <div class="nav nav-tabs justify-content-center" id="nav-tab">
+        <a class="nav-link active" id="nav-group-settings-tab" data-toggle="tab" href="#nav-group-settings"><i
+                class="fa fa-fw fa-cog mr-0 mr-md-1"></i><span class="d-none d-md-inline">Group settings</span></a>
+        <a class="nav-link" id="nav-group-events-tab" data-toggle="tab" href="#nav-group-events"><i
+                class="fa fa-fw fa-calendar mr-0 mr-md-1"></i><span class="d-none d-md-inline">What's on</span></a>
+        <a class="nav-link" id="nav-advanced-settings-tab" data-toggle="tab" href="#nav-group-advanced-settings"><i
+                class="fa fa-fw fa-cogs mr-0 mr-md-1"></i><span class="d-none d-md-inline">Advanced settings</span></a>
+    </div>
+</nav>
+
+<div class="tab-content" id="nav-tabContent">
+
+    <form class="tab-pane fade show active" id="nav-group-settings" method="post" enctype="multipart/form-data"
+        action="{{url_for("groups.update", group_id=group.id, update_type="group_settings")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="name">{{ _("Group name") }}</label>
+                    <input type="text" id="name" name="name"
+                        placeholder="e.g. Student-Run Computing Facility"
+                        class="form-control{% if errors.name is defined %} is-invalid{% endif %}"
+                        value="{{ name }}" required>
+                    {%- if errors.name is defined %}
+                    <small class="invalid-feedback">{{ errors.name }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">{{ _("This is the full name of your group.") }}</small>
+                </div>
+                <div class="form-group">
+                    <label for="description">{{ _("Group description") }}</label>
+                    <textarea id="description" name="description" rows=10
+                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
+                    {%- if errors.description is defined %}
+                    <small class="invalid-feedback">{{ errors.description }}</small>
+                    {%- endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    {% set current_logo = "images/{}".format(group.logo) %}
+                    <div class="mx-auto d-flex align-items-center justify-content-center"
+                        style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
+                        <img class="img-fluid img-thumbnail" style="max-height:100%"
+                            src="{{ url_for('static', filename=current_logo) }}" alt="Logo" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="logo">Logo</label>
+                    <input type="file" id="logo" name="logo"
+                        class="form-control{% if errors.logo is defined %} is-invalid{% endif %}" accept="image/*">
+                    {%- if errors.logo is defined %}
+                    <small class="invalid-feedback">{{ errors.logo }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 1
+                        MB.</small>
+                    <small
+                        class="form-text text-muted">{{ _("This logo will be displayed on your group's home page.") }}</small>
+                    <small class="form-text text-muted"><a
+                        href="{{ url_for('groups.delete_group_logo', group_id=group.id) }}">Delete
+                        logo</a></small>
+                </div>
+            </div>
+        </div>
+        {{ submit_button() }}
+    </form>
+
+    <form class="tab-pane fade" id="nav-group-events" method="post"
+        action="{{url_for("groups.update", group_id=group.id, update_type="group_events")}}">
+
+        {% if group.rooms | length %}
+        <ul class="list-group">
+        {% for room in group.rooms %}
+            <li class="list-group-item">
+            <h4 style="margin-bottom: 0">{{ room.name }}</h4>
+            <p>Event times / authentication method go here</p>
+            <a href="{{ url_for('rooms.manage', room_alias=room.alias) }}"
+                class="btn btn-outline-primary float-right"><i class="fa fa-cog"></i>   {{ _("Event settings") }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+        <br />
+        {% else %}
+        <p>There are no events at the moment.</p>
+        {% endif %}
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <div class="input-group mb-3">
+            <input type="text" name="room_name" class="form-control" placeholder="Event name">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-plus"></i>   {{ _("Add event") }}</button>
+            </div>
+        </div>
+    </form>
+
+    <form class="tab-pane fade" id="nav-group-advanced-settings" method="post"
+        action="{{url_for("groups.update", group_id=group.id, update_type="advanced_settings")}}">
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <div class="row">
+            <div class="form-group">
+                <label for="new_owner_crsid">{{ _("Group owners") }}</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-users"></i></span>
+                        {%- for owner in group.owners %}
+                        <span class="input-group-text">{{ owner.crsid }}</span>
+                        {%- endfor %}
+                    </div>
+                    <input type="text" id="new_owner_crsid" name="new_owner_crsid" class="form-control"
+                        placeholder="Add another CRSid">
+                    <div class="input-group-append">
+                      <button type="submit" class="btn btn-outline-primary"><i class="fa fa-plus"></i>   {{ _("Add owner") }}</button>
+                    </div>
+                </div>
+                {%- if errors.new_owner_crsid is defined %}
+                <small class="text-danger">{{ errors.new_owner_crsid }}</small>
+                {%- endif %}
+                <small
+                    class="form-text text-muted">{{ _("Enter another user's CRSid to grant them administrative privileges. This will allow them to change anything on this page, <b>including deleting the group</b>. The user should already be registered with us. <b>Once an owner has been added, they cannot be removed.") }}</b></small>
+            </div>
+            <div class="form-group">
+                <label class="text-danger"><strong>Danger zone</strong></label>
+                <a href="{{ url_for('groups.delete', group_id=group.id) }}"
+                    class="btn btn-outline-secondary d-block">{{ _("Delete group") }}</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

@@ -17,5 +17,5 @@ production.log
 
 # group logos
 lightbluetent/static/images/*
-!lightbluetent/static/images/default_logo.png
-!lightbluetent/static/images/default_bbb_logo.png
+!lightbluetent/static/images/default_room_logo.png
+!lightbluetent/static/images/default_group_logo.png

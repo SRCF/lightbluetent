@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
+<meta property="og:type" content="website" />
+{% if group.description %}
+<meta property="og:description"
+  content="{{ group.description | truncate(200) }}" />
+{% else %}
+  <meta property="og:description"
+    content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+{% endif %}
+<meta property="og:url" content="{{ request.base_url }}" />
+{% set logo = 'images/' + group.logo %}
+<meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
+{% endblock %}
+
+{% block title %}
+<title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}</title>
+{% endblock %}
+
+{% block static %}
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+<link href="{{ url_for('static', filename=logo) }}" rel="icon" type="image/svg">
+{% endblock %}
+
+{% block nav %}
+<header></header>
+{% endblock %}
+
+{% block heading %}
+<div></div>
+{% endblock %}
+
+{% block body %}
+
+{% macro match_link(link) -%}
+<!-- This isn't very readable, but I'm not sure if we can do enums in Jinja... -->
+<li>
+    {% if link.type == 1 %} <!-- Email address -->
+    <i class="fa fa-li fa-envelope" title="Link {{link.id}}"></i>
+    {% elif link.type == 2 %} <!-- Facebook -->
+    <i class="fa fa-li fa-facebook-square" title="Link {{link.id}}"></i>
+    {% elif link.type == 3 %} <!-- Twitter -->
+    <i class="fa fa-li fa-twitter-square" title="Link {{link.id}}"></i>
+    {% elif link.type == 4 %} <!-- Instagram -->
+    <i class="fa fa-li fa-instagram" title="Link {{link.id}}"></i>
+    {% elif link.type == 5 %} <!-- Youtube -->
+    <i class="fa fa-li fa-youtube-play" title="Link {{link.id}}"></i>
+    {% else %} <!-- Other -->
+    <i class="fa fa-li fa-globe" title="Link {{link.id}}"></i>
+    {% endif %}
+
+    {% if link.type == 1 %} <!-- Email address -->
+    <a href="mailto:{{ link.url }}">{{ link.url }}</a>
+    {% else %}
+    {% if link.url.startswith("https://") or link.url.startswith("http://") %}
+    <a href="{{ link.url }}">{{ link.url}}</a>
+    {% else %}
+    <a href="http://{{ link.url }}">{{ link.url}}</a>
+    {% endif %}
+    {% endif %}
+</li>
+{%- endmacro %}
+
+<div class="row">
+    <div class="col-lg">
+        <div class="card my-3 shadow-sm">
+            <h4 class="card-header" style="margin-bottom: 0">{{ group.name }} <small
+                    class="text-muted">{{ group.short_name }}</small></h4>
+            <div class="card-body">
+                {% if group.links %}
+                <ul class="fa-ul">
+                    {% for link in room.links %}
+                    {{ match_link(link) }}
+                    {% endfor %}
+                </ul>
+                <hr>
+                {% endif %}
+                <div class="row no-gutters overflow-hidden">
+                    {% if has_logo %}
+                    {% set logo = 'images/' + group.logo %}
+                    <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
+                        style="width:100%;max-width:150px;max-height:150px;">
+                        <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"
+                            alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
+                    </div>
+                    {% endif %}
+                    <div class="col-sm px-4 mt-3 mt-sm-0">
+                        {% if group.description %}
+                        <div class="sr-only mb-1 text-muted">{{ _("Group description") }}</div>
+                        <div class="card-text mb-auto">
+                            {% for paragraph in desc_paragraphs %}
+                              {% if loop.index == desc_paragraphs | length %}
+                              <!-- This is the last paragraph -->
+                              <p class="mb-0">{{ paragraph }}</p>
+                              {% else %}
+                              <p>{{ paragraph }}</p>
+                              {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

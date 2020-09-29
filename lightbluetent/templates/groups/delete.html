@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block meta %}{% endblock %}
+
+{% block body %}
+
+  <p>You are about to delete {{ group.name }} ({{ group.id }}). <b>This cannot be undone.</b> <br />To confirm, type "{{ group.id }}" below.</p>
+
+  <form method="post">
+
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group-row">
+      <label class="col-lg-2 col-md-3 col-sm-4 col-form-label" for="group_id"></label>
+      <div class="col-lg-10 col-md-9 col-sm-8">
+        <input type="text" id="group_id" name="group_id" class="group_delete_form form-control{% if errors.group_id is defined %} is-invalid{% endif %}" required>
+        {%- if errors.group_id is defined %}
+          <small class="invalid-feedback">{{ errors.group_id }}</small>
+        {%- endif %}
+      </div>
+    </div>
+    <br />
+    <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary">Go back</a>
+    <input type="submit" class="btn btn-outline-danger float-right" value="Delete">
+    <br />
+  </form>
+{% endblock %}

@@ -23,8 +23,8 @@ class Config(object):
     HAS_DIRECTORY_PAGE = False
     NUMBER_OF_DAYS = 2
 
-    DEFAULT_LOGO = "default_logo.png"
-    DEFAULT_BBB_LOGO = "default_bbb_logo.png"
+    DEFAULT_GROUP_LOGO = "default_group_logo.png"
+    DEFAULT_ROOM_LOGO = "default_room_logo.png"
     MAX_LOGO_SIZE = (512, 512)
     LOGO_ALLOWED_EXTENSIONS = {".png", ".jpeg", ".jpg", ".gif"}
     IMAGES_DIR = "lightbluetent/static/images"

@@ -7,10 +7,10 @@ import requests
 import xmltodict
 import os
 
-# Represents a stall for a group.
+# Represents a meeting for a group.
 # Usage:
-# group = Group.query.filter_by(uid=uid).first()
-# meeting = Meeting(group)
+# meeting = Meeting.query.filter_by(id=id).first()
+# meeting = Meeting(room)
 # created, msg = meeting.create("Moderator-only message")
 # if not created:
 #     # do something with msg, e.g. redirect to error page
@@ -18,25 +18,25 @@ import os
 #     redirect(meeting.moderator_url(name))
 class Meeting:
 
-    def __init__(self, group):
+    def __init__(self, room):
 
-        self.uid = group.uid
-        self.meeting_name = group.name
-        self.meeting_id = group.bbb_id
-        self.moderator_pw = group.moderator_pw
-        self.attendee_pw = group.attendee_pw
-        self.welcome_text = group.welcome_text
-        self.banner_text = group.banner_text
-        self.logo = group.logo
-        self.banner_color = group.banner_color
-        self.mute_on_start = group.mute_on_start
-        self.disable_private_chat = group.disable_private_chat
+        self.id = room.id
+        self.room_name = room.name
+        self.welcome_text = room.welcome_text
+        self.banner_text = room.banner_text
+        self.banner_color = room.banner_color
+        self.mute_on_start = room.mute_on_start
+        self.disable_private_chat = room.disable_private_chat
+        self.attendee_pw = room.attendee_pw
+        self.moderator_pw = room.moderator_pw
+
+        self.alias = room.alias
 
 
     def create(self, moderator_only_message=""):
         params = {}
-        params["name"] = self.meeting_name
-        params["meetingID"] = self.meeting_id
+        params["name"] = self.room_name
+        params["meetingID"] = self.id
         params["attendeePW"] = self.attendee_pw
         params["moderatorPW"] = self.moderator_pw
         params["welcome"] = self.welcome_text if self.welcome_text != None else ""
@@ -45,9 +45,7 @@ class Meeting:
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
-        params["logoutURL"] = url_for('groups.welcome', uid=self.uid, _external=True)
-
-        print(params["logoutURL"])
+        params["logoutURL"] = url_for('rooms.room_home', alias=self.alias, _external=True)
 
         response, error = self.request("create", params)
 
@@ -64,17 +62,17 @@ class Meeting:
     def moderator_url(self, full_name):
         params = {}
         params["fullName"] = full_name
-        params["meetingID"] = self.meeting_id
+        params["meetingID"] = self.id
         params["password"] = self.moderator_pw
         params["redirect"] = "true"
 
-        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
+        '''if self.logo != current_app.config["DEFAULT_ROOM_LOGO"]:
             logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
             params["logo"] = url_for("static", filename=logo_path, _external=True)
             params["userdata-bbb_display_branding_area"] = "true"
 
             # Custom styling to make the bbb_logo look better
-            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"'''
 
         return self.build_url("join", params)
 
@@ -82,23 +80,23 @@ class Meeting:
     def attendee_url(self, full_name):
         params = {}
         params["fullName"] = full_name
-        params["meetingID"] = self.meeting_id
+        params["meetingID"] = self.id
         params["password"] = self.attendee_pw
         params["redirect"] = "true"
 
-        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
+        '''if self.logo != current_app.config["DEFAULT_ROOM_LOGO"]:
             logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
             params["logo"] = url_for("static", filename=logo_path, _external=True)
             params["userdata-bbb_display_branding_area"] = "true"
 
             # Custom styling to make the bbb_logo look better
-            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"
+            params["userdata-bbb_custom_style"] = ".branding--Z1T4eH0>img{display:block;margin-right:auto;margin-left:auto;}.separator--Z3YSEe{margin-top:0;}.branding--Z1T4eH0 {padding:var(--sm-padding-x);}"'''
 
         return self.build_url("join", params)
 
     def is_running(self):
         params = {}
-        params["meetingID"] = self.meeting_id
+        params["meetingID"] = self.id
 
         response, error = self.request("isMeetingRunning", params)
 

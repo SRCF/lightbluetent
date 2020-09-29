@@ -1,9 +1,10 @@
 import uuid
 import re
+import os
 import sys
 import requests
 from jinja2 import is_undefined
-from flask import render_template
+from flask import render_template, current_app
 import traceback
 from lightbluetent.models import db
 
@@ -17,7 +18,7 @@ def table_exists(name):
 
 
 def gen_unique_string():
-    return str(uuid.uuid4()).replace("-", "")
+    return str(uuid.uuid4()).replace("-", "")[0:12]
 
 
 # Based on https://github.com/SRCF/control-panel/blob/master/control/webapp/utils.py#L249.
@@ -140,3 +141,24 @@ def fetch_lookup_data(crsid):
     else:
         # something bad happened, don't prefill any fields
         return None
+
+def delete_logo(path):
+
+    images_dir = current_app.config["IMAGES_DIR"]
+
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+        abort(500)
+
+    if not os.path.isfile(path):
+        current_app.logger.info(f"no logo to delete")
+        return
+
+    os.remove(path)
+    current_app.logger.info(f"Deleted logo '{ path }'")
+
+def get_form_values(request, keys):
+    values = {}
+    for key in keys:
+        values[key] = request.form.get(key, "").strip()
+    return values
