@@ -109,6 +109,9 @@ def manage(uid):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
 
+    if not user:
+        return redirect(url_for("users.register"))
+
     if society not in user.societies:
         abort(403)
 
