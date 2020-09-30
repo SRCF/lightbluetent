@@ -198,7 +198,7 @@ def update(group_id, update_type):
         return redirect(url_for("groups.manage", group_id=group.id))
 
 
-@bp.route("/<group_id>/manage", methods=("GET", "POST"))
+@bp.route("/<group_id>/manage", methods=["GET"])
 @auth_decorator
 def manage(group_id):
     group = Group.query.filter_by(id=group_id).first()
