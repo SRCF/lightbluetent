@@ -123,8 +123,12 @@ def register():
     crsid = auth_decorator.principal
 
     existing_user = User.query.filter_by(crsid=crsid).first()
-    if existing_user:
-        return redirect(url_for("users.home"))
+
+    if existing_user is not None:
+
+        # Check that the user's not a dummy user without a name and email address.
+        if existing_user.email is not None and existing_user.full_name is not None:
+            return redirect(url_for("users.home"))
 
     if request.method == "POST":
 

@@ -18,6 +18,7 @@ from lightbluetent.utils import (
     gen_unique_string,
     delete_logo,
     get_form_values,
+    fetch_lookup_data
 )
 from PIL import Image
 from flask_babel import _
@@ -29,6 +30,8 @@ bp = Blueprint("rooms", __name__, url_prefix="/r")
 
 @bp.route("/<room_alias>", methods=("GET", "POST"))
 def home(room_alias):
+
+    crsid = auth_decorator.principal
 
     room = Room.query.filter_by(alias=room_alias).first()
 
@@ -45,38 +48,128 @@ def home(room_alias):
     meeting = Meeting(room)
     running = meeting.is_running()
 
+    values = {}
     errors = {}
 
     if request.method == "POST":
 
-        full_name = request.form.get("full_name", "").strip()
-
-        errors = {}
-        if len(full_name) <= 1:
-            errors["full_name"] = "That name is too short."
-
-        if errors:
-            return render_template("rooms/home.html", page_title=f"{ room.name }",
-                           room=room, group=group, desc_paragraphs=desc_paragraphs,
-                           running=running, errors=errors)
+        keys = ("name", "password")
+        values = get_form_values(request, keys)
 
         if not running:
-            flash("The meeting is no longer running.")
+            flash("This meeting is no longer running.")
+            return render_template("rooms/home.html", page_title=f"{ room.name }",
+                room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
+                running=running, errors=errors, **values)
+
+        if len(values["name"]) <= 1:
+                errors["name"] = "That name is too short."
+
+        if room.authentication.value == "password":
+
+            if values["password"] != room.password:
+                errors["password"] = "Incorrect password."
+
+            if not errors:
+                url = meeting.attendee_url(values["name"])
+                return redirect(url)
+            else:
+                return render_template("rooms/home.html", page_title=f"{ room.name }",
+                    room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
+                    running=running, errors=errors, **values)
+
+        # Public room
         else:
-            url = meeting.attendee_url(full_name)
+
+            if not errors:
+                url = meeting.attendee_url(values["name"])
+                return redirect(url)
+            else:
+                return render_template("rooms/home.html", page_title=f"{ room.name }",
+                    room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
+                    running=running, errors=errors, **values)
+
+
+    # If not authenticated
+    if crsid is None:
+        user = None
+    else:
+        user = User.query.filter_by(crsid=crsid).first()
+        if user is None:
+            # Create a dummy user if they're signed in with Raven but not actually in the DB
+            user = User(
+                email=None,
+                full_name=None,
+                crsid=crsid,
+                role=Role.query.filter_by(name="user").first(),
+            )
+            db.session.add(user)
+            current_app.logger.info(
+                f"Registered dummy user with CRSid { crsid }"
+            )
+            db.session.commit()
+
+    if room.authentication.value == "raven" or room.authentication.value == "whitelist":
+        lookup_data = fetch_lookup_data(crsid)
+        raven_join_url = meeting.attendee_url(lookup_data["visibleName"])
+    else:
+        raven_join_url = None
+
+    return render_template("rooms/home.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
+        room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
+        running=running, errors=errors)
+
+
+@bp.route("/<room_alias>/begin", methods=("GET", "POST"))
+def begin(room_alias):
+    room = Room.query.filter_by(alias=room_alias).first()
+    group_id = room.group_id
+    group = Group.query.filter_by(id=group_id).first()
+
+    if not room:
+        abort(404)
+
+    # ensure that the user belongs to the group they're editing
+    crsid = auth_decorator.principal
+
+    if crsid is None:
+        abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+    if group not in user.groups:
+        abort(403)
+
+    lookup_data = fetch_lookup_data(crsid)
+    full_name = lookup_data["visibleName"]
+
+    meeting = Meeting(room)
+    running = meeting.is_running()
+
+    if not running:
+        join_url = url_for("rooms.home", room_alias=room.alias, _external=True)
+        moderator_msg = _("To invite others to this event, share your room link: %(join_url)s", join_url=join_url)
+
+        success, message = meeting.create(moderator_msg)
+        current_app.logger.info(f"User '{ full_name }' with CRSid '{ crsid }' created room '{ room.name }', meetingID: '{ room.id }'")
+
+        if success:
+            url = meeting.moderator_url(full_name)
             return redirect(url)
+        else:
+            # For some reason the meeting wasn't created.
+            current_app.logger.error(f"Creation of stall failed: { message }")
+            flash(f"The meeting could not be created. Please contact an administrator at support@srcf.net and include the following: { message }")
 
     else:
-        return render_template("rooms/home.html", page_title=f"{ room.name }",
-                           room=room, group=group, desc_paragraphs=desc_paragraphs,
-                           running=running, errors=errors)
+        url = meeting.moderator_url(full_name)
+        return redirect(url)
+
+
 
 
 @bp.route("/<room_alias>/manage", methods=("GET", "POST"))
 @auth_decorator
 def manage(room_alias):
-
-    has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
 
     room = Room.query.filter_by(alias=room_alias).first()
     group_id = room.group_id
