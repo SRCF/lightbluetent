@@ -1,7 +1,20 @@
 import os
+import enum
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+class PermissionType(enum.Enum):
+    CAN_VIEW_ADMIN_PAGE = "can_view_admin_page"                 # Admins
+    CAN_MANAGE_ALL_GROUPS = "can_manage_all_groups"             # Admins
+    CAN_MANAGE_ALL_ROOMS = "can_manage_all_rooms"               # Admins
+    CAN_START_ALL_ROOMS = "can_start_all_rooms"                 # Admins
+    CAN_DELETE_ALL_ROOMS = "can_delete_all_rooms"               # Admins
+    CAN_CREATE_OWN_ROOMS = "can_create_own_rooms"               # Users
+    CAN_DELETE_OWN_ROOMS = "can_delete_own_rooms"               # Users
+    CAN_MANAGE_OWN_ROOMS = "can_manage_own_rooms"               # Users
+    CAN_START_OWN_ROOMS = "can_start_rooms"                     # Users
+    CAN_JOIN_WHITELISTED_ROOMS = "can_join_whitelisted_rooms"   # Visitors
 
 class Config(object):
     """Base configuration"""
@@ -35,27 +48,51 @@ class Config(object):
     # getting the URL of the bbb_logo to pass to BBB.
     IMAGES_DIR_FROM_STATIC = "images"
 
-    # defines the default permissions that comes with the app
-    # for now, only admin as users can access anything else
-    DEFAULT_PERMS = []
-    DEFAULT_PERMS.append({"name": "admin"})
-    DEFAULT_PERMS.append({"name": "user"})
 
     # defines the default roles that come with the app
-    # a role has a permission associated with it
+    # a role has permissions associated with it
     DEFAULT_ROLES = []
+
+    visitor_permissions = [
+        PermissionType.CAN_JOIN_WHITELISTED_ROOMS
+    ]
+
     DEFAULT_ROLES.append(
         {
-            "name": "administrator",
-            "permission": "admin",
-            "description": "An administrator can manage site settings and room features for LightBlueTent",
+            "name": "visitor",
+            "permissions": visitor_permissions,
+            "description": "A visitor can join rooms",
         }
     )
+
+    user_permissions = visitor_permissions + [
+        PermissionType.CAN_CREATE_OWN_ROOMS,
+        PermissionType.CAN_DELETE_OWN_ROOMS,
+        PermissionType.CAN_MANAGE_OWN_ROOMS,
+        PermissionType.CAN_START_OWN_ROOMS
+    ]
+
     DEFAULT_ROLES.append(
         {
             "name": "user",
-            "permission": "user",
+            "permissions": user_permissions,
             "description": "A user can create rooms",
+        }
+    )
+
+    admin_permissions = user_permissions + [
+        PermissionType.CAN_VIEW_ADMIN_PAGE,
+        PermissionType.CAN_MANAGE_ALL_GROUPS,
+        PermissionType.CAN_MANAGE_ALL_ROOMS,
+        PermissionType.CAN_START_ALL_ROOMS,
+        PermissionType.CAN_DELETE_ALL_ROOMS
+    ]
+
+    DEFAULT_ROLES.append(
+        {
+            "name": "administrator",
+            "permissions": admin_permissions,
+            "description": "An administrator can manage site settings and room features for LightBlueTent",
         }
     )
 
