@@ -21,6 +21,10 @@ def gen_unique_string():
     return str(uuid.uuid4()).replace("-", "")[0:12]
 
 
+def gen_meeting_id(name):
+    id = str(uuid.uuid4())
+    return f"{name}-{id[:3]}-{id[3:6]}"
+
 # Based on https://github.com/SRCF/control-panel/blob/master/control/webapp/utils.py#L249.
 # Checks email is a valid email address and belongs to the currently authenticated crsid.
 # Returns None if valid.

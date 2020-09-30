@@ -8,7 +8,7 @@ from flask import (
     abort,
     current_app,
 )
-from lightbluetent.models import db, User, Group, Setting, Role
+from lightbluetent.models import db, User, Group, Setting, Role, Room, Authentication
 from lightbluetent.utils import (
     gen_unique_string,
     validate_email,
@@ -174,6 +174,23 @@ def register():
                 crsid=auth_decorator.principal,
                 role=Role.query.filter_by(name="user").first(),
             )
+
+            try_id = gen_unique_string(auth_decorator.principal)
+            
+            # this might be expensive and unnecessary
+            while not Room.query.filter_by(id=try_id).first():
+                try_id = gen_unique_string(auth_decorator.principal)
+
+            home_room = Room(
+                id=try_id,
+                name="Home room",
+                attendee_pw=gen_unique_string(),
+                moderator_pw=gen_unique_string(),
+                authentication=Authentication.PUBLIC,
+                alias=try_id
+            )
+
+            user.rooms.append(home_room)
 
             db.session.add(user)
             db.session.commit()
