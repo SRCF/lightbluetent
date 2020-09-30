@@ -87,7 +87,21 @@
         {% for room in group.rooms %}
             <li class="list-group-item">
             <h4 style="margin-bottom: 0">{{ room.name }}</h4>
-            <p>Event times / authentication method go here</p>
+            <p>Event times go here</p>
+
+            {% if room.authentication.value == "raven" %}
+            <p><i class="fa fa-address-book"></i>   Uses Raven</p>
+            {% elif room.authentication.value == "password" %}
+            <p><i class="fa fa-key"></i>   Password-protected</p>
+            {% elif room.authentication.value == "whitelist" %}
+            <p><i class="fa fa-user-plus"></i>   Has a whitelist</p>
+            {% else %}
+            <p><i class="fa fa-users"></i>   Public</p>
+            {% endif %}
+
+            <a href="{{ url_for('rooms.home', room_alias=room.alias) }}" class="btn btn-outline-primary"><i class="fa fa-home"></i>   Home page</a>
+            <a href="{{ url_for('rooms.begin', room_alias=room.alias) }}"
+                class="btn btn-outline-success float-right"><i class="fa fa-play"></i>   {{ _("Start event") }}</a>
             <a href="{{ url_for('rooms.manage', room_alias=room.alias) }}"
                 class="btn btn-outline-primary float-right"><i class="fa fa-cog"></i>   {{ _("Event settings") }}</a>
             </li>

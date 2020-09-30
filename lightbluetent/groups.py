@@ -142,7 +142,9 @@ def update(group_id, update_type):
                 attendee_pw=gen_unique_string(),
                 moderator_pw=gen_unique_string(),
                 authentication=Authentication.PUBLIC,
-                alias=id
+                alias=id,
+                password=gen_unique_string()[0:6],
+                whitelisted_users=group.owners
             )
 
             db.session.add(room)

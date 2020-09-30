@@ -30,8 +30,8 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     crsid = db.Column(db.String(7), db.CheckConstraint("crsid = lower(crsid)"))
-    email = db.Column(db.String, unique=True, nullable=False)
-    full_name = db.Column(db.String, unique=False, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=True)
+    full_name = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
 
@@ -75,10 +75,10 @@ class Group(db.Model):
 
 # Different levels of authentication for attendees joining a room
 class Authentication(enum.Enum):
-    PUBLIC = 1
-    RAVEN = 2
-    PASSWORD = 3
-    WHITELIST = 4
+    PUBLIC = "public"
+    RAVEN = "raven"
+    PASSWORD = "password"
+    WHITELIST = "whitelist"
 
 class Room(db.Model):
 
@@ -91,6 +91,7 @@ class Room(db.Model):
     group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=False)
     sessions = db.relationship('Session', backref='room', lazy=True)
     links = db.relationship('Link', backref="room", lazy=True)
+    description = db.Column(db.String, unique=False, nullable=True)
 
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     banner_text = db.Column(db.String, unique=False, nullable=True)
@@ -102,6 +103,7 @@ class Room(db.Model):
 
     sessions = db.relationship("Session", backref="room", lazy=True)
     authentication = db.Column(db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC)
+    password = db.Column(db.String, nullable=True)
 
     whitelisted_users = db.relationship(
         "User",
@@ -118,17 +120,17 @@ class Room(db.Model):
 
 
 class Recurrence(enum.Enum):
-    NONE = 1
-    DAILY = 2
-    WEEKDAYS = 3
-    WEEKLY = 4
-    MONTHLY = 5
-    YEARLY = 6
+    NONE = "none"
+    DAILY = "daily"
+    WEEKDAYS = "weekdays"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
 
 class RecurrenceLimit(enum.Enum):
-    FOREVER = 1   # No limit is given
-    COUNT = 2     # A number of days / weeks months to recur is provided
-    UNTIL = 3     # A date is given after which no more sessions will occur
+    FOREVER = "forever"   # No limit is given
+    COUNT = "count"       # A number of days / weeks months to recur is provided
+    UNTIL = "until"       # A date is given after which no more sessions will occur
 
 class Session(db.Model):
     __tablename__ = "sessions"
@@ -145,12 +147,12 @@ class Session(db.Model):
 
 
 class LinkType(enum.Enum):
-    EMAIL = 1
-    FACEBOOK = 2
-    TWITTER = 3
-    INSTAGRAM = 4
-    YOUTUBE = 5
-    OTHER = 6
+    EMAIL = "email"
+    FACEBOOK = "facebook"
+    TWITTER = "twitter"
+    INSTAGRAM = "instagram"
+    YOUTUBE = "youtube"
+    OTHER = "other"
 
 class Link(db.Model):
     __tablename__ = "links"

@@ -11,7 +11,7 @@
     content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
-{% set logo = 'images/' + room.logo %}
+{% set logo = 'images/' + group.logo %}
 <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
 {% endblock %}
 
@@ -69,26 +69,10 @@
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
-                {% if room.links) %}
-                <ul class="fa-ul">
-                    {% for link in room.links %}
-                    {{ match_link(link) }}
-                    {% endfor %}
-                </ul>
-                <hr>
-                {% endif %}
                 <div class="row no-gutters overflow-hidden">
-                    {% if has_logo %}
-                    {% set logo = 'images/' + room.logo %}
-                    <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
-                        style="width:100%;max-width:150px;max-height:150px;">
-                        <img class="img-fluid rounded" style="max-height:100%" src="{{ url_for('static', filename=logo) }}"
-                            alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
-                    </div>
-                    {% endif %}
                     <div class="col-sm px-4 mt-3 mt-sm-0">
                         {% if room.description %}
-                        <div class="sr-only mb-1 text-muted">{{ _("Roomou description") }}</div>
+                        <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}
                               {% if loop.index == desc_paragraphs | length %}
@@ -109,45 +93,74 @@
         <div class="card my-3 shadow-sm">
             <h5 class="card-header">Session times</h5>
             <div class="card-body">
-                {% for n in range(1, sessions_data["days"] + 1) %}
-                {% set ns = namespace(found=false) %}
-                <h6 class="card-title">Day {{n}}</h6>
-                <ul class="fa-ul">
-                    {% for session in room.sessions %}
-                    {% set ns.found = true %}
-                    <li>
-                        <i class="fa fa-li fa-clock-o" title="Session"></i>
-                        {{ session["start"] }} - {{ session["end"] }}
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                    {% if not ns.found %}
-                    <li>
-                        <i class="fa fa-li fa-times" title="Session"></i>
-                        There are no sessions at the moment.
-                    </li>
-                    {% endif %}
-                </ul>
-                {% endfor %}
-
                 <h6 class="card-title text-muted">Join the live session</h6>
 
                 <form method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
+                    {% if room.authentication.value == "public" %}
+
                     <div class="form-group">
-                        <input type="name"
-                            class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}"
-                            name="full_name" id="full_name" placeholder="Enter your name..."
-                            {% if not running %}disabled{% endif %}>
-                        {%- if errors.full_name is defined %}
-                        <small class="invalid-feedback">{{ errors.full_name }}</small>
+                        <input type="text"
+                            class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                            name="name" id="name" placeholder="Enter your name..."
+                            {% if not running %}disabled{% endif %}>{{ name }}</input>
+                        {%- if errors.name is defined %}
+                        <small class="invalid-feedback">{{ errors.name }}</small>
                         {%- endif %}
                     </div>
 
                     <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
-                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join session') }}">
+                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
+
+                    {% elif room.authentication.value == "raven" %}
+
+                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
+
+                    {% elif room.authentication.value == "password" %}
+
+                    <div class="form-group">
+                        <input type="text"
+                            class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                            name="name" id="name" placeholder="Enter your name..."
+                            {% if not running %}disabled{% endif %}>
+                        {%- if errors.name is defined %}
+                        <small class="invalid-feedback">{{ errors.name }}</small>
+                        {%- endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password"
+                            class="form-control {% if errors.password is defined %} is-invalid{% endif %}"
+                            name="password" id="password" placeholder="Room password"
+                            {% if not running %}disabled{% endif %}>
+                        {%- if errors.password is defined %}
+                        <small class="invalid-feedback">{{ errors.password }}</small>
+                        {%- endif %}
+                    </div>
+
+                    <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
+
+                    {% else %} <!-- Whitelist -->
+
+                        {% if user is none or user not in room.whitelisted_users %}
+
+                        <p>You do not have permission to join this event.</p>
+
+                        {% else %}
+
+                        <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join") }}</a>
+
+                        {% endif %}
+
+
+                    {% endif %}
                 </form>
+
+
             </div>
         </div>
     </div>
