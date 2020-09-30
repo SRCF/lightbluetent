@@ -82,7 +82,7 @@
     <form class="tab-pane fade" id="nav-group-events" method="post"
         action="{{url_for("groups.update", group_id=group.id, update_type="group_events")}}">
 
-        {% if group.rooms | length %}
+        {% if group.rooms %}
         <ul class="list-group">
         {% for room in group.rooms %}
             <li class="list-group-item">
