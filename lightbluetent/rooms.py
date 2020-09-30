@@ -13,7 +13,7 @@ from flask import (
 )
 from lightbluetent.models import db, User, Society
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id
+from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time
 from PIL import Image
 from flask_babel import _
 from datetime import time, datetime
@@ -255,6 +255,11 @@ def manage(uid):
 
         # Add a new session
         if values["new_session_start"] and values["new_session_end"]:
+            
+            fields = ("new_session_start", "new_session_end")
+            for f in fields:
+                if not match_time(values[f]):
+                    errors[f] = "Invalid time format. Time must be given in standard format, eg. 08:39"
 
             start_time = [int(nstr) for nstr in values["new_session_start"].split(":")]
             end_time = [int(nstr) for nstr in values["new_session_end"].split(":")]

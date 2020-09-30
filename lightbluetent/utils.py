@@ -8,6 +8,7 @@ import traceback
 from lightbluetent.models import db
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
+time_re = re.compile(r"\d{2}:\d{2}")
 
 
 def table_exists(name):
@@ -75,6 +76,10 @@ def get_social_by_id(id, socials):
             if social["id"] == id:
                 return (index, social)
     return (False, False)
+
+
+def match_time(time):
+    return time_re.match(time)
 
 
 # from django humanize
