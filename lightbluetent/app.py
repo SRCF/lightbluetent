@@ -98,7 +98,8 @@ def create_app(config_name=None):
 
         if table_exists("permissions"):
             for perm in app.config["DEFAULT_PERMS"]:
-                has_perm = Role.query.filter_by(name=perm["name"]).first()
+                has_perm = Permission.query.filter_by(name=perm["name"]).first()
+                print(has_perm)
                 if not has_perm:
                     new_perm = Permission(name=perm["name"])
                     db.session.add(new_perm)
