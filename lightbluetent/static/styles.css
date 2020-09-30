@@ -1,5 +1,5 @@
 /* font defaults */
-@import url('https://www.srcf.net/_srcf/fonts.css');
+@import url("https://www.srcf.net/_srcf/fonts.css");
 
 h1,
 h2,
@@ -138,4 +138,13 @@ ul.traceback li {
 
 .card-body :only-child {
     margin-bottom: 0;
+}
+
+.lbt-icon-ul {
+    padding: 0 0 0 0.5rem;
+    list-style: none;
+}
+
+.lbt-icon-li {
+    margin-right: 0.5rem;
 }

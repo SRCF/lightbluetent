@@ -7,7 +7,7 @@ from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
 from lightbluetent.utils import delete_logo, gen_unique_string, get_form_values
 from flask_babel import _
-from datetime import time, datetime
+from datetime import datetime
 from PIL import Image
 
 bp = Blueprint("groups", __name__, url_prefix="/g")
@@ -206,6 +206,11 @@ def manage(group_id):
 
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
+
+    # Check the user is registered with us, if not redirect to the user reg page
+    if not user:
+        return redirect(url_for("users.register"))
+
     if group not in user.groups:
         abort(403)
 
