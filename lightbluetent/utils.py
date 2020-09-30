@@ -119,7 +119,7 @@ def fetch_lookup_data(crsid):
         response = res.json()["result"]["person"]
 
         email = ""
-        if len(response["attributes"] > 0):
+        if len(response["attributes"]) > 0:
             email = response["attributes"][0]["value"]
         else:
             email = f"{crsid}@cam.ac.uk"
