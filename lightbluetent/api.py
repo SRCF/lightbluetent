@@ -45,7 +45,7 @@ class Meeting:
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
-        params["logoutURL"] = url_for('rooms.room_home', alias=self.alias, _external=True)
+        params["logoutURL"] = url_for('rooms.home', alias=self.alias, _external=True)
 
         response, error = self.request("create", params)
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
+<script src="{{ url_for('static', filename='javascripts/authentications.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -70,6 +70,67 @@
                 <small class="form-text text-muted">This is an optional field that will add a banner to the top of your room
                     with your chosen banner color.</small>
             </div>
+
+            <div class="card">
+               <div class="card-body">
+                    <h5 class="card-title">Authentication</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="authentication" id="authentication_public" value="public" {% if authentication.value == "public" %}checked{% endif %} >
+                        <label for="authentication_public">{{ _("Open to the public") }}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="authentication" id="authentication_raven" value="raven" {% if authentication.value == "raven" %}checked{% endif %}>
+                        <label for="authentication_raven">{{ _("Raven users only") }}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="authentication" id="authentication_password" value="password" {% if authentication.value == "password" %}checked{% endif %}>
+                        <label for="authentication_password">{{ _("Use a password") }}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="authentication" id="authentication_whitelist" value="whitelist" {% if authentication.value == "whitelist" %}checked{% endif %}>
+                        <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
+                    </div>
+                    <small class="form-text text-muted">Restrict who can join this event.</small>
+
+                    <div id="auth_box_password" class="auth-box" style="display: none;">
+                    <div class="form-group">
+                        <br>
+                        <label for="password">{{ _("Event Password: ") }}</label>
+                        <h1><a href={{ url_for("rooms.new_password", room_alias=room.alias) }} class="badge badge-primary">{{ room.password }}</a></h1>
+                        <small class="form-text text-muted">Anyone with this password will be able to join the meeting. Click to generate a new one.</small>
+                        <br>
+                    </div>
+                    </div>
+
+                    <div id="auth_box_whitelist" class="auth-box" style="display: none;">
+                    <div class="form-group">
+                        <br>
+                        <label for="whitelist">{{ _("Whitelist a CRSid") }}</label>
+                        <br>
+                        {% for user in room.whitelisted_users %}
+                        <!-- Group owners can't be unwhitelisted -->
+                        {% if user in group.owners %}
+                          <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
+                        {% else %}
+                          <a href="{{ url_for('rooms.unwhitelist', room_alias=room.alias, crsid_to_remove=user.crsid) }}" type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
+                        {% endif %}
+                        {% endfor %}
+                        <br><br>
+                        <input type="whitelist" id="whitelist" name="whitelist"
+                            class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
+                            value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
+                        {%- if errors.whitelist is defined %}
+                        <small class="invalid-feedback">{{ errors.whitelist }}</small>
+                        {%- endif %}
+                        <small class="form-text text-muted">People with these CRSids will be able to join the meeting. Click to remove a CRSid. Group owners cannot be removed.</small>
+                        <br>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %}
