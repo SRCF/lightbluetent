@@ -48,3 +48,14 @@ $('#enable-room-creation .dropdown-menu').on('click', '> *', function () {
     const token = parent.data('csrf');
     changeSiteSetting(paths, data, token)
 });
+
+// change whether group creation should be enabled
+$('#enable-group-creation .dropdown-menu').on('click', '> *', function () {
+    const parent = $('#enable-group-creation');
+    const paths = {
+        success: parent.data('path'), error: parent.data('path-error')
+    };
+    const data = { name: "enable_group_creation", enabled: $(this).data('action') == "enable" }
+    const token = parent.data('csrf');
+    changeSiteSetting(paths, data, token)
+});

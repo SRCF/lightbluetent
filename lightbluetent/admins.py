@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 from lightbluetent.users import auth_decorator
 from lightbluetent.models import db, Setting, User, Group
+from lightbluetent.config import PermissionType
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
@@ -27,7 +28,7 @@ def manage():
         return redirect(url_for("users.register"))
 
     # TO-DO: PAGINATION
-    if user.role.name == "admin":
+    if user.has_permission_to(PermissionType.CAN_VIEW_ADMIN_PAGE):
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",

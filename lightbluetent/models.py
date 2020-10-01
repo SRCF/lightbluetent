@@ -11,9 +11,7 @@ migrate = Migrate()
 user_group = db.Table(
     "users_groups",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
-    db.Column(
-        "group_id", db.String(12), db.ForeignKey("groups.id"), primary_key=True
-    ),
+    db.Column("group_id", db.String(12), db.ForeignKey("groups.id"), primary_key=True),
 )
 
 # Association table between roles and permissions.
@@ -32,7 +30,7 @@ whitelist = db.Table(
     db.Column("id", db.Integer, primary_key=True),
     db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("group_id", db.String(12), db.ForeignKey("groups.id")),
-    db.Column("room_id", db.String(20), db.ForeignKey("rooms.id"))
+    db.Column("room_id", db.String(20), db.ForeignKey("rooms.id")),
 )
 
 
@@ -46,8 +44,10 @@ class User(db.Model):
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
 
-    rooms = db.relationship('Room', backref="user", lazy=True)
+    rooms = db.relationship("Room", backref="user", lazy=True)
 
+    def has_permission_to(self, perm: PermissionType):
+        return perm in [p.name for p in self.role.permissions]
 
     def __repr__(self):
         return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
@@ -56,25 +56,27 @@ class User(db.Model):
 class Group(db.Model):
     __tablename__ = "groups"
 
-    id = db.Column(db.String(12), primary_key=True)             # e.g. "srcf"
-    name = db.Column(db.String, unique=False, nullable=False)   # e.g. "Student-Run Computing Facility"
+    id = db.Column(db.String(12), primary_key=True)  # e.g. "srcf"
+    name = db.Column(
+        db.String, unique=False, nullable=False
+    )  # e.g. "Student-Run Computing Facility"
     owners = db.relationship(
         "User",
         secondary=user_group,
         lazy=True,
         backref=db.backref("groups", lazy=True),
     )
-    rooms = db.relationship('Room', backref="group", lazy=True)
+    rooms = db.relationship("Room", backref="group", lazy=True)
 
     whitelisted_users = db.relationship(
         "User",
         secondary=whitelist,
         lazy=True,
-        backref=db.backref("groups_whitelisted_for", lazy=True)
+        backref=db.backref("groups_whitelisted_for", lazy=True),
     )
 
     description = db.Column(db.String, unique=False, nullable=True)
-    links = db.relationship('Link', backref="group", lazy=True)
+    links = db.relationship("Link", backref="group", lazy=True)
 
     logo = db.Column(
         db.String, unique=False, nullable=False, default="default_group_logo.png"
@@ -86,6 +88,7 @@ class Group(db.Model):
     def __repr__(self):
         return f"Group('{self.name}')"
 
+
 # Different levels of authentication for attendees joining a room
 class Authentication(enum.Enum):
     PUBLIC = "public"
@@ -93,18 +96,27 @@ class Authentication(enum.Enum):
     PASSWORD = "password"
     WHITELIST = "whitelist"
 
+
 class Room(db.Model):
 
     __tablename__ = "rooms"
 
-    id = db.Column(db.String(20), primary_key=True)                 # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
+    id = db.Column(
+        db.String(20), primary_key=True
+    )  # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
 
     name = db.Column(db.String(100), nullable=False)
-    alias = db.Column(db.String(100), nullable=True, unique=True)   # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
-    group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=True)   # For group-owned rooms
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)            # For user-owned rooms
-    sessions = db.relationship('Session', backref='room', lazy=True)
-    links = db.relationship('Link', backref="room", lazy=True)
+    alias = db.Column(
+        db.String(100), nullable=True, unique=True
+    )  # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
+    group_id = db.Column(
+        db.String(12), db.ForeignKey("groups.id"), nullable=True
+    )  # For group-owned rooms
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True
+    )  # For user-owned rooms
+    sessions = db.relationship("Session", backref="room", lazy=True)
+    links = db.relationship("Link", backref="room", lazy=True)
     description = db.Column(db.String, unique=False, nullable=True)
 
     welcome_text = db.Column(db.String, unique=False, nullable=True)
@@ -116,14 +128,16 @@ class Room(db.Model):
     moderator_pw = db.Column(db.String, unique=True, nullable=False)
 
     sessions = db.relationship("Session", backref="room", lazy=True)
-    authentication = db.Column(db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC)
+    authentication = db.Column(
+        db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC
+    )
     password = db.Column(db.String, nullable=True)
 
     whitelisted_users = db.relationship(
         "User",
         secondary=whitelist,
         lazy=True,
-        backref=db.backref("rooms_whitelisted_for", lazy=True)
+        backref=db.backref("rooms_whitelisted_for", lazy=True),
     )
 
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -141,10 +155,12 @@ class Recurrence(enum.Enum):
     MONTHLY = "monthly"
     YEARLY = "yearly"
 
+
 class RecurrenceLimit(enum.Enum):
-    FOREVER = "forever"   # No limit is given
-    COUNT = "count"       # A number of days / weeks months to recur is provided
-    UNTIL = "until"       # A date is given after which no more sessions will occur
+    FOREVER = "forever"  # No limit is given
+    COUNT = "count"  # A number of days / weeks months to recur is provided
+    UNTIL = "until"  # A date is given after which no more sessions will occur
+
 
 class Session(db.Model):
     __tablename__ = "sessions"
@@ -167,6 +183,7 @@ class LinkType(enum.Enum):
     INSTAGRAM = "instagram"
     YOUTUBE = "youtube"
     OTHER = "other"
+
 
 class Link(db.Model):
     __tablename__ = "links"

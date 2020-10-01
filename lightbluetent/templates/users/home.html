@@ -3,13 +3,13 @@
 {% block body %}
 
 <p>Hello, <b>{{ user.full_name }}</b>.</p>
-
-{% if not user.groups %}
-<p>{{ _("You currently have no registered groups.") }}</p>
-{% else %}
-<div class="row">
-    {% for group in user.groups %}
-    <div class="col-lg-6">
+<section class="row">
+    <article class="mb-3 col-lg-6">
+        <h3>Your groups</h3>
+        {% if not user.groups %}
+        <p>{{ _("You currently have no registered groups.") }}</p>
+        {% else %}
+        {% for group in user.groups %}
         <div class="card mb-3">
             <div class="card-header">
             </div>
@@ -26,7 +26,7 @@
                     <h4 style="overflow-wrap:anywhere;" class="card-title">{{ group.name }} <small
                             class="text-muted">{{ group.id }}</small>
                     </h4>
-                    <ul class="mb-0 lbt-icon-ul" >
+                    <ul class="mb-0 lbt-icon-ul">
                         <li>
                             <i class="fa fa-link lbt-icon-li" title="Group URL"></i>
                             <a href="{{ url_for('groups.home', group_id=group.id) }}">
@@ -38,21 +38,64 @@
                         </li>
                     </ul>
                 </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
+                            class="fa fa-home"></i> Group page</a>
+                    <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
+                            class="fa fa-cog"></i> Settings</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
+        {% if enable_room_creation.enabled %}
+        <a href="{{ url_for('users.register_group') }}"
+            class="btn btn-outline-primary">{{ _("Create group") }}</a>
+        {% endif %}
+
+    </article>
+    <article class="mb-3 col-lg-6">
+        <h3>Your personal rooms</h3>
+        {% set personal_rooms = user.rooms | selectattr("group", "none") %}
+        {% if not personal_rooms %}
+        <p>{{ _("You currently have no registered rooms.") }}</p>
+        {% else %}
+        {% for room in personal_rooms %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4 style="overflow-wrap:anywhere;" class="card-title">{{ room.name }} <small
+                        class="text-muted">{{ room.id }}</small>
+                </h4>
+                <ul class="mb-0 lbt-icon-ul">
+                    <li>
+                        <i class="fa fa-link lbt-icon-li" title="Room URL"></i>
+                        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}">
+                            {{ url_for('room_aliases.home', room_id=room.id, _external=True) }}</a>
+                    </li>
+                </ul>
             </div>
             <div class="card-footer">
-                <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
-                        class="fa fa-home"></i> Group page</a>
-                <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
+                <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary mr-1"><i
+                        class="fa fa-home"></i> Room page</a>
+                <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-outline-primary"><i
                         class="fa fa-cog"></i> Settings</a>
             </div>
         </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+        {% endfor %}
+        {% endif %}
 
-{% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
-{% if enable_room_creation.enabled %}
-<a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create a new group") }}</a>
-{% endif %}
+        {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
+        {% if enable_room_creation.enabled %}
+        <a href="{{ url_for('users.register_group') }}"
+            class="btn btn-outline-primary">{{ _("Create room") }}</a>
+        {% endif %}
+
+    </article>
+</section>
+
+
+
+
 {% endblock %}

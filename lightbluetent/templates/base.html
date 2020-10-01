@@ -59,7 +59,7 @@
                         <div class=" dropdown-menu">
                             <a class="dropdown-item" href="{{ url_for('users.profile') }}"><i
                                     class="fa fa-fw fa-id-card mr-3" aria-hidden="true"></i>Profile</a>
-                            {% if user.role.value == "admin" %}
+                            {% if  user.has_permission_to(permission_type.CAN_VIEW_ADMIN_PAGE) %}
                             <a class="dropdown-item" href="{{ url_for('admins.manage') }}"><i
                                     class="fa fa-fw fa-server mr-3" aria-hidden="true"></i>Administration</a>
                             {% endif %}

@@ -111,6 +111,12 @@ class Config(object):
             "enabled": os.getenv("ENABLE_ROOM_CREATION", True),
         }
     )
+    SITE_SETTINGS.append(
+        {
+            "name": "enable_group_creation",
+            "enabled": os.getenv("ENABLE_GROUP_CREATION", True),
+        }
+    )
 
 
 class ProductionConfig(Config):

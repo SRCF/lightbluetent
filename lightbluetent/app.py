@@ -47,6 +47,7 @@ def create_app(config_name=None):
     app.jinja_env.globals["sif"] = sif
     app.jinja_env.globals["gen_unique_string"] = gen_unique_string
     app.jinja_env.globals["ordinal"] = ordinal
+    app.jinja_env.globals["permission_type"] = PermissionType
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -85,7 +86,7 @@ def create_app(config_name=None):
                 if role:
                     user.role = role
                     db.session.commit()
-                    click.echo(f"Changed {user.full_name}'s role from {prev_role.name} to {role.name}")
+                    click.echo(f"Changed {user.full_name}'s role from {prev_role.role} to {role.role}")
                 else:
                     click.echo("Role does not exist")
 
