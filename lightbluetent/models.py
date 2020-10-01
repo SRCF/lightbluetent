@@ -1,21 +1,31 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
+from lightbluetent.config import PermissionType
 import enum
 
 db = SQLAlchemy()
 migrate = Migrate()
 
-# Association table for many-to-many relationship between users and groups.
+# Association table between users and groups.
 user_group = db.Table(
-    "user_group",
+    "users_groups",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
     db.Column(
         "group_id", db.String(12), db.ForeignKey("groups.id"), primary_key=True
     ),
 )
 
-# Association table for many-to-many relationship between attendees and either a group or a room.
+# Association table between roles and permissions.
+roles_permissions = db.Table(
+    "roles_permissions",
+    db.Column("role_id", db.Integer, db.ForeignKey("roles.id"), primary_key=True),
+    db.Column(
+        "permission_id", db.Integer, db.ForeignKey("permissions.id"), primary_key=True
+    ),
+)
+
+# Association table between attendees and either a group or a room.
 # Groups may have a default whitelist, which can then be inherited by its rooms and modified if required.
 whitelist = db.Table(
     "whitelist",
@@ -88,7 +98,7 @@ class Room(db.Model):
 
     name = db.Column(db.String(100), nullable=False)
     alias = db.Column(db.String(100), nullable=True, unique=True)   # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
-    group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=False)
+    group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=True)
     sessions = db.relationship('Session', backref='room', lazy=True)
     links = db.relationship('Link', backref="room", lazy=True)
     description = db.Column(db.String, unique=False, nullable=True)
@@ -182,9 +192,14 @@ class Role(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    permission_id = db.Column(
-        db.Integer, db.ForeignKey("permissions.id"), nullable=False
+
+    permissions = db.relationship(
+        "Permission",
+        secondary=roles_permissions,
+        lazy=True,
+        backref=db.backref("roles", lazy=True),
     )
+
     description = db.Column(db.String, unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     users = db.relationship("User", backref="role", lazy=True)
@@ -197,8 +212,7 @@ class Permission(db.Model):
     __tablename__ = "permissions"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=False, nullable=False)
-    roles = db.relationship("Role", backref="permission", lazy=True)
+    name = db.Column(db.Enum(PermissionType), unique=False, nullable=False)
 
     def __repr__(self):
         return f"Permission('{self.name}')"
