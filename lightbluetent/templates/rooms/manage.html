@@ -50,7 +50,6 @@
                         {%- endif %}
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label for="alias">Room alias</label>
                     <div class="input-group mb-3">
@@ -72,7 +71,16 @@
                         <small class="form-text text-muted">For example, if you set your alias to "srcf-talks", your Room home page would be at
                             {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
                     </div>
-
+                </div>
+                <div class="form-group">
+                    <label for="description">{{ _("Room description") }}</label>
+                    <textarea id="description" name="description" rows=2
+                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ room.description }}{% endif %}</textarea>
+                    {%- if errors.description is defined %}
+                    <small class="invalid-feedback">{{ errors.description }}</small>
+                    {%- endif %}
+                    <small
+                        class="form-text text-muted">{{ _("Optionally include more information about your room for your guests and yourself.") }}</small>
                 </div>
             </div>
             <div class="col-md-6">

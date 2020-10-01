@@ -253,24 +253,23 @@ def profile():
 
 @bp.route("/update", methods=["POST"])
 def update():
-    if request.method == "POST":
-        res = request.get_json(force=True)
-        crsid = auth_decorator.principal
-        user = User.query.filter_by(crsid=crsid).first()
-        error = False
-        if res["type"] == "email":
-            email_err = validate_email(crsid, res["value"])
-            if email_err is not None:
-                error = True
-                flash(email_err, "error")
-        if not error:
-            old_field = getattr(user, res["type"])
-            setattr(user, res["type"], res["value"])
-            current_app.logger.info(
-                f"Changing {res['type']} for {auth_decorator.principal} from {old_field} to {res['value']}"
-            )
-            db.session.commit()
-            flash("Your profile was updated successfully", "success")
+    res = request.get_json(force=True)
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    error = False
+    if res["type"] == "email":
+        email_err = validate_email(crsid, res["value"])
+        if email_err is not None:
+            error = True
+            flash(email_err, "error")
+    if not error:
+        old_field = getattr(user, res["type"])
+        setattr(user, res["type"], res["value"])
+        current_app.logger.info(
+            f"Changing {res['type']} for {auth_decorator.principal} from {old_field} to {res['value']}"
+        )
+        db.session.commit()
+        flash("Your profile was updated successfully", "success")
     return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 
 

@@ -103,7 +103,7 @@ def update(room_id, update_type):
     errors = {}
 
     if update_type == "room_details":
-        keys = ("name", "authentication", "password", "whitelist", "alias")
+        keys = ("name", "authentication", "password", "whitelist", "alias", "description")
         values = get_form_values(request, keys)
 
         for key in ("alias_checked",):
@@ -151,6 +151,8 @@ def update(room_id, update_type):
         if not errors:
             room.name = values["name"]
             room.authentication = Authentication(values["authentication"])
+            room.description = values["description"]
+            print(room.description)
             room.alias = values["alias"] if values["alias"] != "" else None
 
     elif update_type == "room_times":
@@ -193,6 +195,7 @@ def update(room_id, update_type):
         )
     else:
         room.updated_at = datetime.now()
+        print(db.session.dirty)
         db.session.commit()
         flash("Settings saved.", "success")
         return redirect(url_for("rooms.manage", room_id=room.id))
