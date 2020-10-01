@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='javascripts/room_management.js') }}"></script>
+<script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
 {% endblock %}
-
-{% block body %}
 
 {% macro social_field(n, placeholder="e.g. a social media URL", id=("social-"+gen_unique_string())) -%}
 <div {% if n != 0 %}class="pt-2" {% endif %}>
@@ -22,165 +20,212 @@
 </div>
 {%- endmacro %}
 
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-    <div class="form-row">
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                <label for="name">{{ _("Event name") }}</label>
-                <input type="text" id="name" name="name" placeholder="e.g. Weekly Meeting"
-                    class="form-control{% if errors.name is defined %} is-invalid{% endif %}" value="{{ name }}"
-                    required>
-                {%- if errors.name is defined %}
-                <small class="invalid-feedback">{{ errors.name }}</small>
-                {%- endif %}
-            </div>
-        </div>
+{% block body %}
+
+<nav class="my-4">
+    <div class="nav nav-tabs justify-content-center" id="nav-tab">
+        <a class="nav-link active" id="nav-room-details-tab" data-toggle="tab" href="#nav-room-details"><i
+                class="fa fa-fw fa-home mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room details</span></a>
+        <a class="nav-link" id="nav-room-times-tab" data-toggle="tab" href="#nav-room-times"><i
+                class="fa fa-fw fa-clock-o mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room times</span></a>
+        <a class="nav-link" id="nav-room-features-tab" data-toggle="tab" href="#nav-room-features"><i
+                class="fa fa-fw fa-check mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room features</span></a>
     </div>
+</nav>
 
-    <div class="form-row">
-        <div class="col-md-6 px-5">
-            <div class="form-group">
-                <label for="welcome_text">Welcome text</label>
-                <input type="text" id="welcome_text" name="welcome_text"
-                    placeholder="e.g. Welcome to {{ room.name }}!"
-                    class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}"
-                    value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
-                {%- if errors.welcome_text is defined %}
-                <small class="invalid-feedback">{{ errors.welcome_text }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">This message will be shown to all users in the chat when they
-                    join your room.</small>
-            </div>
-            <div class="form-group">
-                <label for="banner_text">Banner</label>
-                <div class="input-group mb-3">
-                    <input type="text" id="banner_text" name="banner_text" class="form-control"
-                        placeholder="e.g. Welcome to {{ room.name }}!" aria-label="" aria-describedby="basic-addon1"
-                        value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
-                    <div class="input-group-append">
-                        <input type="color" id="banner_color" name="banner_color" style="width: 50px"
-                            class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}"
-                            value="{{ banner_color }}" required>
-                    </div>
-                </div>
-                {%- if errors.banner_text is defined %}
-                <small class="text-danger">{{ errors.banner_text }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">This is an optional field that will add a banner to the top of your room
-                    with your chosen banner color.</small>
-            </div>
-
-            <!-- TODO: need to fix the styling of this. -->
-            <div class="form-group">
-            <label for="alias">Event URL</label>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">
-                        <input type="checkbox" class="form-check-input" name="alias_checked" id="alias_checkbox" {% if alias is not none %}checked{% endif %}>
-                    </div>
-                </div>
-                <input type="text" id="alias_input" name="alias"
-                        class="form-control{% if errors.alias is defined %} is-invalid{% endif %}"
-                        value="{% if alias is not none %}{{ alias }}{% endif %}"
-                        placeholder="e.g. srcf-talks"
-                        {% if alias is none %}disabled{% endif %}>
-                {%- if errors.alias is defined %}
-                <small class="text-danger">{{ errors.alias }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">You can customise the URL for your event. For example, if you entered
-                        "srcf-talks" here, your event home page would be at {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
-            </div>
-            </div>
-
-            <div class="card">
-               <div class="card-body">
-                    <h5 class="card-title">Authentication</h5>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="authentication" id="authentication_public" value="public" {% if authentication.value == "public" %}checked{% endif %} >
-                        <label for="authentication_public">{{ _("Open to the public") }}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="authentication" id="authentication_raven" value="raven" {% if authentication.value == "raven" %}checked{% endif %}>
-                        <label for="authentication_raven">{{ _("Raven users only") }}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="authentication" id="authentication_password" value="password" {% if authentication.value == "password" %}checked{% endif %}>
-                        <label for="authentication_password">{{ _("Use a password") }}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="authentication" id="authentication_whitelist" value="whitelist" {% if authentication.value == "whitelist" %}checked{% endif %}>
-                        <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
-                    </div>
-                    <small class="form-text text-muted">Restrict who can join this event.</small>
-
-                    <div id="auth_box_password" class="auth-box" style="display: none;">
+<div class="tab-content" id="nav-tabContent">
+    <form class="tab-pane fade show active" id="nav-room-details" method="post" enctype="multipart/form-data"
+        action="{{url_for("rooms.update", room_id=room.id, update_type="room_details")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
                     <div class="form-group">
-                        <br>
-                        <label for="password">{{ _("Event Password: ") }}</label>
-                        <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }} class="badge badge-primary">{{ room.password }}</a></h1>
-                        <small class="form-text text-muted">Anyone with this password will be able to join the meeting. Click to generate a new one.</small>
-                        <br>
-                    </div>
-                    </div>
-
-                    <div id="auth_box_whitelist" class="auth-box" style="display: none;">
-                    <div class="form-group">
-                        <br>
-                        <label for="whitelist">{{ _("Whitelist a CRSid") }}</label>
-                        <br>
-                        {% for user in room.whitelisted_users %}
-                        <!-- Group owners can't be unwhitelisted -->
-                        {% if user in group.owners %}
-                          <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
-                        {% else %}
-                          <a href="{{ url_for('rooms.unwhitelist', room_id=room.id, crsid_to_remove=user.crsid) }}" type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
-                        {% endif %}
-                        {% endfor %}
-                        <br><br>
-                        <input type="text" id="whitelist" name="whitelist"
-                            class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
-                            value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
-                        {%- if errors.whitelist is defined %}
-                        <small class="invalid-feedback">{{ errors.whitelist }}</small>
+                        <label for="name">{{ _("Event name") }}</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Weekly Meeting"
+                            class="form-control{% if errors.name is defined %} is-invalid{% endif %}" value="{{ name }}"
+                            required>
+                        {%- if errors.name is defined %}
+                        <small class="invalid-feedback">{{ errors.name }}</small>
                         {%- endif %}
-                        <small class="form-text text-muted">People with these CRSids will be able to join the meeting. Click to remove a CRSid. Group owners cannot be removed.</small>
-                        <br>
                     </div>
+                </div>
+
+                <!-- TODO: need to fix the styling of this. -->
+                <div class="form-group">
+                    <label for="alias">Event URL</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" class="form-check-input" name="alias_checked" id="alias_checkbox"
+                                    {% if alias is not none %}checked{% endif %}>
+                            </div>
+                        </div>
+                        <input type="text" id="alias_input" name="alias"
+                            class="form-control{% if errors.alias is defined %} is-invalid{% endif %}"
+                            value="{% if alias is not none %}{{ alias }}{% endif %}" placeholder="e.g. srcf-talks"
+                            {% if alias is none %}disabled{% endif %}>
+                        {%- if errors.alias is defined %}
+                        <small class="text-danger">{{ errors.alias }}</small>
+                        {%- endif %}
+                        <small class="form-text text-muted">You can customise the URL for your event. For
+                            example, if you
+                            entered
+                            "srcf-talks" here, your event home page would be at
+                            {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Authentication</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="authentication"
+                                id="authentication_public" value="public"
+                                {% if authentication.value == "public" %}checked{% endif %}>
+                            <label for="authentication_public">{{ _("Open to the public") }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="authentication" id="authentication_raven"
+                                value="raven" {% if authentication.value == "raven" %}checked{% endif %}>
+                            <label for="authentication_raven">{{ _("Raven users only") }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="authentication"
+                                id="authentication_password" value="password"
+                                {% if authentication.value == "password" %}checked{% endif %}>
+                            <label for="authentication_password">{{ _("Use a password") }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="authentication"
+                                id="authentication_whitelist" value="whitelist"
+                                {% if authentication.value == "whitelist" %}checked{% endif %}>
+                            <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
+                        </div>
+                        <small class="form-text text-muted">Restrict who can join this event.</small>
 
-            <br>
+                        <div id="auth_box_password" class="auth-box" style="display: none;">
+                            <div class="form-group">
+                                <br>
+                                <label for="password">{{ _("Event Password: ") }}</label>
+                                <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }}
+                                        class="badge badge-primary">{{ room.password }}</a></h1>
+                                <small class="form-text text-muted">Anyone with this password will be able to join the
+                                    meeting. Click to generate a new one.</small>
+                                <br>
+                            </div>
+                        </div>
 
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %}
-                        checked{% endif %}>
-                    Mute users on joining
-                </label>
-                {%- if errors.mute_on_start is defined %}
-                <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
-                {%- endif %}
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input type="checkbox" name="disable_private_chat" class="form-check-input"
-                        {% if disable_private_chat %} checked{% endif %}>
-                    Disable private chat
-                </label>
-                {%- if errors.disable_private_chat is defined %}
-                <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
-                {%- endif %}
-                <small class="form-text text-muted">Prevent attendees from talking to each other individually</small>
+                        <div id="auth_box_whitelist" class="auth-box" style="display: none;">
+                            <div class="form-group">
+                                <br>
+                                <label for="whitelist">{{ _("Whitelist a CRSid") }}</label>
+                                <br>
+                                {% for user in room.whitelisted_users %}
+                                <!-- Group owners can't be unwhitelisted -->
+                                {% if user in group.owners %}
+                                <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
+                                {% else %}
+                                <a href="{{ url_for('rooms.unwhitelist', room_id=room.id, crsid_to_remove=user.crsid) }}"
+                                    type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
+                                {% endif %}
+                                {% endfor %}
+                                <br><br>
+                                <input type="text" id="whitelist" name="whitelist"
+                                    class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
+                                    value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
+                                {%- if errors.whitelist is defined %}
+                                <small class="invalid-feedback">{{ errors.whitelist }}</small>
+                                {%- endif %}
+                                <small class="form-text text-muted">People with these CRSids will be able to join the
+                                    meeting. Click to remove a CRSid. Group owners cannot be removed.</small>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mt-3 float-right">
+                    <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
+                        class="btn btn-outline-danger float-right">{{ _("Delete event") }}</a>
+                </div>
             </div>
         </div>
-    </div>
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-room-times" method="post"
+        action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
 
-    <div class="form-group mt-3 form-row px-5 float-right">
-        <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
-            class="btn btn-outline-danger float-right">{{ _("Delete event") }}</a>
-    </div>
-</form>
+        </div>
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-room-features" method="post"
+        action="{{url_for("rooms.update", room_id=room.id, update_type="room_features")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <section class="row">
+            <article class="col-md-6">
+                <div class="form-group">
+                    <label for="welcome_text">Welcome text</label>
+                    <input type="text" id="welcome_text" name="welcome_text"
+                        placeholder="e.g. Welcome to {{ room.name }}!"
+                        class="form-control{% if errors.welcome_text is defined %} is-invalid{% endif %}"
+                        value="{% if welcome_text is not none %}{{ welcome_text }}{% endif %}">
+                    {%- if errors.welcome_text is defined %}
+                    <small class="invalid-feedback">{{ errors.welcome_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This message will be shown to all users in the chat when
+                        they
+                        join your room.</small>
+                </div>
+                <div class="form-group">
+                    <label for="banner_text">Banner</label>
+                    <div class="input-group mb-3">
+                        <input type="text" id="banner_text" name="banner_text" class="form-control"
+                            placeholder="e.g. Welcome to {{ room.name }}!" aria-label="" aria-describedby="basic-addon1"
+                            value="{% if banner_text is not none %}{{ banner_text }}{% endif %}">
+                        <div class="input-group-append">
+                            <input type="color" id="banner_color" name="banner_color" style="width: 50px"
+                                class="input-group-text form-control{% if errors.banner_color is defined %} is-invalid{% endif %}"
+                                value="{{ banner_color }}" required>
+                        </div>
+                    </div>
+                    {%- if errors.banner_text is defined %}
+                    <small class="text-danger">{{ errors.banner_text }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">This is an optional field that will add a banner to the
+                        top of your
+                        room
+                        with your chosen banner color.</small>
+                </div>
+            </article>
+            <article class="col-md-6">
+                <div class="form-check">
+                    <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %} checked
+                    {% endif %}>
+                    <label class="form-check-label">
+                        Mute users on joining
+                    </label>
+                    {%- if errors.mute_on_start is defined %}
+                    <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
+                    {%- endif %}
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="disable_private_chat" class="form-check-input"
+                    {% if disable_private_chat %} checked{% endif %}>
+                    <label class="form-check-label">
+                        Disable private chat
+                    </label>
+                    {%- if errors.disable_private_chat is defined %}
+                    <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Prevent attendees from talking to each other
+                        individually</small>
+                </div>
+            </article>
+        </section>
+        {{submit_button()}}
+    </form>
+</div>
 {% endblock %}
