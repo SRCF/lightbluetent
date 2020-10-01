@@ -97,7 +97,7 @@ def begin_session(uid):
 
         if errors:
             return render_template("society/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("user.home"), errors=errors)
+                           user=user, running=running, page_parent=url_for("users.home"), errors=errors)
 
         if not running:
             join_url = url_for("society.welcome", uid=society.uid, _external=True)
@@ -119,4 +119,4 @@ def begin_session(uid):
             return redirect(url)
 
     return render_template("society/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("user.home"), errors={})
+                           user=user, running=running, page_parent=url_for("users.home"), errors={})
