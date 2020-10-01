@@ -32,23 +32,35 @@ bp = Blueprint("rooms", __name__, url_prefix="/r")
 
 @bp.route("/<room_id>/begin", methods=("GET", "POST"))
 def begin(room_id):
+
     room = Room.query.filter_by(id=room_id).first()
 
     if not room:
         abort(404)
 
-    group_id = room.group_id
-    group = Group.query.filter_by(id=group_id).first()
+    group = None
 
-    # ensure that the user belongs to the group they're editing
     crsid = auth_decorator.principal
 
     if crsid is None:
         abort(403)
 
     user = User.query.filter_by(crsid=crsid).first()
-    if group not in user.groups:
-        abort(403)
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
 
     lookup_data = fetch_lookup_data(crsid)
     full_name = lookup_data["visibleName"]
@@ -89,14 +101,36 @@ def manage(room_id):
     if not room:
         abort(404)
 
-    group_id = room.group_id
-    group = Group.query.filter_by(id=group_id).first()
+    group = None
 
-    # ensure that the user belongs to the group they're editing
     crsid = auth_decorator.principal
-    user = User.query.filter_by(crsid=crsid).first()
-    if group not in user.groups:
+
+    if crsid is None:
         abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=room.group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+
+        parent_page = url_for("groups.manage", group_id=room.group.id)
+
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+
+        parent_page = url_for("users.home")
+
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
+
 
     values = {}
     errors = {}
@@ -110,7 +144,13 @@ def manage(room_id):
             "authentication",
             "password",
             "whitelist",
-            "alias"
+            "alias",
+            "start_date",
+            "start_hour",
+            "start_min",
+            "end_date",
+            "end_hour",
+            "end_min"
         )
         values = get_form_values(request, keys)
 
@@ -124,6 +164,24 @@ def manage(room_id):
 
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
+
+
+        # Is there a better way to do this?
+        start_date_entered = values["start_date"] != "" or values["start_hour"] != "" or values["start_min"] != ""
+        end_date_entered = values["end_date"] != "" or values["end_hour"] != "" or values["end_min"] != ""
+        full_start_date = values["start_date"] != "" and values["start_hour"] != "" and values["start_min"] != ""
+        full_end_date = values["end_date"] != "" and values["end_hour"] != "" and values["end_min"] != ""
+
+        if start_date_entered or end_date_entered:
+            if not full_start_date:
+                errors["start"] = "Enter a full date and time."
+            if not full_end_date:
+                errors["end"] = "Enter a full date and time."
+
+            session = Session(
+
+            )
+
 
         if values["alias_checked"]:
             if values["alias"] == "":
@@ -191,7 +249,7 @@ def manage(room_id):
                 user=user,
                 group=group,
                 errors=errors,
-                page_parent=url_for("groups.manage", group_id=group.id),
+                page_parent=parent_page,
                 **values
             )
 
@@ -215,7 +273,7 @@ def manage(room_id):
         group=group,
         user=user,
         errors={},
-        page_parent=url_for("groups.manage", group_id=group.id),
+        page_parent=parent_page,
         **values,
     )
 
@@ -223,16 +281,35 @@ def manage(room_id):
 @bp.route("/<room_id>/new_password")
 @auth_decorator
 def new_password(room_id):
+
     room = Room.query.filter_by(id=room_id).first()
+
     if not room:
         abort(404)
 
-    crsid = auth_decorator.principal
-    user = User.query.filter_by(crsid=crsid).first()
-    group = Group.query.filter_by(id=room.group_id).first()
+    group = None
 
-    if group not in user.groups:
+    crsid = auth_decorator.principal
+
+    if crsid is None:
         abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=room.group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
 
     new_pw = gen_unique_string()[0:6]
 
@@ -246,15 +323,33 @@ def new_password(room_id):
 def unwhitelist(room_id, crsid_to_remove):
 
     room = Room.query.filter_by(id=room_id).first()
+
     if not room:
         abort(404)
 
-    crsid = auth_decorator.principal
-    user = User.query.filter_by(crsid=crsid).first()
-    group = Group.query.filter_by(id=room.group_id).first()
+    group = None
 
-    if group not in user.groups:
+    crsid = auth_decorator.principal
+
+    if crsid is None:
         abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
 
     user_to_remove = User.query.filter_by(crsid=crsid_to_remove).first()
 
@@ -272,15 +367,33 @@ def unwhitelist(room_id, crsid_to_remove):
 def delete(room_id):
 
     room = Room.query.filter_by(id=room_id).first()
+
     if not room:
         abort(404)
 
-    crsid = auth_decorator.principal
-    user = User.query.filter_by(crsid=crsid).first()
-    group = Group.query.filter_by(id=room.group_id).first()
+    group = None
 
-    if group not in user.groups:
+    crsid = auth_decorator.principal
+
+    if crsid is None:
         abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=room.group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
 
     db.session.delete(room)
     db.session.commit()
@@ -290,4 +403,5 @@ def delete(room_id):
     )
 
     return redirect(url_for("groups.manage", group_id=group.id))
+
 
