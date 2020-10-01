@@ -83,18 +83,22 @@ def begin(room_id):
 @bp.route("/<room_id>/manage", methods=("GET", "POST"))
 @auth_decorator
 def manage(room_id):
-
+    # first pass: is the room URL valid?
     room = Room.query.filter_by(id=room_id).first()
-
     if not room:
         abort(404)
+
+    # second pass: does the room belong to the user?
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    if room not in user.rooms:
+        abort(403)
 
     group_id = room.group_id
     group = Group.query.filter_by(id=group_id).first()
 
     # ensure that the user belongs to the group they're editing
-    crsid = auth_decorator.principal
-    user = User.query.filter_by(crsid=crsid).first()
+
     if group not in user.groups:
         abort(403)
 
