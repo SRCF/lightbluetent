@@ -100,53 +100,28 @@ def update(room_id, update_type):
         if room not in user.rooms:
             abort(403)
 
-    values = {}
     errors = {}
 
-    keys = (
-        "name",
-        "welcome_text",
-        "banner_text",
-        "banner_color",
-        "authentication",
-        "password",
-        "whitelist",
-        "alias"
-        )
+    if update_type == "room_details":
+        keys = ("name", "authentication", "password", "whitelist", "alias")
+        values = get_form_values(request, keys)
 
-    values = get_form_values(request, keys)
+        for key in ("alias_checked",):
+            values[key] = bool(request.form.get(key, False))
 
-    for key in ("mute_on_start", "disable_private_chat", "alias_checked"):
-        values[key] = bool(request.form.get(key, False))
+        if len(values["whitelist"]) > 7:
+            errors["whitelist"] = "Invalid CRSid."
 
-    if len(values["welcome_text"]) > 500:
-        errors["welcome_text"] = "Welcome text is too long."
-    if len(values["banner_text"]) > 200:
-        errors["banner_text"] = "Banner text is too long."
-    if len(values["whitelist"]) > 7:
-        errors["whitelist"] = "Invalid CRSid."
+        if values["alias_checked"]:
+            if values["alias"] == "":
+                errors["alias"] = "You must specify the name of your alias."
+            elif not validate_room_alias(values["alias"]):
+                errors["alias"] = "Invalid alias."
 
-    if values["alias_checked"]:
-        if values["alias"] == "":
-            errors["alias"] = "You must specify the name of your customised page."
-        elif not validate_room_alias(values["alias"]):
-            errors["alias"] = "Invalid name."
+            room_with_alias = Room.query.filter_by(alias=values["alias"]).first()
 
-        room_with_alias = Room.query.filter_by(alias=values["alias"]).first()
-
-        if room_with_alias and room_with_alias.id != room.id:
-            errors["alias"] = "That URL is already in use. Choose a different one."
-
-    if not errors:
-        room.name = values["name"]
-        room.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
-        room.banner_text = values["banner_text"] if values["banner_text"] != "" else None
-        room.banner_color = values["banner_color"]
-        room.authentication = Authentication(values["authentication"])
-        room.alias = values["alias"] if values["alias"] != "" else None
-        room.mute_on_start = values["mute_on_start"]
-        room.disable_private_chat = values["disable_private_chat"]
-        room.updated_at = datetime.now()
+            if room_with_alias and room_with_alias.id != room.id:
+                errors["alias"] = "That URL is already in use. Choose a different one."
 
         if values["whitelist"] != "":
             current_app.logger.info(
@@ -172,12 +147,41 @@ def update(room_id, update_type):
                     f"Registered visitor with CRSid { values['whitelist'] }"
                 )
                 room.whitelisted_users.append(user)
+        
+        if not errors:
+            room.name = values["name"]
+            room.authentication = Authentication(values["authentication"])
+            room.alias = values["alias"] if values["alias"] != "" else None
 
-        db.session.commit()
-        flash("Settings saved.")
-        return redirect(url_for("rooms.manage", room_id=room.id))
+    elif update_type == "room_times":
+        print("HI THIS NEEDS TO BE FILLED!!!")
+    elif update_type == "room_features":
+        keys = ("welcome_text", "banner_text", "banner_color")
+        values = get_form_values(request, keys)
+
+        for key in ("mute_on_start", "disable_private_chat"):
+            values[key] = bool(request.form.get(key, False))
+
+        if len(values["welcome_text"]) > 500:
+            errors["welcome_text"] = "Welcome text is too long."
+        if len(values["banner_text"]) > 200:
+            errors["banner_text"] = "Banner text is too long."
+
+        if not errors:
+            room.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
+            room.banner_text = values["banner_text"] if values["banner_text"] != "" else None
+            room.banner_color = values["banner_color"]
+
+            room.mute_on_start = values["mute_on_start"]
+            room.disable_private_chat = values["disable_private_chat"]
+
     else:
-        flash(_("There were problems with the information you provided."))
+        current_app.logger.error(
+            f"Attempted to update room page at incorrect endpoint: {update_type}"
+        )        
+
+    if errors:
+        flash(_("There were problems with the information you provided."), "error")
         return render_template(
             "rooms/manage.html",
             page_title=f"Settings for { room.name }",
@@ -187,6 +191,11 @@ def update(room_id, update_type):
             page_parent=url_for("room_aliases.home", room_id=room.id),
             **values
         )
+    else:
+        room.updated_at = datetime.now()
+        db.session.commit()
+        flash("Settings saved.", "success")
+        return redirect(url_for("rooms.manage", room_id=room.id))
 
 
 @bp.route("/<room_id>/manage", methods=["GET"])

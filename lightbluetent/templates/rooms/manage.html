@@ -29,7 +29,7 @@
         <a class="nav-link" id="nav-room-times-tab" data-toggle="tab" href="#nav-room-times"><i
                 class="fa fa-fw fa-clock-o mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room times</span></a>
         <a class="nav-link" id="nav-room-features-tab" data-toggle="tab" href="#nav-room-features"><i
-                class="fa fa-fw fa-check mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room features</span></a>
+                class="fa fa-fw fa-cogs mr-0 mr-md-1"></i><span class="d-none d-md-inline">Room features</span></a>
     </div>
 </nav>
 
@@ -41,7 +41,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="form-group">
-                        <label for="name">{{ _("Event name") }}</label>
+                        <label for="name">{{ _("Room name") }}</label>
                         <input type="text" id="name" name="name" placeholder="e.g. Weekly Meeting"
                             class="form-control{% if errors.name is defined %} is-invalid{% endif %}" value="{{ name }}"
                             required>
@@ -51,29 +51,28 @@
                     </div>
                 </div>
 
-                <!-- TODO: need to fix the styling of this. -->
                 <div class="form-group">
-                    <label for="alias">Event URL</label>
+                    <label for="alias">Room alias</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" class="form-check-input" name="alias_checked" id="alias_checkbox"
-                                    {% if alias is not none %}checked{% endif %}>
+                                <input type="checkbox" name="alias_checked" id="alias_checkbox"
+                                    {% if alias %}checked{% endif %}>
                             </div>
                         </div>
                         <input type="text" id="alias_input" name="alias"
                             class="form-control{% if errors.alias is defined %} is-invalid{% endif %}"
-                            value="{% if alias is not none %}{{ alias }}{% endif %}" placeholder="e.g. srcf-talks"
-                            {% if alias is none %}disabled{% endif %}>
+                            value="{% if alias %}{{ alias }}{% endif %}" {% if not alias %}disabled{% endif %}>
                         {%- if errors.alias is defined %}
                         <small class="text-danger">{{ errors.alias }}</small>
                         {%- endif %}
-                        <small class="form-text text-muted">You can customise the URL for your event. For
-                            example, if you
-                            entered
-                            "srcf-talks" here, your event home page would be at
+                        <small class="form-text text-muted">Your room page is
+                            <a href="{{url_for("room_aliases.home", room_id=room.id, _external=True)}}">{{url_for("room_aliases.home", room_id=room.id, _external=True)}}</a>. If you want a more
+                            descriptive URL, you can request an alias.</small>
+                        <small class="form-text text-muted">For example, if you set your alias to "srcf-talks", your Room home page would be at
                             {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
                     </div>
+
                 </div>
             </div>
             <div class="col-md-6">
@@ -103,12 +102,12 @@
                                 {% if authentication.value == "whitelist" %}checked{% endif %}>
                             <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
                         </div>
-                        <small class="form-text text-muted">Restrict who can join this event.</small>
+                        <small class="form-text text-muted">Restrict who can join this room.</small>
 
                         <div id="auth_box_password" class="auth-box" style="display: none;">
                             <div class="form-group">
                                 <br>
-                                <label for="password">{{ _("Event Password: ") }}</label>
+                                <label for="password">{{ _("Room Password: ") }}</label>
                                 <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }}
                                         class="badge badge-primary">{{ room.password }}</a></h1>
                                 <small class="form-text text-muted">Anyone with this password will be able to join the
@@ -147,7 +146,7 @@
                 </div>
                 <div class="form-group mt-3 float-right">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
-                        class="btn btn-outline-danger float-right">{{ _("Delete event") }}</a>
+                        class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>
                 </div>
             </div>
         </div>
@@ -203,7 +202,7 @@
             <article class="col-md-6">
                 <div class="form-check">
                     <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %} checked
-                    {% endif %}>
+                        {% endif %}>
                     <label class="form-check-label">
                         Mute users on joining
                     </label>
@@ -213,7 +212,7 @@
                 </div>
                 <div class="form-check">
                     <input type="checkbox" name="disable_private_chat" class="form-check-input"
-                    {% if disable_private_chat %} checked{% endif %}>
+                        {% if disable_private_chat %} checked{% endif %}>
                     <label class="form-check-label">
                         Disable private chat
                     </label>
