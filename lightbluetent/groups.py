@@ -40,13 +40,8 @@ def home(group_id):
 @bp.route("/<group_id>/update/<update_type>", methods=["POST"])
 def update(group_id, update_type):
     crsid = auth_decorator.principal
-
     user = User.query.filter_by(crsid=crsid).first()
     group = Group.query.filter_by(id=group_id).first()
-
-    # Check the user is registered with us, if not redirect to the user reg page
-    if not user:
-        return redirect(url_for("users.register"))
 
     if group not in user.groups:
         abort(403)

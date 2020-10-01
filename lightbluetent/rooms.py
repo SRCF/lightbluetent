@@ -91,86 +91,42 @@ def begin(room_id):
         url = meeting.moderator_url(full_name)
         return redirect(url)
 
-
-@bp.route("/<room_id>/manage", methods=("GET", "POST"))
+@bp.route("/<room_id>/update/<update_type>", methods=["POST"])
 @auth_decorator
-def manage(room_id):
-
+def update(room_id, update_type):
+    # first pass: is the room URL valid?
     room = Room.query.filter_by(id=room_id).first()
-
     if not room:
         abort(404)
 
-    group = None
-
+    # second pass: does the room belong to the user?
+    # or does it belong to a user's group?
     crsid = auth_decorator.principal
-
-    if crsid is None:
-        abort(403)
-
     user = User.query.filter_by(crsid=crsid).first()
-
-    # If this room is associated with a group
     if room.group_id:
-        group = Group.query.filter_by(id=room.group_id).first()
-
-        # ensure that the user belongs to the group they're editing
+        parent_page = url_for("groups.manage", group_id=room.group.id)
+        group_id = room.group_id
+        group = Group.query.filter_by(id=group_id).first()
         if group not in user.groups:
             abort(403)
-
-        parent_page = url_for("groups.manage", group_id=room.group.id)
-
-    elif room.user_id:
-        if user.id != room.user_id:
-            abort(403)
-
-        parent_page = url_for("users.home")
-
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
-        abort(500)
-
-
+        parent_page = url_for("users.home")
+        group = None
+        if room not in user.rooms:
+            abort(403)
 
     values = {}
     errors = {}
 
-    if request.method == "POST":
-        keys = (
-            "name",
-            "welcome_text",
-            "banner_text",
-            "banner_color",
-            "authentication",
-            "password",
-            "whitelist",
-            "alias",
-            "start_date",
-            "start_hour",
-            "start_min",
-            "end_date",
-            "end_hour",
-            "end_min"
-        )
+    if update_type == "room_details":
+        keys = ("name", "authentication", "password", "whitelist", "alias", "description")
         values = get_form_values(request, keys)
 
-        for key in ("mute_on_start", "disable_private_chat", "alias_checked"):
+        for key in ("alias_checked",):
             values[key] = bool(request.form.get(key, False))
-
-        if len(values["welcome_text"]) > 500:
-            errors["welcome_text"] = "Welcome text is too long."
-        if len(values["banner_text"]) > 200:
-            errors["banner_text"] = "Banner text is too long."
 
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
-
-
-        # Is there a better way to do this?
-        start_date_entered = values["start_date"] != "" or values["start_hour"] != "" or values["start_min"] != ""
-        end_date_entered = values["end_date"] != "" or values["end_hour"] != "" or values["end_min"] != ""
-        full_start_date = values["start_date"] != "" and values["start_hour"] != "" and values["start_min"] != ""
-        full_end_date = values["end_date"] != "" and values["end_hour"] != "" and values["end_min"] != ""
 
         if start_date_entered or end_date_entered:
             if not full_start_date:
@@ -178,81 +134,137 @@ def manage(room_id):
             if not full_end_date:
                 errors["end"] = "Enter a full date and time."
 
-            session = Session(
-
-            )
-
-
         if values["alias_checked"]:
             if values["alias"] == "":
-                errors["alias"] = "You must specify the name of your customised page."
+                errors["alias"] = "You must specify the name of your alias."
             elif not validate_room_alias(values["alias"]):
-                errors["alias"] = "Invalid name."
+                errors["alias"] = "Invalid alias."
 
             room_with_alias = Room.query.filter_by(alias=values["alias"]).first()
 
             if room_with_alias and room_with_alias.id != room.id:
                 errors["alias"] = "That URL is already in use. Choose a different one."
 
-        if not errors:
-            print(Authentication(values["authentication"]))
+        if values["whitelist"] != "":
+            current_app.logger.info(
+                f"{ crsid } is whitelisting '{ values['whitelist'] }' for room '{ room.id }'..."
+            )
 
+            # Whitelist a new CRSid.
+            # We check if the user's already registered. If not, we create a
+            # visitor user containing only the whitelisted CRSid.
+
+            existing_user = User.query.filter_by(crsid=values["whitelist"]).first()
+            if existing_user:
+                room.whitelisted_users.append(existing_user)
+            else:
+                user = User(
+                    email=None,
+                    full_name=None,
+                    crsid=values["whitelist"],
+                    role=Role.query.filter_by(role=RoleType("visitor")).first(),
+                )
+                db.session.add(user)
+                current_app.logger.info(
+                    f"Registered visitor with CRSid { values['whitelist'] }"
+                )
+                room.whitelisted_users.append(user)
+
+        if not errors:
             room.name = values["name"]
+            room.authentication = Authentication(values["authentication"])
+            room.description = values["description"]
+            print(room.description)
+            room.alias = values["alias"] if values["alias"] != "" else None
+
+
+    elif update_type == "room_times":
+        keys = (
+            "start_date",
+            "start_hour",
+            "start_min",
+            "end_date",
+            "end_hour",
+            "end_min"
+        )
+
+        # Is there a better way to do this?
+        start_date_entered = values["start_date"] != "" or values["start_hour"] != "" or values["start_min"] != ""
+        end_date_entered = values["end_date"] != "" or values["end_hour"] != "" or values["end_min"] != ""
+        full_start_date = values["start_date"] != "" and values["start_hour"] != "" and values["start_min"] != ""
+        full_end_date = values["end_date"] != "" and values["end_hour"] != "" and values["end_min"] != ""
+
+        # TODO: check and add the session
+
+
+    elif update_type == "room_features":
+        keys = ("welcome_text", "banner_text", "banner_color")
+        values = get_form_values(request, keys)
+
+        for key in ("mute_on_start", "disable_private_chat"):
+            values[key] = bool(request.form.get(key, False))
+
+        if len(values["welcome_text"]) > 500:
+            errors["welcome_text"] = "Welcome text is too long."
+        if len(values["banner_text"]) > 200:
+            errors["banner_text"] = "Banner text is too long."
+
+        if not errors:
             room.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
             room.banner_text = values["banner_text"] if values["banner_text"] != "" else None
             room.banner_color = values["banner_color"]
-            room.authentication = Authentication(values["authentication"])
-            room.alias = values["alias"] if values["alias"] != "" else None
+
             room.mute_on_start = values["mute_on_start"]
             room.disable_private_chat = values["disable_private_chat"]
-            room.updated_at = datetime.now()
 
-            if values["whitelist"] != "":
+    else:
+        current_app.logger.error(
+            f"Attempted to update room page at incorrect endpoint: {update_type}"
+        )
 
-                current_app.logger.info(
-                    f"{ crsid } is whitelisting '{ values['whitelist'] }' for room '{ group.id }/{ room.name }'..."
-                )
+    if errors:
+        flash(_("There were problems with the information you provided."), "error")
+        return render_template(
+            "rooms/manage.html",
+            page_title=f"Settings for { room.name }",
+            room=room,
+            user=user,
+            group=group,
+            errors=errors,
+            page_parent=parent_page,
+            **values
+        )
+    else:
+        room.updated_at = datetime.now()
+        db.session.commit()
+        flash("Settings saved.", "success")
+        return redirect(url_for("rooms.manage", room_id=room.id))
 
-                # Whitelist a new CRSid.
-                # We check if the user's already registered. If not, we create a
-                # visitor user containing only the whitelisted CRSid.
 
-                existing_user = User.query.filter_by(crsid=values["whitelist"]).first()
-                if existing_user:
-                    room.whitelisted_users.append(existing_user)
-                else:
-                    user = User(
-                        email=None,
-                        full_name=None,
-                        crsid=values["whitelist"],
-                        role=Role.query.filter_by(role=RoleType("visitor")).first(),
-                    )
-                    db.session.add(user)
-                    current_app.logger.info(
-                        f"Registered visitor with CRSid { values['whitelist'] }"
-                    )
-                    db.session.commit()
 
-                    room.whitelisted_users.append(user)
+@bp.route("/<room_id>/manage", methods=["GET"])
+@auth_decorator
+def manage(room_id):
+    # first pass: is the room URL valid?
+    room = Room.query.filter_by(id=room_id).first()
+    if not room:
+        abort(404)
 
-            db.session.commit()
-
-            flash("Settings saved.")
-            return redirect(url_for("rooms.manage", room_id=room.id))
-
-        else:
-            flash(_("There were problems with the information you provided."))
-            return render_template(
-                "rooms/manage.html",
-                page_title=f"Settings for { room.name }",
-                room=room,
-                user=user,
-                group=group,
-                errors=errors,
-                page_parent=parent_page,
-                **values
-            )
-
+    # second pass: does the room belong to the user?
+    # or does it belong to a user's group?
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    if room.group_id:
+        parent_page = url_for("groups.manage", group_id=room.group.id)
+        group_id = room.group_id
+        group = Group.query.filter_by(id=group_id).first()
+        if group not in user.groups:
+            abort(403)
+    else:
+        parent_page = url_for("users.home")
+        group = None
+        if room not in user.rooms:
+            abort(403)
 
     # Defaults
     values = {
@@ -270,8 +282,8 @@ def manage(room_id):
         "rooms/manage.html",
         page_title=f"Settings for { room.name }",
         room=room,
-        group=group,
         user=user,
+        group=group,
         errors={},
         page_parent=parent_page,
         **values,

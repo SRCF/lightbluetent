@@ -49,8 +49,8 @@
         {% endfor %}
         {% endif %}
 
-        {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
-        {% if enable_room_creation.enabled %}
+        {% set enable_group_creation = settings | selectattr("name", "equalto", "enable_group_creation") | first %}
+        {% if enable_group_creation.enabled %}
         <a href="{{ url_for('users.register_group') }}"
             class="btn btn-outline-primary">{{ _("Create group") }}</a>
         {% endif %}
@@ -58,11 +58,10 @@
     </article>
     <article class="mb-3 col-lg-6">
         <h3>Your personal rooms</h3>
-        {% set personal_rooms = user.rooms | selectattr("group", "none") %}
-        {% if not personal_rooms %}
+        {% if not user.rooms %}
         <p>{{ _("You currently have no registered rooms.") }}</p>
         {% else %}
-        {% for room in personal_rooms %}
+        {% for room in user.rooms %}
         <div class="card mb-3">
             <div class="card-body">
                 <h4 style="overflow-wrap:anywhere;" class="card-title">{{ room.name }} <small

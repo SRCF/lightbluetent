@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 
 {% block meta %}
-<meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
+<meta property="og:title"
+    content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
 <meta property="og:type" content="website" />
 {% if room.description %}
-<meta property="og:description"
-  content="{{ room.description | truncate(200) }}" />
+<meta property="og:description" content="{{ room.description | truncate(200) }}" />
 {% else %}
-  <meta property="og:description"
-    content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+<meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
-{% set logo = 'images/' + group.logo %}
+{% if room.group %}
+{% set logo = 'images/' + room.group.logo %}
+{% endif %}
 <meta property="og:image" content="{{ url_for('static', filename=logo) }}" />
 {% endblock %}
 
@@ -38,21 +39,28 @@
 {% macro match_link(link) -%}
 <!-- This isn't very readable, but I'm not sure if we can do enums in Jinja... -->
 <li>
-    {% if link.type == 1 %} <!-- Email address -->
+    {% if link.type == 1 %}
+    <!-- Email address -->
     <i class="fa fa-li fa-envelope" title="Link {{link.id}}"></i>
-    {% elif link.type == 2 %} <!-- Facebook -->
+    {% elif link.type == 2 %}
+    <!-- Facebook -->
     <i class="fa fa-li fa-facebook-square" title="Link {{link.id}}"></i>
-    {% elif link.type == 3 %} <!-- Twitter -->
+    {% elif link.type == 3 %}
+    <!-- Twitter -->
     <i class="fa fa-li fa-twitter-square" title="Link {{link.id}}"></i>
-    {% elif link.type == 4 %} <!-- Instagram -->
+    {% elif link.type == 4 %}
+    <!-- Instagram -->
     <i class="fa fa-li fa-instagram" title="Link {{link.id}}"></i>
-    {% elif link.type == 5 %} <!-- Youtube -->
+    {% elif link.type == 5 %}
+    <!-- Youtube -->
     <i class="fa fa-li fa-youtube-play" title="Link {{link.id}}"></i>
-    {% else %} <!-- Other -->
+    {% else %}
+    <!-- Other -->
     <i class="fa fa-li fa-globe" title="Link {{link.id}}"></i>
     {% endif %}
 
-    {% if link.type == 1 %} <!-- Email address -->
+    {% if link.type == 1 %}
+    <!-- Email address -->
     <a href="mailto:{{ link.url }}">{{ link.url }}</a>
     {% else %}
     {% if link.url.startswith("https://") or link.url.startswith("http://") %}
@@ -75,12 +83,12 @@
                         <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}
-                              {% if loop.index == desc_paragraphs | length %}
-                              <!-- This is the last paragraph -->
-                              <p class="mb-0">{{ paragraph }}</p>
-                              {% else %}
-                              <p>{{ paragraph }}</p>
-                              {% endif %}
+                            {% if loop.index == desc_paragraphs | length %}
+                            <!-- This is the last paragraph -->
+                            <p class="mb-0">{{ paragraph }}</p>
+                            {% else %}
+                            <p>{{ paragraph }}</p>
+                            {% endif %}
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -101,8 +109,7 @@
                     {% if room.authentication.value == "public" %}
 
                     <div class="form-group">
-                        <input type="text"
-                            class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                        <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
                             name="name" id="name" placeholder="Enter your name..."
                             {% if not running %}disabled{% endif %}>{{ name }}</input>
                         {%- if errors.name is defined %}
@@ -115,20 +122,20 @@
 
                     {% elif room.authentication.value == "raven" %}
 
-                        {% if user is none %}
-                        <p>You must sign in to join this event.</p>
-                        <a href="{{ url_for('general.log_in_and_redirect_to_room', room_id=room.id) }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
-                                    {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Sign in with Raven") }}</a>
-                        {% else %}
-                        <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
-                                    {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
-                        {% endif %}
+                    {% if user is none %}
+                    <p>You must sign in to join this event.</p>
+                    <a href="{{ url_for('general.log_in_and_redirect_to_room', room_id=room.id) }}"
+                        class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Sign in with Raven") }}</a>
+                    {% else %}
+                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
+                    {% endif %}
 
                     {% elif room.authentication.value == "password" %}
 
                     <div class="form-group">
-                        <input type="text"
-                            class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                        <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
                             name="name" id="name" placeholder="Enter your name..."
                             {% if not running %}disabled{% endif %}>
                         {%- if errors.name is defined %}
@@ -149,18 +156,19 @@
                     <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
                         {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
 
-                    {% else %} <!-- Whitelist -->
+                    {% else %}
+                    <!-- Whitelist -->
 
-                        {% if user is none or user not in room.whitelisted_users %}
+                    {% if user is none or user not in room.whitelisted_users %}
 
-                        <p>You do not have permission to join this event.</p>
+                    <p>You do not have permission to join this event.</p>
 
-                        {% else %}
+                    {% else %}
 
-                        <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
                         {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join") }}</a>
 
-                        {% endif %}
+                    {% endif %}
 
 
                     {% endif %}
