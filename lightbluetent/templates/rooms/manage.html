@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='javascripts/authentications.js') }}"></script>
+<script src="{{ url_for('static', filename='javascripts/room_management.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -71,6 +71,28 @@
                     with your chosen banner color.</small>
             </div>
 
+            <!-- TODO: need to fix the styling of this. -->
+            <div class="form-group">
+            <label for="alias">Event URL</label>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <input type="checkbox" class="form-check-input" name="alias_checked" id="alias_checkbox" {% if alias is not none %}checked{% endif %}>
+                    </div>
+                </div>
+                <input type="text" id="alias_input" name="alias"
+                        class="form-control{% if errors.alias is defined %} is-invalid{% endif %}"
+                        value="{% if alias is not none %}{{ alias }}{% endif %}"
+                        placeholder="e.g. srcf-talks"
+                        {% if alias is none %}disabled{% endif %}>
+                {%- if errors.alias is defined %}
+                <small class="text-danger">{{ errors.alias }}</small>
+                {%- endif %}
+                <small class="form-text text-muted">You can customise the URL for your event. For example, if you entered
+                        "srcf-talks" here, your event home page would be at {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
+            </div>
+            </div>
+
             <div class="card">
                <div class="card-body">
                     <h5 class="card-title">Authentication</h5>
@@ -96,7 +118,7 @@
                     <div class="form-group">
                         <br>
                         <label for="password">{{ _("Event Password: ") }}</label>
-                        <h1><a href={{ url_for("rooms.new_password", room_alias=room.alias) }} class="badge badge-primary">{{ room.password }}</a></h1>
+                        <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }} class="badge badge-primary">{{ room.password }}</a></h1>
                         <small class="form-text text-muted">Anyone with this password will be able to join the meeting. Click to generate a new one.</small>
                         <br>
                     </div>
@@ -112,11 +134,11 @@
                         {% if user in group.owners %}
                           <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
                         {% else %}
-                          <a href="{{ url_for('rooms.unwhitelist', room_alias=room.alias, crsid_to_remove=user.crsid) }}" type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
+                          <a href="{{ url_for('rooms.unwhitelist', room_id=room.id, crsid_to_remove=user.crsid) }}" type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
                         {% endif %}
                         {% endfor %}
                         <br><br>
-                        <input type="whitelist" id="whitelist" name="whitelist"
+                        <input type="text" id="whitelist" name="whitelist"
                             class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
                             value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
                         {%- if errors.whitelist is defined %}
@@ -157,7 +179,7 @@
 
     <div class="form-group mt-3 form-row px-5 float-right">
         <input type="submit" class="btn btn-outline-primary mx-2" value="Update">
-        <a href="{{ url_for('rooms.delete', room_alias=room.alias) }}"
+        <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
             class="btn btn-outline-danger float-right">{{ _("Delete event") }}</a>
     </div>
 </form>

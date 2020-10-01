@@ -7,3 +7,4 @@ $("#nav-tab a").on("shown.bs.tab", function (e) {
 // on load of the page: switch to the currently selected tab
 $(`#nav-tab a[href="${window.sessionStorage.getItem('last-tab')}"]`).tab('show');
 
+

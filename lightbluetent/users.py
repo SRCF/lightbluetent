@@ -9,8 +9,10 @@ from flask import (
     current_app,
 )
 from lightbluetent.models import db, User, Group, Setting, Role, Room, Authentication
+from lightbluetent.config import RoleType
 from lightbluetent.utils import (
     gen_unique_string,
+    gen_room_id,
     validate_email,
     fetch_lookup_data,
     validate_short_name,
@@ -75,7 +77,7 @@ def register_group():
         is_valid_short_name = validate_short_name(values["group_short_name"])
         if not is_valid_short_name:
             errors["group_short_name"] = _(
-                "Your short name must be one word less than 20 characters"
+                "Your short name must be a single word and have fewer than 12 characters."
             )
 
         id = values["group_short_name"].lower()
@@ -124,11 +126,15 @@ def register():
 
     existing_user = User.query.filter_by(crsid=crsid).first()
 
-    if existing_user is not None:
+    if existing_user:
 
-        # Check that the user's not a dummy user without a name and email address.
-        if existing_user.email is not None and existing_user.full_name is not None:
-            return redirect(url_for("users.home"))
+        # If the User is a visitor, upgrade them to being a user
+        if existing_user.role == RoleType.VISITOR:
+            existing_user.role = RoleType.USER
+            current_app.logger.info(f"Changed role of user '{ user.name }' from visitor to user.")
+            db.session.commit()
+
+        return redirect(url_for("users.home"))
 
     if request.method == "POST":
 
@@ -172,14 +178,14 @@ def register():
                 email=values["email_address"],
                 full_name=values["full_name"],
                 crsid=auth_decorator.principal,
-                role=Role.query.filter_by(name="user").first(),
+                role=Role.query.filter_by(role=RoleType("user")).first(),
             )
 
-            try_id = gen_unique_string(auth_decorator.principal)
+            try_id = gen_room_id(auth_decorator.principal)
             
             # this might be expensive and unnecessary
-            while not Room.query.filter_by(id=try_id).first():
-                try_id = gen_unique_string(auth_decorator.principal)
+            while Room.query.filter_by(id=try_id).first():
+                try_id = gen_room_id(auth_decorator.principal)
 
             home_room = Room(
                 id=try_id,
@@ -187,7 +193,6 @@ def register():
                 attendee_pw=gen_unique_string(),
                 moderator_pw=gen_unique_string(),
                 authentication=Authentication.PUBLIC,
-                alias=try_id
             )
 
             user.rooms.append(home_room)

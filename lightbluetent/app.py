@@ -1,12 +1,12 @@
 import os, subprocess, logging
 from flask import Flask
-from . import rooms, users, groups, admins, general
+from . import rooms, room_aliases, users, groups, admins, general
 from .flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
 from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error, table_exists
 from lightbluetent.models import db, migrate, Setting, Role, Permission, User
-from lightbluetent.config import PermissionType
+from lightbluetent.config import PermissionType, RoleType
 import click
 
 
@@ -53,6 +53,7 @@ def create_app(config_name=None):
 
     app.register_blueprint(general.bp)
     app.register_blueprint(rooms.bp)
+    app.register_blueprint(room_aliases.bp)
     app.register_blueprint(users.bp)
     app.register_blueprint(groups.bp)
     app.register_blueprint(admins.bp)
@@ -79,7 +80,7 @@ def create_app(config_name=None):
         with app.app_context():
             for crsid in crsids:
                 user = User.query.filter_by(crsid=crsid).first()
-                role = Role.query.filter_by(name=role.lower()).first()
+                role = Role.query.filter_by(role=RoleType(role.lower())).first()
                 prev_role = user.role
                 if role:
                     user.role = role
@@ -102,10 +103,10 @@ def create_app(config_name=None):
         if table_exists("roles"):
 
             # Populate the roles table
-            for role in app.config["DEFAULT_ROLES"]:
-                has_role = Role.query.filter_by(name=role["name"]).first()
+            for role_info in app.config["ROLES_INFO"]:
+                has_role = Role.query.filter_by(role=role_info["role"]).first()
                 if not has_role:
-                    new_role = Role(name=role["name"], description=role["description"])
+                    new_role = Role(role=role_info["role"], description=role_info["description"])
                     db.session.add(new_role)
 
         if table_exists("permissions"):
@@ -118,8 +119,8 @@ def create_app(config_name=None):
                     db.session.add(new_perm)
 
             # Associate the roles with the permissions
-            for role_info in app.config["DEFAULT_ROLES"]:
-                role = Role.query.filter_by(name=role_info["name"]).first()
+            for role_info in app.config["ROLES_INFO"]:
+                role = Role.query.filter_by(role=role_info["role"]).first()
                 for permission_name in role_info["permissions"]:
                     permission = Permission.query.filter_by(name=permission_name).first()
                     if not permission in role.permissions:

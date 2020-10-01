@@ -99,10 +99,10 @@
             <p><i class="fa fa-users"></i>   Public</p>
             {% endif %}
 
-            <a href="{{ url_for('rooms.home', room_alias=room.alias) }}" class="btn btn-outline-primary"><i class="fa fa-home"></i>   Home page</a>
-            <a href="{{ url_for('rooms.begin', room_alias=room.alias) }}"
+            <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary"><i class="fa fa-home"></i>   Home page</a>
+            <a href="{{ url_for('rooms.begin', room_id=room.id) }}"
                 class="btn btn-outline-success float-right"><i class="fa fa-play"></i>   {{ _("Start event") }}</a>
-            <a href="{{ url_for('rooms.manage', room_alias=room.alias) }}"
+            <a href="{{ url_for('rooms.manage', room_id=room.id) }}"
                 class="btn btn-outline-primary float-right"><i class="fa fa-cog"></i>   {{ _("Event settings") }}</a>
             </li>
         {% endfor %}

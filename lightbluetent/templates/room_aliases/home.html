@@ -115,8 +115,14 @@
 
                     {% elif room.authentication.value == "raven" %}
 
-                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
-                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
+                        {% if user is none %}
+                        <p>You must sign in to join this event.</p>
+                        <a href="{{ url_for('general.log_in_and_redirect_to_room', room_id=room.id) }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                                    {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Sign in with Raven") }}</a>
+                        {% else %}
+                        <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                                    {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
+                        {% endif %}
 
                     {% elif room.authentication.value == "password" %}
 

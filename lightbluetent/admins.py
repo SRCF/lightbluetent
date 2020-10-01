@@ -27,7 +27,7 @@ def manage():
         return redirect(url_for("users.register"))
 
     # TO-DO: PAGINATION
-    if user.role.permission.name == "admin":
+    if user.role.name == "admin":
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",

@@ -9,7 +9,8 @@ import traceback
 from lightbluetent.models import db
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
-short_name_re = re.compile(r"\w{1,20}")
+short_name_re = re.compile(r"\w{1,12}")
+alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
 
 
 def table_exists(name):
@@ -21,7 +22,7 @@ def gen_unique_string():
     return str(uuid.uuid4()).replace("-", "")[0:12]
 
 
-def gen_meeting_id(name):
+def gen_room_id(name):
     id = str(uuid.uuid4())
     return f"{name}-{id[:3]}-{id[3:6]}"
 
@@ -53,6 +54,9 @@ def validate_email(crsid, email):
 
 def validate_short_name(short_name):
     return short_name_re.match(short_name)
+
+def validate_room_alias(alias):
+    return alias_re.match(alias)
 
 
 def sif(variable):

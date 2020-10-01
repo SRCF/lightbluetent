@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, flash, abort, redirect, u
 from lightbluetent.models import db, Group, User, Room, Authentication
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import delete_logo, gen_unique_string, get_form_values
+from lightbluetent.utils import delete_logo, gen_unique_string, gen_room_id, get_form_values
 from flask_babel import _
 from datetime import datetime
 from PIL import Image
@@ -133,7 +133,7 @@ def update(group_id, update_type):
             )
 
         else:
-            id = gen_unique_string()
+            id = gen_room_id(group.id)
 
             room = Room(
                 id=id,
@@ -142,7 +142,6 @@ def update(group_id, update_type):
                 attendee_pw=gen_unique_string(),
                 moderator_pw=gen_unique_string(),
                 authentication=Authentication.PUBLIC,
-                alias=id,
                 password=gen_unique_string()[0:6],
                 whitelisted_users=group.owners
             )
