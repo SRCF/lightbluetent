@@ -1,17 +1,30 @@
-# PRODUCTION CONFIG
+# SRCF LightBlueTent Production Configuration
+# Copy this file and rename it as `.env`
 
-# FLASK_ENV=
+### FLASK ###
+
 # FLASK_CONFIG=production
+# FLASK_TRUSTED_HOSTS=localhost
+# FLASK_SECRET_KEY=dummy_secret_key
+
+### DATABASE ###
+
 # POSTGRES_DB=
 # POSTGRES_USER=postgres
 # POSTGRES_HOSTNAME=postgres
 # POSTGRES_PASSWORD=
 # APPLICATION_DB=lightbluetent
-# FLASK_TRUSTED_HOSTS=localhost
-# FLASK_SECRET_KEY=dummy_secret_key
+
+# When relying on ident/peer auth, it is useful to override 
+# the URI with a custom one that omits that password
+
 # SQLALCHEMY_URI="postgresql+psycopg2://mw781@postgres:5432/mw781"
-# set to "lbt" or a prefix of choice to avoid table name clashes
-# LBT_FEATURES=signups,recording
+
+### BIGBLUEBUTTON ###
+
+BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
+BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6
+
 
 # DEVELOPMENT CONFIG
 
@@ -24,7 +37,5 @@ POSTGRES_PASSWORD=password
 APPLICATION_DB=lightbluetent
 FLASK_TRUSTED_HOSTS=localhost
 FLASK_SECRET_KEY=dummy_secret_key
-
-
 BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
 BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6
