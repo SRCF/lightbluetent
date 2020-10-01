@@ -16,6 +16,11 @@ class PermissionType(enum.Enum):
     CAN_START_OWN_ROOMS = "can_start_rooms"                     # Users
     CAN_JOIN_WHITELISTED_ROOMS = "can_join_whitelisted_rooms"   # Visitors
 
+class RoleType(enum.Enum):
+    VISITOR = "visitor"
+    USER = "user"
+    ADMINISTRATOR = "administrator"
+
 class Config(object):
     """Base configuration"""
 
@@ -51,15 +56,15 @@ class Config(object):
 
     # defines the default roles that come with the app
     # a role has permissions associated with it
-    DEFAULT_ROLES = []
+    ROLES_INFO = []
 
     visitor_permissions = [
         PermissionType.CAN_JOIN_WHITELISTED_ROOMS
     ]
 
-    DEFAULT_ROLES.append(
+    ROLES_INFO.append(
         {
-            "name": "visitor",
+            "role": RoleType.VISITOR,
             "permissions": visitor_permissions,
             "description": "A visitor can join rooms",
         }
@@ -72,9 +77,9 @@ class Config(object):
         PermissionType.CAN_START_OWN_ROOMS
     ]
 
-    DEFAULT_ROLES.append(
+    ROLES_INFO.append(
         {
-            "name": "user",
+            "role": RoleType.USER,
             "permissions": user_permissions,
             "description": "A user can create rooms",
         }
@@ -88,9 +93,9 @@ class Config(object):
         PermissionType.CAN_DELETE_ALL_ROOMS
     ]
 
-    DEFAULT_ROLES.append(
+    ROLES_INFO.append(
         {
-            "name": "administrator",
+            "role": RoleType.ADMINISTRATOR,
             "permissions": admin_permissions,
             "description": "An administrator can manage site settings and room features for LightBlueTent",
         }

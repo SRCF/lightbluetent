@@ -12,13 +12,15 @@ from flask import (
     current_app,
 )
 from lightbluetent.models import db, User, Group, Room, Authentication, Role
+from lightbluetent.config import RoleType
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
 from lightbluetent.utils import (
     gen_unique_string,
     delete_logo,
     get_form_values,
-    fetch_lookup_data
+    fetch_lookup_data,
+    validate_room_alias
 )
 from PIL import Image
 from flask_babel import _
@@ -28,106 +30,15 @@ from sqlalchemy.orm.attributes import flag_modified
 bp = Blueprint("rooms", __name__, url_prefix="/r")
 
 
-@bp.route("/<room_alias>", methods=("GET", "POST"))
-def home(room_alias):
-
-    crsid = auth_decorator.principal
-
-    room = Room.query.filter_by(alias=room_alias).first()
+@bp.route("/<room_id>/begin", methods=("GET", "POST"))
+def begin(room_id):
+    room = Room.query.filter_by(id=room_id).first()
 
     if not room:
         abort(404)
 
-    group = Group.query.filter_by(id=room.group_id).first()
-
-    desc_paragraphs = {}
-    # Split the description into paragraphs so it renders nicely.
-    if room.description is not None:
-        desc_paragraphs=room.description.split("\n")
-
-    meeting = Meeting(room)
-    running = meeting.is_running()
-
-    values = {}
-    errors = {}
-
-    if request.method == "POST":
-
-        keys = ("name", "password")
-        values = get_form_values(request, keys)
-
-        if not running:
-            flash("This meeting is no longer running.")
-            return render_template("rooms/home.html", page_title=f"{ room.name }",
-                room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                running=running, errors=errors, **values)
-
-        if len(values["name"]) <= 1:
-                errors["name"] = "That name is too short."
-
-        if room.authentication.value == "password":
-
-            if values["password"] != room.password:
-                errors["password"] = "Incorrect password."
-
-            if not errors:
-                url = meeting.attendee_url(values["name"])
-                return redirect(url)
-            else:
-                return render_template("rooms/home.html", page_title=f"{ room.name }",
-                    room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                    running=running, errors=errors, **values)
-
-        # Public room
-        else:
-
-            if not errors:
-                url = meeting.attendee_url(values["name"])
-                return redirect(url)
-            else:
-                return render_template("rooms/home.html", page_title=f"{ room.name }",
-                    room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                    running=running, errors=errors, **values)
-
-
-    # If not authenticated
-    if crsid is None:
-        user = None
-    else:
-        user = User.query.filter_by(crsid=crsid).first()
-        if user is None:
-            # Create a dummy user if they're signed in with Raven but not actually in the DB
-            user = User(
-                email=None,
-                full_name=None,
-                crsid=crsid,
-                role=Role.query.filter_by(name="user").first(),
-            )
-            db.session.add(user)
-            current_app.logger.info(
-                f"Registered dummy user with CRSid { crsid }"
-            )
-            db.session.commit()
-
-    if room.authentication.value == "raven" or room.authentication.value == "whitelist":
-        lookup_data = fetch_lookup_data(crsid)
-        raven_join_url = meeting.attendee_url(lookup_data["visibleName"])
-    else:
-        raven_join_url = None
-
-    return render_template("rooms/home.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
-        room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-        running=running, errors=errors)
-
-
-@bp.route("/<room_alias>/begin", methods=("GET", "POST"))
-def begin(room_alias):
-    room = Room.query.filter_by(alias=room_alias).first()
     group_id = room.group_id
     group = Group.query.filter_by(id=group_id).first()
-
-    if not room:
-        abort(404)
 
     # ensure that the user belongs to the group they're editing
     crsid = auth_decorator.principal
@@ -146,7 +57,11 @@ def begin(room_alias):
     running = meeting.is_running()
 
     if not running:
-        join_url = url_for("rooms.home", room_alias=room.alias, _external=True)
+
+        if room.alias:
+            join_url = url_for("room_aliases.home", room_alias=room.alias, _external=True)
+        else:
+            join_url = url_for("room_aliases.home", id=room.id, _external=True)
         moderator_msg = _("To invite others to this event, share your room link: %(join_url)s", join_url=join_url)
 
         success, message = meeting.create(moderator_msg)
@@ -165,18 +80,17 @@ def begin(room_alias):
         return redirect(url)
 
 
-
-
-@bp.route("/<room_alias>/manage", methods=("GET", "POST"))
+@bp.route("/<room_id>/manage", methods=("GET", "POST"))
 @auth_decorator
-def manage(room_alias):
+def manage(room_id):
 
-    room = Room.query.filter_by(alias=room_alias).first()
-    group_id = room.group_id
-    group = Group.query.filter_by(id=group_id).first()
+    room = Room.query.filter_by(id=room_id).first()
 
     if not room:
         abort(404)
+
+    group_id = room.group_id
+    group = Group.query.filter_by(id=group_id).first()
 
     # ensure that the user belongs to the group they're editing
     crsid = auth_decorator.principal
@@ -195,11 +109,12 @@ def manage(room_alias):
             "banner_color",
             "authentication",
             "password",
-            "whitelist"
+            "whitelist",
+            "alias"
         )
         values = get_form_values(request, keys)
 
-        for key in ("mute_on_start", "disable_private_chat"):
+        for key in ("mute_on_start", "disable_private_chat", "alias_checked"):
             values[key] = bool(request.form.get(key, False))
 
         if len(values["welcome_text"]) > 500:
@@ -210,12 +125,26 @@ def manage(room_alias):
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
 
+        if values["alias_checked"]:
+            if values["alias"] == "":
+                errors["alias"] = "You must specify the name of your customised page."
+            elif not validate_room_alias(values["alias"]):
+                errors["alias"] = "Invalid name."
+
+            room_with_alias = Room.query.filter_by(alias=values["alias"]).first()
+
+            if room_with_alias and room_with_alias.id != room.id:
+                errors["alias"] = "That URL is already in use. Choose a different one."
+
         if not errors:
+            print(Authentication(values["authentication"]))
+
             room.name = values["name"]
             room.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
             room.banner_text = values["banner_text"] if values["banner_text"] != "" else None
             room.banner_color = values["banner_color"]
             room.authentication = Authentication(values["authentication"])
+            room.alias = values["alias"] if values["alias"] != "" else None
             room.mute_on_start = values["mute_on_start"]
             room.disable_private_chat = values["disable_private_chat"]
             room.updated_at = datetime.now()
@@ -228,8 +157,7 @@ def manage(room_alias):
 
                 # Whitelist a new CRSid.
                 # We check if the user's already registered. If not, we create a
-                # dummy user containing only the whitelisted CRSid.
-                # TODO: sign-up code must be changed to account for users with NULL email and full_name.
+                # visitor user containing only the whitelisted CRSid.
 
                 existing_user = User.query.filter_by(crsid=values["whitelist"]).first()
                 if existing_user:
@@ -239,11 +167,11 @@ def manage(room_alias):
                         email=None,
                         full_name=None,
                         crsid=values["whitelist"],
-                        role=Role.query.filter_by(name="user").first(),
+                        role=Role.query.filter_by(role=RoleType("visitor")).first(),
                     )
                     db.session.add(user)
                     current_app.logger.info(
-                        f"Registered dummy user with CRSid { values['whitelist'] }"
+                        f"Registered visitor with CRSid { values['whitelist'] }"
                     )
                     db.session.commit()
 
@@ -252,7 +180,7 @@ def manage(room_alias):
             db.session.commit()
 
             flash("Settings saved.")
-            return redirect(url_for("rooms.manage", room_alias=room.alias))
+            return redirect(url_for("rooms.manage", room_id=room.id))
 
         else:
             flash(_("There were problems with the information you provided."))
@@ -275,6 +203,7 @@ def manage(room_alias):
         "banner_text": room.banner_text,
         "banner_color": room.banner_color,
         "authentication": room.authentication,
+        "alias": room.alias,
         "mute_on_start": room.mute_on_start,
         "disable_private_chat": room.disable_private_chat
     }
@@ -291,10 +220,10 @@ def manage(room_alias):
     )
 
 
-@bp.route("/<room_alias>/new_password")
+@bp.route("/<room_id>/new_password")
 @auth_decorator
-def new_password(room_alias):
-    room = Room.query.filter_by(alias=room_alias).first()
+def new_password(room_id):
+    room = Room.query.filter_by(id=room_id).first()
     if not room:
         abort(404)
 
@@ -310,13 +239,13 @@ def new_password(room_alias):
     room.password = new_pw
     db.session.commit()
 
-    return redirect(url_for("rooms.manage", room_alias=room.alias))
+    return redirect(url_for("rooms.manage", id=room.id))
 
-@bp.route("/<room_alias>/unwhitelist/<crsid_to_remove>")
+@bp.route("/<room_id>/unwhitelist/<crsid_to_remove>")
 @auth_decorator
-def unwhitelist(room_alias, crsid_to_remove):
+def unwhitelist(room_id, crsid_to_remove):
 
-    room = Room.query.filter_by(alias=room_alias).first()
+    room = Room.query.filter_by(id=room_id).first()
     if not room:
         abort(404)
 
@@ -335,14 +264,14 @@ def unwhitelist(room_alias, crsid_to_remove):
     room.whitelisted_users.remove(user_to_remove)
     db.session.commit()
 
-    return redirect(url_for("rooms.manage", room_alias=room.alias))
+    return redirect(url_for("rooms.manage", id=room.id))
 
 
-@bp.route("/<room_alias>/delete", methods=("GET", "POST"))
+@bp.route("/<room_id>/delete", methods=("GET", "POST"))
 @auth_decorator
-def delete(room_alias):
+def delete(room_id):
 
-    room = Room.query.filter_by(alias=room_alias).first()
+    room = Room.query.filter_by(id=room_id).first()
     if not room:
         abort(404)
 
@@ -357,7 +286,8 @@ def delete(room_alias):
     db.session.commit()
 
     current_app.logger.info(
-        f"User { crsid } deleted room with alias='{ room.alias }'"
+        f"User { crsid } deleted room with id = '{ room.id }'"
     )
 
     return redirect(url_for("groups.manage", group_id=group.id))
+

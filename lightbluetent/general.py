@@ -45,4 +45,9 @@ def logout():
 @bp.route("/log_in")
 @auth_decorator
 def log_in():
-    return redirect(url_for("users.home"))
+    return redirect(url_for("general.index"))
+
+@bp.route("/log_in_and_redirect_to_room/<room_id>")
+@auth_decorator
+def log_in_and_redirect_to_room(room_id):
+    return redirect(url_for("room_aliases.home", room_id=room_id))

@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
-from lightbluetent.config import PermissionType
+from lightbluetent.config import PermissionType, RoleType
 import enum
 
 db = SQLAlchemy()
@@ -29,9 +29,10 @@ roles_permissions = db.Table(
 # Groups may have a default whitelist, which can then be inherited by its rooms and modified if required.
 whitelist = db.Table(
     "whitelist",
-    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("id", db.Integer, primary_key=True),
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("group_id", db.String(12), db.ForeignKey("groups.id")),
-    db.Column("room_id", db.String(12), db.ForeignKey("rooms.id"))
+    db.Column("room_id", db.String(20), db.ForeignKey("rooms.id"))
 )
 
 
@@ -44,6 +45,8 @@ class User(db.Model):
     full_name = db.Column(db.String, unique=False, nullable=True)
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), nullable=False)
+
+    rooms = db.relationship('Room', backref="user", lazy=True)
 
 
     def __repr__(self):
@@ -94,11 +97,12 @@ class Room(db.Model):
 
     __tablename__ = "rooms"
 
-    id = db.Column(db.String(12), primary_key=True)                 # The room's meetingID
+    id = db.Column(db.String(20), primary_key=True)                 # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
 
     name = db.Column(db.String(100), nullable=False)
     alias = db.Column(db.String(100), nullable=True, unique=True)   # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
-    group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=True)
+    group_id = db.Column(db.String(12), db.ForeignKey('groups.id'), nullable=True)   # For group-owned rooms
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)            # For user-owned rooms
     sessions = db.relationship('Session', backref='room', lazy=True)
     links = db.relationship('Link', backref="room", lazy=True)
     description = db.Column(db.String, unique=False, nullable=True)
@@ -191,7 +195,7 @@ class Role(db.Model):
     __tablename__ = "roles"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=False, nullable=False)
+    role = db.Column(db.Enum(RoleType), unique=False, nullable=False)
 
     permissions = db.relationship(
         "Permission",
