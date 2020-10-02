@@ -66,9 +66,12 @@
                         <small class="text-danger">{{ errors.alias }}</small>
                         {%- endif %}
                         <small class="form-text text-muted">Your room page is
-                            <a href="{{url_for("room_aliases.home", room_id=room.id, _external=True)}}">{{url_for("room_aliases.home", room_id=room.id, _external=True)}}</a>. If you want a more
+                            <a
+                                href="{{url_for("room_aliases.home", room_id=room.id, _external=True)}}">{{url_for("room_aliases.home", room_id=room.id, _external=True)}}</a>.
+                            If you want a more
                             descriptive URL, you can request an alias.</small>
-                        <small class="form-text text-muted">For example, if you set your alias to "srcf-talks", your Room home page would be at
+                        <small class="form-text text-muted">For example, if you set your alias to "srcf-talks", your
+                            Room home page would be at
                             {{ url_for("room_aliases.home", room_alias="srcf-talks", _external=True) }}.</small>
                     </div>
                 </div>
@@ -172,157 +175,128 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <br>
-
-        </div>
-        {{submit_button()}}
-    </form>
-    <form class="tab-pane fade" id="nav-room-times" method="post"
-        action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <div class="row">
-            <br>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Session times</h5>
-                </div>
-            </div>
-
-            <br>
-
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Start date</span>
-                        </div>
-                        <input type="date" id="begin_date" name="begin_date"
-                                placeholder="DD/MM/YYYY"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if begin_date is not none %}{{ begin_date }}{% endif %}"
-                                pattern="\d{2}\/\d{2}\/d{4}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">Start time</span>
-                        </div>
-                        <input type="text" id="begin_hours" name="begin_hours"
-                                placeholder="00" maxlength="2" pattern="\d{1,2}"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if begin_hours is not none %}{{ begin_hours }}{% endif %}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">:</span>
-                        </div>
-                        <input type="text" id="begin_mins" name="begin_mins"
-                                placeholder="00" maxlength="2" pattern="\d{1,2}"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if begin_mins is not none %}{{ begin_mins }}{% endif %}">
-                    </div>
-                </div>
-            </div>
-
-            {%- if errors.begin is defined %}
-            <small class="invalid-feedback">{{ errors.begin }}</small>
-            {%- endif %}
-
-            <br>
-
-            <div class="row">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">End date</span>
-                        </div>
-                        <input type="date" id="end_date" name="end_date"
-                                placeholder="DD/MM/YYYY"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if end_date is not none %}{{ end_date }}{% endif %}"
-                                pattern="\d{2}\/\d{2}\/d{4}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">End time</span>
-                        </div>
-                        <input type="text" id="end_hours" name="end_hours"
-                                placeholder="00" maxlength="2" pattern="\d{1,2}"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if end_hours is not none %}{{ end_hours }}{% endif %}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">:</span>
-                        </div>
-                        <input type="text" id="end_minutes" name="end_minutes"
-                                placeholder="00" maxlength="2" pattern="\d{1,2}"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if end_minutes is not none %}{{ end_minutes }}{% endif %}">
-                    </div>
-                </div>
-            </div>
-
-            {%- if errors.end is defined %}
-            <small class="invalid-feedback">{{ errors.end }}</small>
-            {%- endif %}
-
-            <br>
-
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input type="checkbox" id="recurring_checkbox" name="recurring" class="form-check-input"
-                        {% if recurring %} checked{% endif %}>
-                    Recurring?
-                </label>
-            </div>
-
-            <div id="recurring_box">
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text">Repeat every</label>
-                    </div>
-                    <select class="custom-select" id="recurrence_select">
-                        <option selected>Choose...</option>
-                        <option value="day">day</option>
-                        <option value="weekday">weekday</option>
-                        <option value="week">week</option>
-                        <option value="month">month</option>
-                        <option value="year">year</option>
-                    </select>
-                    <div class="input-group-append">
-                        <select class="custom-select" id="limit_select">
-                            <option selected>Choose...</option>
-                            <option value="forever">forever</option>
-                            <option value="until">until...</option>
-                            <option value="number">a certain number of times...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="limit_option" id="limit_box_until">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Until</span>
-                        </div>
-                        <input type="date" id="limit_until" name="limit_until"
-                                placeholder="DD/MM/YYYY"
-                                class="form-control{% if errors.limit_until is defined %} is-invalid{% endif %}"
-                                value="{% if limit_until is not none %}{{ limit_until }}{% endif %}"
-                                pattern="\d{2}\/\d{2}\/d{4}">
-                    </div>
-                </div>
-                <div class="limit_option" id="limit_box_number">
-                    <div class="input-group">
-                        <input type="text" id="limit_number" name="limit_number"
-                                maxlength="2" pattern="\d{1,2}"
-                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                                value="{% if limit_number is not none %}{{ limit_number }}{% endif %}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">times</span>
-                        </div>
-                    </div>
-                </div>
                 <div class="form-group mt-3 float-right">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
                         class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>
                 </div>
             </div>
         </div>
+        {{submit_button()}}
+    </form>
+    <form class="tab-pane fade" id="nav-room-times" method="post"
+        action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <section class="row">
+            <article class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Start date</span>
+                    </div>
+                    <input type="date" id="begin_date" name="begin_date" placeholder="DD/MM/YYYY"
+                        class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if begin_date is not none %}{{ begin_date }}{% endif %}" pattern="\d{2}\/\d{2}\/d{4}">
+                    {%- if errors.begin is defined %}
+                    <small class="invalid-feedback">{{ errors.begin }}</small>
+                    {%- endif %}
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Start time</span>
+                    </div>
+                    <input type="text" id="begin_hours" name="begin_hours" placeholder="00" maxlength="2"
+                        pattern="\d{1,2}" class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if begin_hours is not none %}{{ begin_hours }}{% endif %}">
+                    <div class="input-group-append">
+                        <span class="input-group-text">:</span>
+                    </div>
+                    <input type="text" id="begin_mins" name="begin_mins" placeholder="00" maxlength="2"
+                        pattern="\d{1,2}" class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if begin_mins is not none %}{{ begin_mins }}{% endif %}">
+                </div>
+            </article>
+            <article class="col-md-6">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">End date</span>
+                    </div>
+                    <input type="date" id="end_date" name="end_date" placeholder="DD/MM/YYYY"
+                        class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if end_date is not none %}{{ end_date }}{% endif %}" pattern="\d{2}\/\d{2}\/d{4}">
+                    {%- if errors.end is defined %}
+                    <small class="invalid-feedback">{{ errors.end }}</small>
+                    {%- endif %}
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">End time</span>
+                    </div>
+                    <input type="text" id="end_hours" name="end_hours" placeholder="00" maxlength="2" pattern="\d{1,2}"
+                        class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if end_hours is not none %}{{ end_hours }}{% endif %}">
+                    <div class="input-group-append">
+                        <span class="input-group-text">:</span>
+                    </div>
+                    <input type="text" id="end_minutes" name="end_minutes" placeholder="00" maxlength="2"
+                        pattern="\d{1,2}" class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                        value="{% if end_minutes is not none %}{{ end_minutes }}{% endif %}">
+                </div>
+            </article>
+        </section>
+        <section class="row">
+            <article class="col-auto">
+                <div class="form-check mb-3">
+                    <label class="form-check-label">
+                        <input type="checkbox" id="recurring_checkbox" name="recurring" class="form-check-input"
+                            {% if recurring %} checked{% endif %}>
+                        Recurring?
+                    </label>
+                </div>
+                <div id="recurring_box">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text">Repeat every</label>
+                        </div>
+                        <select class="custom-select" id="recurrence_select">
+                            <option selected>Choose...</option>
+                            <option value="day">day</option>
+                            <option value="weekday">weekday</option>
+                            <option value="week">week</option>
+                            <option value="month">month</option>
+                            <option value="year">year</option>
+                        </select>
+                        <div class="input-group-append">
+                            <select class="custom-select" id="limit_select">
+                                <option selected>Choose...</option>
+                                <option value="forever">forever</option>
+                                <option value="until">until...</option>
+                                <option value="number">a certain number of times...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="limit_option" id="limit_box_until">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Until</span>
+                        </div>
+                        <input type="date" id="limit_until" name="limit_until" placeholder="DD/MM/YYYY"
+                            class="form-control{% if errors.limit_until is defined %} is-invalid{% endif %}"
+                            value="{% if limit_until is not none %}{{ limit_until }}{% endif %}"
+                            pattern="\d{2}\/\d{2}\/d{4}">
+                    </div>
+                </div>
+                <div class="limit_option" id="limit_box_number">
+                    <div class="input-group">
+                        <input type="text" id="limit_number" name="limit_number" maxlength="2" pattern="\d{1,2}"
+                            class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                            value="{% if limit_number is not none %}{{ limit_number }}{% endif %}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">times</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
         {{submit_button()}}
     </form>
     <form class="tab-pane fade" id="nav-room-features" method="post"
