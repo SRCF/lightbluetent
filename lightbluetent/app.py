@@ -8,6 +8,7 @@ from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error
 from lightbluetent.models import db, migrate, Setting, Role, Permission, User, Recurrence, RecurrenceType
 from lightbluetent.config import PermissionType, RoleType
 import click
+from datetime import datetime, timedelta
 
 
 def create_app(config_name=None):
@@ -74,6 +75,15 @@ def create_app(config_name=None):
     @app.template_test()
     def equalto(value, other):
         return value == other
+
+    # Test if a session ended in the past or within a cooling period.
+    @app.template_filter()
+    def ended_hours_ago(session, cooling_period=0):
+        return datetime.now() > session.end + timedelta(hours=cooling_period)
+
+    @app.template_filter()
+    def get_ordinal(n):
+        return f"{n}th" if 11<=n<=13 else {1: f"{n}st", 2: f"{n}nd", 3: f"{n}rd" }.get(n%10, f"{n}th")
 
     @app.cli.command("change-role")
     @click.argument("crsids", nargs=-1)

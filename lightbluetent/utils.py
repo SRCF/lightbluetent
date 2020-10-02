@@ -89,9 +89,6 @@ def validate_short_name(short_name):
 def validate_room_alias(alias):
     return alias_re.match(alias)
 
-def validate_date(date):
-    return date_re.match(date)
-
 def sif(variable):
     """"string if": `variable` is defined and truthy, else ''"""
     if not is_undefined(variable) and variable:
