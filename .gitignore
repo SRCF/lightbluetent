@@ -19,3 +19,4 @@ production.log
 lightbluetent/static/images/*
 !lightbluetent/static/images/default_room_logo.png
 !lightbluetent/static/images/default_group_logo.png
+!lightbluetent/static/images/raven.svg
