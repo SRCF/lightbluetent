@@ -31,7 +31,7 @@ class User(db.Model):
 
     # will it work if I use the backref here?
     def __repr__(self):
-        return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
+        return f"User({self.crsid!r}: {self.full_name!r}, {self.email!r})"
 
 
 class Society(db.Model):
@@ -76,7 +76,7 @@ class Society(db.Model):
     bbb_id = db.Column(db.String, unique=True, nullable=False)
 
     def __repr__(self):
-        return f"Society('{self.name}', '{self.admins}')"
+        return f"Society({self.name!r}, {self.admins!r})"
 
 
 class Setting(db.Model):
@@ -89,7 +89,7 @@ class Setting(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Setting('{self.name}', '{self.enabled}')"
+        return f"Setting({self.name!r}, {self.enabled!r})"
 
 
 class Role(db.Model):
@@ -105,7 +105,7 @@ class Role(db.Model):
     users = db.relationship("User", backref="role", lazy=True)
 
     def __repr__(self):
-        return f"Role('{self.name}', '{self.description}')"
+        return f"Role({self.name!r}, {self.description!r})"
 
 
 class Permission(db.Model):
@@ -116,4 +116,4 @@ class Permission(db.Model):
     roles = db.relationship("Role", backref="permission", lazy=True)
 
     def __repr__(self):
-        return f"Permission('{self.name}')"
+        return f"Permission({self.name!r})"
