@@ -21,7 +21,6 @@ from lightbluetent.utils import (
     get_form_values,
     fetch_lookup_data,
     validate_room_alias,
-    validate_date
 )
 from PIL import Image
 from flask_babel import _
