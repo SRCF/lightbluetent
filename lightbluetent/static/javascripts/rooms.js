@@ -61,6 +61,20 @@ $('input[type="checkbox"]').click(function() {
     }
 });
 
+/* Show the recurring options if they're selected on page load */
+if ($("recurring_checkbox").checked) {
+    $("#recurring_box").show();
+} else {
+    $("#recurring_box").hide();
+}
+
+/* Enable the alias input if selected on page load */
+if ($("alias_checkbox").checked) {
+    $("alias_input").disabled = false;
+} else {
+    $("alias_input").disabled = true;
+}
+
 /* Show or hide the limit settings when the select changes */
 $('#limit_select').change(function() {
     $('.limit_option').hide();
