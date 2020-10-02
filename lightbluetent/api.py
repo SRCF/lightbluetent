@@ -2,6 +2,7 @@ from os import getenv
 from urllib.parse import urlencode
 from hashlib import sha1
 from flask import current_app, url_for
+from lightbluetent.models import Asset
 
 import requests
 import xmltodict
@@ -68,8 +69,9 @@ class Meeting:
         params["password"] = self.moderator_pw
         params["redirect"] = "true"
 
-        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
-            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+        if self.logo is not None:
+            logo_subpath = Asset.query.filter_by(key=self.logo).first().path
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], logo_subpath)
             params["logo"] = url_for("static", filename=logo_path, _external=True)
             params["userdata-bbb_display_branding_area"] = "true"
 
@@ -86,8 +88,9 @@ class Meeting:
         params["password"] = self.attendee_pw
         params["redirect"] = "true"
 
-        if self.logo != current_app.config["DEFAULT_BBB_LOGO"]:
-            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], self.logo)
+        if self.logo is not None:
+            logo_subpath = Asset.query.filter_by(key=self.logo).first().path
+            logo_path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], logo_subpath)
             params["logo"] = url_for("static", filename=logo_path, _external=True)
             params["userdata-bbb_display_branding_area"] = "true"
 

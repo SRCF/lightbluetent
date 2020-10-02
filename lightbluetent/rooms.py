@@ -11,7 +11,7 @@ from flask import (
     url_for,
     current_app,
 )
-from lightbluetent.models import db, User, Society
+from lightbluetent.models import db, User, Society, Asset
 from lightbluetent.users import auth_decorator
 from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time
 from PIL import Image
@@ -45,13 +45,13 @@ def delete_society_logo(uid):
 
     society = Society.query.filter_by(uid=uid).first()
 
-    if society.logo == current_app.config["DEFAULT_LOGO"]:
-        return
-    else:
+    if society.logo is not None:
         current_app.logger.info(f"For uid='{ society.uid }': deleting logo...")
-        old_logo = os.path.join(images_dir, society.logo)
-        remove_logo(old_logo)
-        society.logo = current_app.config["DEFAULT_LOGO"]
+        for asset in Asset.query.filter_by(key=society.logo):
+            old_logo = os.path.join(images_dir, asset.path)
+            remove_logo(old_logo)
+            db.session.delete(asset)
+        society.logo = None
         db.session.commit()
         return
 
@@ -63,13 +63,13 @@ def delete_society_bbb_logo(uid):
 
     images_dir = current_app.config["IMAGES_DIR"]
 
-    if society.bbb_logo == current_app.config["DEFAULT_BBB_LOGO"]:
-        return
-    else:
+    if society.bbb_logo is not None:
         current_app.logger.info(f"For uid='{ society.uid }': deleting bbb_logo")
-        old_logo = os.path.join(images_dir, society.bbb_logo)
-        remove_logo(old_logo)
-        society.bbb_logo = current_app.config["DEFAULT_BBB_LOGO"]
+        for asset in Asset.query.filter_by(key=society.bbb_logo):
+            old_logo = os.path.join(images_dir, asset.path)
+            remove_logo(old_logo)
+            db.session.delete(asset)
+        society.bbb_logo = None
         db.session.commit()
         return
 
@@ -195,7 +195,10 @@ def manage(uid):
                         f"For uid='{ society.uid }': saved new logo '{ path }'"
                     )
 
-                    society.logo = static_filename
+                    key = f"logo:{society.uid}"
+                    asset = Asset(key=key, path=static_filename)
+                    db.session.add(asset)
+                    society.logo = key
                     db.session.commit()
                     current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
                 else:
@@ -229,7 +232,10 @@ def manage(uid):
                         f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
                     )
 
-                    society.bbb_logo = static_filename
+                    key = f"logo-bbb:{society.uid}"
+                    asset = Asset(key=key, path=static_filename)
+                    db.session.add(asset)
+                    society.bbb_logo = key
                     db.session.commit()
                     current_app.logger.info(
                         f"For uid='{ society.uid }': updated bbb_logo."

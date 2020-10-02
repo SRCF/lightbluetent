@@ -61,10 +61,10 @@ class Society(db.Model):
     sessions = db.Column(db.JSON, nullable=True)
     welcome_text = db.Column(db.String, unique=False, nullable=True)
     logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_logo.png"
+        db.String, db.ForeignKey('assets.key'), unique=False, nullable=True
     )
     bbb_logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_bbb_logo.png"
+        db.String, db.ForeignKey('assets.key'), unique=False, nullable=True
     )
     banner_text = db.Column(db.String, unique=False, nullable=True)
     banner_color = db.Column(db.String, unique=False, nullable=True, default="#e8e8e8")

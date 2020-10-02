@@ -26,9 +26,7 @@ def welcome(uid):
 
     sessions_data = {"days": current_app.config["NUMBER_OF_DAYS"]}
 
-    has_logo = True
-    if society.logo == current_app.config["DEFAULT_LOGO"]:
-        has_logo = False
+    has_logo = society.logo is not None
 
     meeting = Meeting(society)
     running = meeting.is_running()
