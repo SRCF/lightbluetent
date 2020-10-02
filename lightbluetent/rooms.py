@@ -172,10 +172,9 @@ def manage(uid):
                     delete_society_logo(uid)
 
                     safe_uid = path_sanitise(society.uid)
-                    static_filename = (
-                        safe_uid + "_" + gen_unique_string() + logo_extension
+                    static_filename = lambda v: (
+                        safe_uid + v + "_" + gen_unique_string() + logo_extension
                     )
-                    path = os.path.join(images_dir, static_filename)
 
                     current_app.logger.info(
                         f"For user { crsid }, society uid='{ society.uid }': changing logo..."
@@ -187,18 +186,28 @@ def manage(uid):
                         abort(500)
 
                     try:
-                        _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
-                        img.save(path)
+                        key = f"logo:{society.uid}"
+                        for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                            variant = f"@{dpi}x"
+                            subpath = static_filename(variant)
+                            path = os.path.join(images_dir, subpath)
+                            img.save(path)
+
+                            variant = Asset(key=key, variant=variant, path=static_filename)
+                            db.session.add(variant)
+                            current_app.logger.info(
+                                f"For uid={society.uid!r}: saved new logo variant [{variant!r}] {path!r}"
+                            )
+                        else:
+                            raise StopIteration
+
                     except StopIteration:
                         errors["logo"] = "Failed to resize image."
                     else:
                         current_app.logger.info(
-                            f"For uid='{ society.uid }': saved new logo '{ path }'"
+                            f"For uid={society.uid!r}: saved new logo"
                         )
 
-                        key = f"logo:{society.uid}"
-                        asset = Asset(key=key, path=static_filename)
-                        db.session.add(asset)
                         society.logo = key
                         db.session.commit()
                         current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
@@ -213,8 +222,8 @@ def manage(uid):
                     delete_society_bbb_logo(uid)
 
                     safe_uid = path_sanitise(society.uid)
-                    static_filename = (
-                        safe_uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                    static_filename = lambda v: (
+                        safe_uid + "_bbb" + v + "_" + gen_unique_string() + bbb_logo_extension
                     )
                     path = os.path.join(images_dir, static_filename)
 
@@ -228,18 +237,28 @@ def manage(uid):
                         abort(500)
 
                     try:
-                        _, img = next(resize_image(bbb_logo_img, (100,30), hidpi=[2,1]))
-                        img.save(path)
+                        key = f"logo-bbb:{society.uid}"
+                        for dpi, img in resize_image(bbb_logo_img, (100,30)):
+                            variant = f"@{dpi}x"
+                            subpath = static_filename(variant)
+                            path = os.path.join(images_dir, subpath)
+                            img.save(path)
+
+                            variant = Asset(key=key, variant=variant, path=static_filename)
+                            db.session.add(variant)
+                            current_app.logger.info(
+                                f"For uid={society.uid!r}: saved new bbb_logo variant [{variant!r}] {path!r}"
+                            )
+                        else:
+                            raise StopIteration
+
                     except StopIteration:
                         errors["bbb_logo"] = "Failed to resize image."
                     else:
                         current_app.logger.info(
-                            f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
+                            f"For uid='{ society.uid }': saved new bbb_logo"
                         )
 
-                        key = f"logo-bbb:{society.uid}"
-                        asset = Asset(key=key, path=static_filename)
-                        db.session.add(asset)
                         society.bbb_logo = key
                         db.session.commit()
                         current_app.logger.info(
