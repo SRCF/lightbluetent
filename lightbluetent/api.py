@@ -27,7 +27,7 @@ class Meeting:
         self.attendee_pw = society.attendee_pw
         self.welcome_text = society.welcome_text
         self.banner_text = society.banner_text
-        self.logo = society.logo
+        self.logo = society.bbb_logo
         self.banner_color = society.banner_color
         self.mute_on_start = society.mute_on_start
         self.disable_private_chat = society.disable_private_chat
