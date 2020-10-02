@@ -7,6 +7,8 @@ from jinja2 import is_undefined
 from flask import render_template, current_app
 import traceback
 from lightbluetent.models import db
+from PIL import Image
+import math
 import re
 import unicodedata
 import hashlib
@@ -190,3 +192,86 @@ def get_form_values(request, keys):
     for key in keys:
         values[key] = request.form.get(key, "").strip()
     return values
+
+
+def resize_image(image, max_dimensions, *, preserve_aspect=True, grow=False, fill_canvas=(0,0,0,0), fill_composite=True, attachment=(0.5,0.5), hidpi=[1,2]):
+    """
+    Resize an image using pillow 'smartly'
+      max_dimensions:
+        a (w,h) tuple specifying the maximum _logical_ dimensions of the 
+        resulting image
+      preserve_aspect:
+        a bool specifying whether or not to preserve the aspect ratio
+      grow:
+        a bool specifying whether to allow a dimension to be stretched
+      fill_canvas:
+        either False in which case the resulting image size may be smaller
+        than max_dimensions, or a valid pillow colour in which case the canvas
+        will be enlarged to match max_dimensions whilst still preserving the
+        aspect ratio if desired; the specified colour is used to fill the
+        background, and by default is transparent
+      fill_composite:
+        if True, then transparent areas of the original image will also be
+        filled by the fill colour
+      attachment:
+        if the canvas is enlarged, then attachment specifies where the image
+        is placed; (0,0) means top-left, (0.5,0.5) means centered, etc
+      hidpi:
+        a list of hidpi resolutions to output
+    """
+
+    if not isinstance(image, Image.Image):
+        image = Image.open(image)
+    image = image.convert("RGBA")
+
+    orig_width, orig_height = image.size
+    max_lwidth, max_lheight = max_dimensions
+
+    ratio_x = max_lwidth / orig_width
+    ratio_y = max_lheight / orig_height
+    if not grow:
+        ratio_x = min(1, ratio_x)
+        ratio_y = min(1, ratio_y)
+
+    new_lwidth = round(ratio_x * orig_width)
+    new_lheight = round(ratio_y * orig_height)
+
+    if preserve_aspect:
+        if ratio_x < ratio_y:
+            new_lwidth = max_lwidth
+        elif ratio_y < ratio_x:
+            new_lheight = max_lheight
+        else:
+            new_lwidth = max_lwidth
+            new_lheight = max_lheight
+        ratio_x = ratio_y = min(ratio_x, ratio_y)
+
+    if fill_canvas is not False:
+        canv_width = math.ceil(max_lwidth / ratio_x)
+        canv_height = math.ceil(max_lheight / ratio_y)
+        att_rx, att_ry = attachment
+        att_x = math.floor(att_rx * (canv_width - orig_width))
+        att_y = math.floor(att_ry * (canv_height - orig_height))
+
+        canvas_size = canv_width, canv_height
+        canvas = Image.new("RGBA", canvas_size, fill_canvas)
+        if fill_composite:
+            canvas2 = Image.new("RGBA", canvas_size, (0,0,0,0))
+            canvas2.paste(image, (att_x, att_y))
+            image = Image.alpha_composite(canvas, canvas2)
+        else:
+            canvas.paste(image, (att_x, att_y))
+            image = canvas
+
+        orig_width, orig_height = image.size
+        new_lwidth = max_lwidth
+        new_lheight = max_lheight
+
+    for px_density in hidpi:
+        out_width = new_lwidth*px_density
+        out_height = new_lheight*px_density
+        if not grow:
+            print((out_width, out_height), (orig_width, orig_height))
+        if not grow and (out_width > orig_width or out_height > orig_height):
+            continue
+        yield px_density, image.resize((out_width, out_height))
