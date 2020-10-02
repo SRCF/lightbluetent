@@ -8,7 +8,7 @@ from lightbluetent.api import Meeting
 from lightbluetent.utils import path_sanitise, delete_logo, gen_unique_string, gen_room_id, get_form_values, resize_image
 from flask_babel import _
 from datetime import datetime
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 bp = Blueprint("groups", __name__, url_prefix="/g")
 
@@ -62,11 +62,13 @@ def update(group_id, update_type):
             filename, extension = os.path.splitext(logo.filename)
 
             has_valid_name = (filename != "")
-            has_valid_extension = (
-                extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]
-            )
 
-            if has_valid_name and has_valid_extension:
+            try:
+                assert filename != ""
+                logo_img = Image.open(logo)
+            except (AssertionError, UnidentifiedImageError):
+                errors["logo"] = "Invalid file."
+            else:
                 if not delete_logo(group.id):
                     abort(500)
 
@@ -89,7 +91,7 @@ def update(group_id, update_type):
                     abort(500)
 
                 try:
-                    _, img = next(resize_image(logo, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
+                    _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
                     img.save(path)
                 except StopIteration:
                     errors["logo"] = "Failed to resize image."
