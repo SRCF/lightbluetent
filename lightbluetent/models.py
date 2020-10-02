@@ -33,6 +33,91 @@ whitelist = db.Table(
     db.Column("room_id", db.String(20), db.ForeignKey("rooms.id")),
 )
 
+# Different levels of authentication for attendees joining a room
+class Authentication(enum.Enum):
+    PUBLIC = "public"
+    RAVEN = "raven"
+    PASSWORD = "password"
+    WHITELIST = "whitelist"
+
+
+class Recurrence(enum.Enum):
+    NONE = "none"
+    DAILY = "daily"
+    WEEKDAYS = "weekdays"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
+
+
+class LinkType(enum.Enum):
+    EMAIL = "email"
+    FACEBOOK = "facebook"
+    TWITTER = "twitter"
+    INSTAGRAM = "instagram"
+    YOUTUBE = "youtube"
+    OTHER = "other"
+
+class Link(db.Model):
+    __tablename__ = "links"
+
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
+    room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
+    url = db.Column(db.String, nullable=False)
+    type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
+
+
+class Room(db.Model):
+
+    __tablename__ = "rooms"
+
+    id = db.Column(
+        db.String(20), primary_key=True
+    )  # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
+
+    name = db.Column(db.String(100), nullable=False)
+    alias = db.Column(
+        db.String(100), nullable=True, unique=True
+    )  # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
+    group_id = db.Column(
+        db.String(12), db.ForeignKey("groups.id"), nullable=True
+    )  # For group-owned rooms
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True
+    )  # For user-owned rooms
+    sessions = db.relationship("Session", backref="room", lazy=True)
+    links = db.relationship("Link", backref="room", lazy=True)
+    description = db.Column(db.String, unique=False, nullable=True)
+
+    welcome_text = db.Column(db.String, unique=False, nullable=True)
+    banner_text = db.Column(db.String, unique=False, nullable=True)
+    banner_color = db.Column(db.String, unique=False, nullable=True)
+    mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
+    disable_private_chat = db.Column(db.Boolean, nullable=False, default=False)
+    attendee_pw = db.Column(db.String, unique=True, nullable=False)
+    moderator_pw = db.Column(db.String, unique=True, nullable=False)
+
+    sessions = db.relationship("Session", backref="room", lazy=True)
+    authentication = db.Column(
+        db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC
+    )
+    password = db.Column(db.String, nullable=True)
+
+    whitelisted_users = db.relationship(
+        "User",
+        secondary=whitelist,
+        lazy=True,
+        backref=db.backref("rooms_whitelisted_for", lazy=True),
+    )
+
+    time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Room(group: '{self.group}', name: '{self.name}')"
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -89,79 +174,6 @@ class Group(db.Model):
         return f"Group('{self.name}')"
 
 
-# Different levels of authentication for attendees joining a room
-class Authentication(enum.Enum):
-    PUBLIC = "public"
-    RAVEN = "raven"
-    PASSWORD = "password"
-    WHITELIST = "whitelist"
-
-
-class Room(db.Model):
-
-    __tablename__ = "rooms"
-
-    id = db.Column(
-        db.String(20), primary_key=True
-    )  # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
-
-    name = db.Column(db.String(100), nullable=False)
-    alias = db.Column(
-        db.String(100), nullable=True, unique=True
-    )  # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
-    group_id = db.Column(
-        db.String(12), db.ForeignKey("groups.id"), nullable=True
-    )  # For group-owned rooms
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=True
-    )  # For user-owned rooms
-    sessions = db.relationship("Session", backref="room", lazy=True)
-    links = db.relationship("Link", backref="room", lazy=True)
-    description = db.Column(db.String, unique=False, nullable=True)
-
-    welcome_text = db.Column(db.String, unique=False, nullable=True)
-    banner_text = db.Column(db.String, unique=False, nullable=True)
-    banner_color = db.Column(db.String, unique=False, nullable=True)
-    mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
-    disable_private_chat = db.Column(db.Boolean, nullable=False, default=False)
-    attendee_pw = db.Column(db.String, unique=True, nullable=False)
-    moderator_pw = db.Column(db.String, unique=True, nullable=False)
-
-    sessions = db.relationship("Session", backref="room", lazy=True)
-    authentication = db.Column(
-        db.Enum(Authentication), nullable=False, default=Authentication.PUBLIC
-    )
-    password = db.Column(db.String, nullable=True)
-
-    whitelisted_users = db.relationship(
-        "User",
-        secondary=whitelist,
-        lazy=True,
-        backref=db.backref("rooms_whitelisted_for", lazy=True),
-    )
-
-    time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"Room(group: '{self.group}', name: '{self.name}')"
-
-
-class Recurrence(enum.Enum):
-    NONE = "none"
-    DAILY = "daily"
-    WEEKDAYS = "weekdays"
-    WEEKLY = "weekly"
-    MONTHLY = "monthly"
-    YEARLY = "yearly"
-
-
-class RecurrenceLimit(enum.Enum):
-    FOREVER = "forever"  # No limit is given
-    COUNT = "count"  # A number of days / weeks months to recur is provided
-    UNTIL = "until"  # A date is given after which no more sessions will occur
-
-
 class Session(db.Model):
     __tablename__ = "sessions"
 
@@ -170,29 +182,11 @@ class Session(db.Model):
     start = db.Column(db.DateTime, nullable=False)
     end = db.Column(db.DateTime, nullable=False)
     recur = db.Column(db.Enum(Recurrence), nullable=False, default=Recurrence.NONE)
-    limit = db.Column(db.Enum(RecurrenceLimit), nullable=True)
+    count = db.Column(db.Integer, nullable=True)
+    until = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
-        return f"Session(group: '{self.group}', start: '{self.start}', end: '{self.end}', reccur: '{self.recur}', limit: '{self.limit}')"
-
-
-class LinkType(enum.Enum):
-    EMAIL = "email"
-    FACEBOOK = "facebook"
-    TWITTER = "twitter"
-    INSTAGRAM = "instagram"
-    YOUTUBE = "youtube"
-    OTHER = "other"
-
-
-class Link(db.Model):
-    __tablename__ = "links"
-
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
-    room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
-    url = db.Column(db.String, nullable=False)
-    type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
+        return f"Session(group: '{self.group}', start: '{self.start}', end: '{self.end}', recur: '{self.recur}', limit: '{self.limit}')"
 
 
 class Setting(db.Model):

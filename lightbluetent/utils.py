@@ -12,6 +12,7 @@ email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 short_name_re = re.compile(r"\w{1,12}")
 alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
 time_re = re.compile(r"\d{2}:\d{2}")
+date_re = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def match_time(time):
@@ -65,6 +66,8 @@ def validate_short_name(short_name):
 def validate_room_alias(alias):
     return alias_re.match(alias)
 
+def validate_date(date):
+    return date_re.match(date)
 
 def sif(variable):
     """"string if": `variable` is defined and truthy, else ''"""
