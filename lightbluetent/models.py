@@ -237,3 +237,30 @@ class Permission(db.Model):
 
     def __repr__(self):
         return f"Permission({self.name!r})"
+
+
+class Asset(db.Model):
+    """
+    The asset table allows storage of assets, but crucially, allows
+    asset variants to be defined. For example, for image assets one may
+    have HiDPI variants for @1x, @2x, etc; this would be stored as:
+
+        id | key       | variant | path
+        ---|-----------|---------|-------------------------
+         1 | srcf-logo | @1x     | srcf-logo-19a6c2c9.png
+         2 | foo-logo  | NULL    | foo-bar.jpeg
+         3 | srcf-logo | @2x     | srcf-logo-35d372d5.png
+        ...
+
+    """
+
+    __tablename__ = "assets"
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String, unique=False, nullable=False)
+    variant = db.Column(db.String, unique=False, nullable=True)
+    path = db.Column(db.String, unique=True, nullable=False)
+
+    def __repr__(self):
+        if self.variant is None:
+            return f"Asset({self.key!r}: {self.path!r})"
+        return f"Asset({self.key!r}/{self.variant!r}: {self.path!r})"
