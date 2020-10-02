@@ -46,8 +46,6 @@ class Recurrence(enum.Enum):
     DAILY = "daily"
     WEEKDAYS = "weekdays"
     WEEKLY = "weekly"
-    MONTHLY = "monthly"
-    YEARLY = "yearly"
 
 class RecurrenceType(enum.Enum):
     FOREVER = "forever"

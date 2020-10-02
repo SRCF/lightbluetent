@@ -186,6 +186,57 @@
     <form class="tab-pane fade" id="nav-room-times" method="post"
         action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+        <div class="card">
+            <div class="card-body">
+                <!-- TODO: this doesn't handle events that span multiple days -->
+                <h5 class="card-title">Upcoming sessions</h5>
+                {% if room.sessions %}
+                {% for session in room.sessions %}
+                {% if session.recur == recurrence.NONE %} <!-- One-off sessions -->
+                    <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
+                    {% if not session | ended_hours_ago(2) %}
+                        {% if session.start.date() != session.end.date() %}
+                            <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash; {{ session.end.strftime("%A %d %b %H:%M") }}</a>
+                        {% else %}
+                            <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% elif session.until %} <!-- Recurring until a certain date -->
+                    {% if session.recur == recurrence.DAILY %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
+                    {% elif session.recur == recurrence.WEEKDAYS %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
+                    {% else %} <!-- recurrence.WEEKLY -->
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%d %b") }}</a>
+                    {% endif %}
+                {% elif session.count %}
+                    {% if session.recur == recurrence.DAILY %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
+                    {% elif session.recur == recurrence.WEEKDAYS %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
+                    {% else %} <!-- recurrence.WEEKLY -->
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} weeks</a>
+                    {% endif %}
+                {% else %} <!-- Recurring forever -->
+                    {% if session.recur == recurrence.DAILY %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                    {% elif session.recur == recurrence.WEEKDAYS %}
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                    {% else %} <!-- recurrence.WEEKLY -->
+                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                    {% endif %}
+                {% endif %}
+                <small class="form-text text-muted">Click to remove a session.</small>
+                {% endfor %}
+                {% else %}
+                    <p>There are no sessions.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <br>
+
         <section class="row">
             <article class="col-md-6">
                 <div class="input-group mb-3">
@@ -266,10 +317,6 @@
                                     value="{{ recurrence.WEEKDAYS.value }}">weekday</option>
                             <option {% if frequency == recurrence.WEEKLY.value %}selected{% endif %}
                                     value="{{ recurrence.WEEKLY.value }}">week</option>
-                            <option {% if frequency == recurrence.MONTHLY.value %}selected{% endif %}
-                                    value="{{ recurrence.MONTHLY.value }}">month</option>
-                            <option {% if frequency == recurrence.YEARLY.value %}selected{% endif %}
-                                    value="{{ recurrence.YEARLY.value }}">year</option>
                         </select>
                         <div class="input-group-append">
                             <select class="custom-select {% if errors.limit is defined %} is-invalid{% endif %}"

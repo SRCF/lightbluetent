@@ -212,9 +212,7 @@ def update(room_id, update_type):
                     errors["limit"] = "Select when the event will end."
                 valid_frequency = (values["frequency"] == Recurrence.DAILY.value
                         or values["frequency"] == Recurrence.WEEKDAYS.value
-                        or values["frequency"] == Recurrence.WEEKLY.value
-                        or values["frequency"] == Recurrence.MONTHLY.value
-                        or values["frequency"] == Recurrence.YEARLY.value)
+                        or values["frequency"] == Recurrence.WEEKLY.value)
 
                 valid_limit = (values["limit"] == RecurrenceType.FOREVER.value
                     or values["limit"] == RecurrenceType.UNTIL.value
@@ -306,6 +304,7 @@ def update(room_id, update_type):
             group=group,
             errors=errors,
             page_parent=parent_page,
+            now=datetime.now(),
             **values
         )
     else:
@@ -372,6 +371,7 @@ def manage(room_id):
         group=group,
         errors={},
         page_parent=parent_page,
+        now=datetime.now(),
         **values,
     )
 
@@ -460,11 +460,56 @@ def unwhitelist(room_id, crsid_to_remove):
     return redirect(url_for("rooms.manage", id=room.id))
 
 
+@bp.route("/delete_session/<id>")
+@auth_decorator
+def delete_session(id):
+
+    session = Session.query.filter_by(id=id).first()
+
+    room = Room.query.filter_by(id=session.room_id).first()
+
+    if not room:
+        abort(404)
+
+    group = None
+
+    crsid = auth_decorator.principal
+
+    if crsid is None:
+        abort(403)
+
+    user = User.query.filter_by(crsid=crsid).first()
+
+    # If this room is associated with a group
+    if room.group_id:
+        group = Group.query.filter_by(id=group_id).first()
+
+        # ensure that the user belongs to the group they're editing
+        if group not in user.groups:
+            abort(403)
+    elif room.user_id:
+        if user.id != room.user_id:
+            abort(403)
+    else:
+        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        abort(500)
+
+    db.session.delete(session)
+    db.session.commit()
+
+    current_app.logger.info(
+        f"User { crsid } deleted session with id = '{ session.id }'"
+    )
+
+    return redirect(url_for("rooms.manage", room_id=room.id))
+
+
 @bp.route("/<room_id>/delete", methods=("GET", "POST"))
 @auth_decorator
 def delete(room_id):
 
     room = Room.query.filter_by(id=room_id).first()
+
 
     if not room:
         abort(404)
