@@ -13,7 +13,7 @@ from flask import (
 )
 from lightbluetent.models import db, User, Society
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time, resize_image
+from lightbluetent.utils import gen_unique_string, path_sanitise, match_social, get_social_by_id, match_time, resize_image
 from PIL import Image, UnidentifiedImageError
 from flask_babel import _
 from datetime import time, datetime
@@ -171,8 +171,9 @@ def manage(uid):
                     # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
+                    safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        society.uid + "_" + gen_unique_string() + logo_extension
+                        safe_uid + "_" + gen_unique_string() + logo_extension
                     )
                     path = os.path.join(images_dir, static_filename)
 
@@ -208,8 +209,9 @@ def manage(uid):
                     # Delete the old logo if it's not the default
                     delete_society_bbb_logo(uid)
 
+                    safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                        safe_uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
                     )
                     path = os.path.join(images_dir, static_filename)
 
