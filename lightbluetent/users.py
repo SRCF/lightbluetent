@@ -213,8 +213,9 @@ def register():
             # defaults
             lookup_data = fetch_lookup_data(crsid)
             values = {
-                "full_name": lookup_data["visibleName"],
-                "email_address": lookup_data["attributes"][0]["value"] or "",
+                "full_name": lookup_data["name"],
+                "email_address": lookup_data["email"],
+                "crsid": crsid,
                 "dpa": False,
                 "tos": False,
             }
@@ -222,9 +223,8 @@ def register():
             return render_template(
                 "users/register.html",
                 page_title="Register",
-                crsid=crsid,
                 errors={},
-                **values,
+                **values
             )
 
         else:

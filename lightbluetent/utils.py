@@ -132,19 +132,25 @@ def fetch_lookup_data(crsid):
     )
     if res.status_code == 200:
         # request successful
-        return res.json()["result"]["person"]
+        response = res.json()["result"]["person"]
+
+        email = ""
+
+        if len(response["attributes"] > 0):
+            email = response["attributes"][0]["value"]
+        else:
+            email = f"{crsid}@cam.ac.uk"
+
+        return {
+            "name": response["visibleName"],
+            "email": email
+        }
     elif res.status_code == 401:
         # not authorized, we're outside of the cudn
+        # feed us dummy data
         return {
-            "cancelled": False,
-            "identifier": {"scheme": "crsid", "value": "mug99"},
-            "displayName": "Testing Software",
-            "registeredName": "Software Testing",
-            "surname": "Software Testing",
-            "visibleName": "Testing Software",
-            "attributes": [{"value": "mug99@cam.ac.uk"}],
-            "staff": True,
-            "student": False,
+            "email": "mug99@cam.ac.uk",
+            "name": "Testing Software"
         }
     else:
         # something bad happened, don't prefill any fields
