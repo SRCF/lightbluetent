@@ -71,12 +71,11 @@ def update(group_id, update_type):
                     abort(500)
 
                 safe_gid = path_sanitise(group.id)
-                static_filename = (
-                    safe_gid + "_" + gen_unique_string() + extension
+                static_filename = lambda v: (
+                    safe_gid + v + "_" + gen_unique_string() + extension
                 )
 
                 images_dir = current_app.config["IMAGES_DIR"]
-                path = os.path.join(images_dir, static_filename)
 
                 current_app.logger.info(
                     f"Changing logo for user { crsid }, group { group.id }..."
@@ -89,17 +88,26 @@ def update(group_id, update_type):
                     abort(500)
 
                 try:
-                    _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
-                    img.save(path)
+                    key = f"logo:{group.id}"
+                    for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                        variant = f"@{dpi}x"
+                        subpath = static_filename(variant)
+                        path = os.path.join(images_dir, subpath)
+                        img.save(path)
+
+                        variant = Asset(key=key, variant=variant, path=static_filename)
+                        db.session.add(variant)
+                        current_app.logger.info(
+                            f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
+                        )
+                    else:
+                        raise StopIteration
                 except StopIteration:
                     errors["logo"] = "Failed to resize image."
                 else:
                     current_app.logger.info(
-                        f"Saved new logo '{ path }' for group '{ group.id }'"
+                        f"Saved new logo for group '{ group.id }'"
                     )
-                    key = f"logo:{group.id}"
-                    asset = Asset(key=key, path=static_filename)
-                    db.session.add(asset)
                     group.logo = key
                     db.session.commit()
 
