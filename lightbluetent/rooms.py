@@ -13,7 +13,7 @@ from flask import (
 )
 from lightbluetent.models import db, User, Society
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time
+from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time, resize_image
 from PIL import Image
 from flask_babel import _
 from datetime import time, datetime
