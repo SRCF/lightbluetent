@@ -40,7 +40,6 @@ class Authentication(enum.Enum):
     PASSWORD = "password"
     WHITELIST = "whitelist"
 
-
 class Recurrence(enum.Enum):
     NONE = "none"
     DAILY = "daily"
@@ -53,7 +52,6 @@ class RecurrenceType(enum.Enum):
     FOREVER = "forever"
     UNTIL = "until"
     COUNT = "count"
-
 
 class LinkType(enum.Enum):
     EMAIL = "email"
@@ -120,7 +118,7 @@ class Room(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Room(group: '{self.group}', name: '{self.name}')"
+        return f"Room(group: {self.group!r}, name: {self.name!r})"
 
 
 class User(db.Model):
@@ -139,7 +137,7 @@ class User(db.Model):
         return perm in [p.name for p in self.role.permissions]
 
     def __repr__(self):
-        return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
+        return f"User({self.crsid!r}: {self.full_name!r}, {self.email!r})"
 
 
 class Group(db.Model):
@@ -167,15 +165,13 @@ class Group(db.Model):
     description = db.Column(db.String, unique=False, nullable=True)
     links = db.relationship("Link", backref="group", lazy=True)
 
-    logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_group_logo.png"
-    )
+    logo = db.Column(db.String, db.ForeignKey('assets.key'), unique=False, nullable=True)
 
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Group('{self.name}')"
+        return f"Group({self.name!r})"
 
 
 class Session(db.Model):
@@ -190,7 +186,7 @@ class Session(db.Model):
     until = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
-        return f"Session(group: '{self.group}', start: '{self.start}', end: '{self.end}', recur: '{self.recur}', limit: '{self.limit}')"
+        return f"Session(group: {self.group!r}, start: {self.start!r}, end: {self.end!r}, reccur: {self.recur!r}, limit: {self.limit!r})"
 
 
 class Setting(db.Model):
@@ -203,7 +199,7 @@ class Setting(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Setting('{self.name}', '{self.enabled}')"
+        return f"Setting({self.name!r}, {self.enabled!r})"
 
 
 class Role(db.Model):
@@ -224,7 +220,7 @@ class Role(db.Model):
     users = db.relationship("User", backref="role", lazy=True)
 
     def __repr__(self):
-        return f"Role('{self.name}', '{self.description}')"
+        return f"Role({self.name!r}, {self.description!r})"
 
 
 class Permission(db.Model):
@@ -234,4 +230,31 @@ class Permission(db.Model):
     name = db.Column(db.Enum(PermissionType), unique=False, nullable=False)
 
     def __repr__(self):
-        return f"Permission('{self.name}')"
+        return f"Permission({self.name!r})"
+
+
+class Asset(db.Model):
+    """
+    The asset table allows storage of assets, but crucially, allows
+    asset variants to be defined. For example, for image assets one may
+    have HiDPI variants for @1x, @2x, etc; this would be stored as:
+
+        id | key       | variant | path
+        ---|-----------|---------|-------------------------
+         1 | srcf-logo | @1x     | srcf-logo-19a6c2c9.png
+         2 | foo-logo  | NULL    | foo-bar.jpeg
+         3 | srcf-logo | @2x     | srcf-logo-35d372d5.png
+        ...
+
+    """
+
+    __tablename__ = "assets"
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String, unique=False, nullable=False)
+    variant = db.Column(db.String, unique=False, nullable=True)
+    path = db.Column(db.String, unique=True, nullable=False)
+
+    def __repr__(self):
+        if self.variant is None:
+            return f"Asset({self.key!r}: {self.path!r})"
+        return f"Asset({self.key!r}/{self.variant!r}: {self.path!r})"

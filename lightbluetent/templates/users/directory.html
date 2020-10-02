@@ -18,12 +18,11 @@
             </div>
             <div class="card-body">
                 <div id="card-intro" class="d-flex justify-content-between">
-                    {% set current_logo = "images/{}".format(group.logo) %}
-                    {% if group.logo != config["DEFAULT_LOGO"] %}
+                    {% if group.logo is not None %}
                     <div class="flex-shrink-0 ml-3 order-1 d-flex align-items-center justify-content-center"
                         style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
                         <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            src="{{ url_for('static', filename=current_logo) }}" alt="Logo" />
+                            {{ group.logo | responsive_image.img }} alt="Logo" />
                     </div>
                     {% endif %}
                     <div>

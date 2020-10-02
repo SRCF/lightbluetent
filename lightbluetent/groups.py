@@ -2,13 +2,13 @@ import re
 import os
 
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
-from lightbluetent.models import db, Group, User, Room, Authentication
+from lightbluetent.models import db, Group, User, Room, Authentication, Asset
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import delete_logo, gen_unique_string, gen_room_id, get_form_values
+from lightbluetent.utils import path_sanitise, gen_unique_string, gen_room_id, get_form_values, resize_image
 from flask_babel import _
 from datetime import datetime
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 bp = Blueprint("groups", __name__, url_prefix="/g")
 
@@ -27,9 +27,7 @@ def home(group_id):
     if group.description is not None:
         desc_paragraphs=group.description.split("\n")
 
-    has_logo = True
-    if group.logo == current_app.config["DEFAULT_GROUP_LOGO"]:
-        has_logo = False
+    has_logo = group.logo is not None
 
     return render_template("groups/home.html", page_title=f"{ group.name }",
                            group=group, desc_paragraphs=desc_paragraphs,
@@ -62,20 +60,22 @@ def update(group_id, update_type):
             filename, extension = os.path.splitext(logo.filename)
 
             has_valid_name = (filename != "")
-            has_valid_extension = (
-                extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]
-            )
 
-            if has_valid_name and has_valid_extension:
+            try:
+                assert filename != ""
+                logo_img = Image.open(logo)
+            except (AssertionError, UnidentifiedImageError):
+                errors["logo"] = "Invalid file."
+            else:
                 if not delete_logo(group.id):
                     abort(500)
 
-                static_filename = (
-                    group.id + "_" + gen_unique_string() + extension
+                safe_gid = path_sanitise(group.id)
+                static_filename = lambda v: (
+                    safe_gid + v + "_" + gen_unique_string() + extension
                 )
 
                 images_dir = current_app.config["IMAGES_DIR"]
-                path = os.path.join(images_dir, static_filename)
 
                 current_app.logger.info(
                     f"Changing logo for user { crsid }, group { group.id }..."
@@ -87,21 +87,29 @@ def update(group_id, update_type):
                         )
                     abort(500)
 
-                maxwidth, maxheight = current_app.config["MAX_LOGO_SIZE"]
-                logo_img = Image.open(logo)
-                ratio = min(maxwidth / logo_img.width, maxheight / logo_img.height)
-                # TODO: possible optimization with reduce here?
-                logo_resized = logo_img.resize(
-                    (round(logo_img.width * ratio), round(logo_img.height * ratio))
-                )
-                logo_resized.save(path)
-                current_app.logger.info(
-                    f"Saved new logo '{ path }' for group '{ group.id }'"
-                )
-                group.logo = static_filename
+                try:
+                    key = f"logo:{group.id}"
+                    for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                        variant = f"@{dpi}x"
+                        subpath = static_filename(variant)
+                        path = os.path.join(images_dir, subpath)
+                        img.save(path)
 
-            else:
-                errors["logo"] = "Invalid file."
+                        variant = Asset(key=key, variant=variant, path=static_filename)
+                        db.session.add(variant)
+                        current_app.logger.info(
+                            f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
+                        )
+                    else:
+                        raise StopIteration
+                except StopIteration:
+                    errors["logo"] = "Failed to resize image."
+                else:
+                    current_app.logger.info(
+                        f"Saved new logo for group '{ group.id }'"
+                    )
+                    group.logo = key
+                    db.session.commit()
 
         if not errors:
             group.name = values["name"]
@@ -226,6 +234,17 @@ def manage(group_id):
     )
 
 
+def delete_logo_variant(path):
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+        return False
+    if not os.path.isfile(path):
+        current_app.logger.info("no logo to delete")
+        return False
+
+    os.remove(path)
+    current_app.logger.info(f"Deleted logo '{ path }'")
+
 # Delete logo on disk for the group with given group_id
 def delete_logo(group_id):
     group = Group.query.filter_by(id=group_id).first()
@@ -233,24 +252,16 @@ def delete_logo(group_id):
     if not group:
         return False
 
-    if group.logo == current_app.config["DEFAULT_GROUP_LOGO"]:
+    if group.logo is None:
         return True
     else:
         images_dir = current_app.config["IMAGES_DIR"]
         current_app.logger.info(f"For id='{ group.id }': deleting logo...")
-        old_logo = os.path.join(images_dir, group.logo)
-
-        if not os.path.isdir(images_dir):
-            current_app.logger.info(f"'{ images_dir }':  no such directory.")
-            return False
-        if not os.path.isfile(old_logo):
-            current_app.logger.info("no logo to delete")
-            return False
-
-        os.remove(old_logo)
-        current_app.logger.info(f"Deleted logo '{ old_logo }'")
-
-        group.logo = current_app.config["DEFAULT_GROUP_LOGO"]
+        for asset in Asset.query.filter_by(key=group.logo):
+            old_logo = os.path.join(images_dir, asset.path)
+            delete_logo_variant(old_logo)
+            db.session.delete(asset)
+        group.logo = None
         db.session.commit()
         return True
 

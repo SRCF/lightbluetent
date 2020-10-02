@@ -52,11 +52,10 @@
             </div>
             <div class="col-lg-6">
                 <div class="form-group">
-                    {% set current_logo = "images/{}".format(group.logo) %}
                     <div class="mx-auto d-flex align-items-center justify-content-center"
                         style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
                         <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            src="{{ url_for('static', filename=current_logo) }}" alt="Logo" />
+                            {{ group.logo | responsive_image.img }} alt="Logo" />
                     </div>
                 </div>
                 <div class="form-group">
