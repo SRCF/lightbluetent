@@ -11,7 +11,7 @@ from flask import (
     url_for,
     current_app,
 )
-from lightbluetent.models import db, User, Group, Room, Authentication, Role
+from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, RecurrenceType, Session
 from lightbluetent.config import RoleType
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
@@ -19,7 +19,8 @@ from lightbluetent.utils import (
     gen_unique_string,
     get_form_values,
     fetch_lookup_data,
-    validate_room_alias
+    validate_room_alias,
+    validate_date
 )
 from PIL import Image
 from flask_babel import _
@@ -27,7 +28,6 @@ from datetime import time, datetime
 from sqlalchemy.orm.attributes import flag_modified
 
 bp = Blueprint("rooms", __name__, url_prefix="/r")
-
 
 @bp.route("/<room_id>/begin", methods=("GET", "POST"))
 def begin(room_id):
@@ -114,15 +114,18 @@ def update(room_id, update_type):
         if room not in user.rooms:
             abort(403)
 
-    values = {}
     errors = {}
 
-    if update_type == "room_details":
-        keys = ("name", "authentication", "password", "whitelist", "alias", "description")
-        values = get_form_values(request, keys)
+    keys = ("name", "authentication", "password", "whitelist", "alias", "description",
+            "start_date", "start_hour", "start_min", "end_date", "end_hour", "end_min", "frequency", "limit", "limit_count", "limit_until",
+            "welcome_text", "banner_text", "banner_color"
+    )
+    values = get_form_values(request, keys)
 
-        for key in ("alias_checked",):
-            values[key] = bool(request.form.get(key, False))
+    for key in ("recurring", "alias_checked"):
+        values[key] = bool(request.form.get(key, False))
+
+    if update_type == "room_details":
 
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
@@ -173,32 +176,104 @@ def update(room_id, update_type):
             room.name = values["name"]
             room.authentication = Authentication(values["authentication"])
             room.description = values["description"]
-            print(room.description)
             room.alias = values["alias"] if values["alias"] != "" else None
 
 
     elif update_type == "room_times":
-        keys = (
-            "start_date",
-            "start_hour",
-            "start_min",
-            "end_date",
-            "end_hour",
-            "end_min"
-        )
 
-        # Is there a better way to do this?
-        start_date_entered = values["start_date"] != "" or values["start_hour"] != "" or values["start_min"] != ""
-        end_date_entered = values["end_date"] != "" or values["end_hour"] != "" or values["end_min"] != ""
-        full_start_date = values["start_date"] != "" and values["start_hour"] != "" and values["start_min"] != ""
-        full_end_date = values["end_date"] != "" and values["end_hour"] != "" and values["end_min"] != ""
+        valid_datetime = True
+        try:
+            start_str = values["start_date"] + " " + values["start_hour"] + ":" + values["start_min"]
+            start = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            errors["start"] = "Invalid start date or time."
+            valid_datetime = False
 
-        # TODO: check and add the session
+        try:
+            end_str = values["end_date"] + " " + values["end_hour"] + ":" + values["end_min"]
+            end = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            errors["end"] = "Invalid end date or time."
+            valid_datetime = False
+
+        if valid_datetime:
+
+            if start > end:
+                errors["end"] = "This event is finished before it starts!"
+
+            limit_until = None
+            limit_count = None
+
+            if values["recurring"]:
+
+                if not values["frequency"]:
+                    errors["frequency"] = "Select a frequency of recurrence."
+                if values["limit"] == "":
+                    errors["limit"] = "Select when the event will end."
+                valid_frequency = (values["frequency"] == Recurrence.DAILY.value
+                        or values["frequency"] == Recurrence.WEEKDAYS.value
+                        or values["frequency"] == Recurrence.WEEKLY.value
+                        or values["frequency"] == Recurrence.MONTHLY.value
+                        or values["frequency"] == Recurrence.YEARLY.value)
+
+                valid_limit = (values["limit"] == RecurrenceType.FOREVER.value
+                    or values["limit"] == RecurrenceType.UNTIL.value
+                    or values["limit"] == RecurrenceType.COUNT.value)
+
+                if not valid_frequency:
+                    errors["frequency"] = "Invalid frequency of recurrence."
+                if not valid_limit:
+                    errors["limit"] = "Invalid recurrence limit."
+
+                if values["limit"] == "until":
+                    try:
+                        limit_until = datetime.strptime(values["limit_until"], "%Y-%m-%d")
+                    except ValueError:
+                        errors["limit"] = "Invalid finishing date."
+
+                elif values["limit"] == "count":
+                    if values["limit_count"] == "":
+                        errors["limit_count"] == "You must specify when the recurrence finishes."
+                    else:
+                        limit_count = values["limit_count"]
+
+        if not errors:
+            if not values["recurring"]:
+                session = Session(
+                    room_id=room.id,
+                    start=start,
+                    end=end,
+                    recur=Recurrence.NONE,
+                )
+            else:
+                if limit_until:
+                    session = Session(
+                        room_id=room.id,
+                        start=start,
+                        end=end,
+                        recur=Recurrence(values["frequency"]),
+                        until=limit_until
+                    )
+                elif limit_count:
+                    session = Session(
+                        room_id=room.id,
+                        start=start,
+                        end=end,
+                        recur=Recurrence(values["frequency"]),
+                        count=limit_count
+                    )
+                else:
+                    session = Session(
+                        room_id=room.id,
+                        start=start,
+                        end=end,
+                        recur=Recurrence(values["frequency"]),
+                    )
+
+            db.session.add(session)
 
 
     elif update_type == "room_features":
-        keys = ("welcome_text", "banner_text", "banner_color")
-        values = get_form_values(request, keys)
 
         for key in ("mute_on_start", "disable_private_chat"):
             values[key] = bool(request.form.get(key, False))
@@ -253,6 +328,11 @@ def manage(room_id):
     # or does it belong to a user's group?
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
+
+    # third pass: does the user even exist?
+    if not user:
+        return redirect(url_for("users.register"))
+
     if room.group_id:
         parent_page = url_for("groups.manage", group_id=room.group.id)
         group_id = room.group_id
@@ -274,7 +354,14 @@ def manage(room_id):
         "authentication": room.authentication,
         "alias": room.alias,
         "mute_on_start": room.mute_on_start,
-        "disable_private_chat": room.disable_private_chat
+        "disable_private_chat": room.disable_private_chat,
+        "start_date": None,
+        "start_hour": None,
+        "start_min": None,
+        "end_date": None,
+        "end_hour": None,
+        "end_min": None,
+        "recurring": False
     }
 
     return render_template(
