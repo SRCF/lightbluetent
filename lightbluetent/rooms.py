@@ -14,7 +14,7 @@ from flask import (
 from lightbluetent.models import db, User, Society
 from lightbluetent.users import auth_decorator
 from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time, resize_image
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from flask_babel import _
 from datetime import time, datetime
 from sqlalchemy.orm.attributes import flag_modified
@@ -163,8 +163,11 @@ def manage(uid):
             images_dir = current_app.config["IMAGES_DIR"]
 
             if logo and logo_filename != "":
-                if logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
-
+                try:
+                    logo_img = Image.open(logo)
+                except UnidentifiedImageError:
+                    errors["logo"] = "Invalid file."
+                else:
                     # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
@@ -183,7 +186,7 @@ def manage(uid):
                         abort(500)
 
                     try:
-                        _, img = next(resize_image(logo, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
+                        _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
                         img.save(path)
                     except StopIteration:
                         errors["logo"] = "Failed to resize image."
@@ -195,12 +198,13 @@ def manage(uid):
                         society.logo = static_filename
                         db.session.commit()
                         current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
-                else:
-                    errors["logo"] = "Invalid file."
 
             if bbb_logo and bbb_logo_filename != "":
-                if bbb_logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
-
+                try:
+                    bbb_logo_img = Image.open(bbb_logo)
+                except UnidentifiedImageError:
+                    errors["bbb_logo"] = "Invalid file."
+                else:
                     # Delete the old logo if it's not the default
                     delete_society_bbb_logo(uid)
 
@@ -219,7 +223,7 @@ def manage(uid):
                         abort(500)
 
                     try:
-                        _, img = next(resize_image(bbb_logo, (100,30), hidpi=[2,1]))
+                        _, img = next(resize_image(bbb_logo_img, (100,30), hidpi=[2,1]))
                         img.save(path)
                     except StopIteration:
                         errors["bbb_logo"] = "Failed to resize image."
@@ -233,8 +237,6 @@ def manage(uid):
                         current_app.logger.info(
                             f"For uid='{ society.uid }': updated bbb_logo."
                         )
-                else:
-                    errors["bbb_logo"] = "Invalid file."
 
         # TODO: tweak these values when their ideal maximum lengths become apparent
         if len(values["welcome_text"]) > 100:
