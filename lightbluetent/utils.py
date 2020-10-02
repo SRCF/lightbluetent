@@ -218,6 +218,8 @@ def resize_image(image, max_dimensions, *, preserve_aspect=True, grow=False, fil
         is placed; (0,0) means top-left, (0.5,0.5) means centered, etc
       hidpi:
         a list of hidpi resolutions to output
+
+    TODO: possible optimisation using reduce here?
     """
 
     if not isinstance(image, Image.Image):

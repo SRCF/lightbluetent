@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, flash, abort, redirect, u
 from lightbluetent.models import db, Group, User, Room, Authentication
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import path_sanitise, delete_logo, gen_unique_string, gen_room_id, get_form_values
+from lightbluetent.utils import path_sanitise, delete_logo, gen_unique_string, gen_room_id, get_form_values, resize_image
 from flask_babel import _
 from datetime import datetime
 from PIL import Image
@@ -88,18 +88,16 @@ def update(group_id, update_type):
                         )
                     abort(500)
 
-                maxwidth, maxheight = current_app.config["MAX_LOGO_SIZE"]
-                logo_img = Image.open(logo)
-                ratio = min(maxwidth / logo_img.width, maxheight / logo_img.height)
-                # TODO: possible optimization with reduce here?
-                logo_resized = logo_img.resize(
-                    (round(logo_img.width * ratio), round(logo_img.height * ratio))
-                )
-                logo_resized.save(path)
-                current_app.logger.info(
-                    f"Saved new logo '{ path }' for group '{ group.id }'"
-                )
-                group.logo = static_filename
+                try:
+                    _, img = next(resize_image(logo, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
+                    img.save(path)
+                except StopIteration:
+                    errors["logo"] = "Failed to resize image."
+                else:
+                    current_app.logger.info(
+                        f"Saved new logo '{ path }' for group '{ group.id }'"
+                    )
+                    group.logo = static_filename
 
             else:
                 errors["logo"] = "Invalid file."
