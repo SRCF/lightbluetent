@@ -254,6 +254,11 @@ def manage(room_id):
     # or does it belong to a user's group?
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
+
+    # third pass: does the user even exist?
+    if not user:
+        return redirect(url_for("users.register"))
+
     if room.group_id:
         parent_page = url_for("groups.manage", group_id=room.group.id)
         group_id = room.group_id
