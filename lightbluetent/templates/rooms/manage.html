@@ -84,10 +84,9 @@
         </div>
         <div class="col-md-6 px-5">
             <div class="form-group">
-                {% set current_logo = "images/{}".format(society.logo) %}
                 <div class="mx-auto img-thumbnail d-flex align-items-center justify-content-center"
                     style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
-                    <img class="img-fluid" style="max-height:100%" src="{{ url_for('static', filename=current_logo) }}"
+                    <img class="img-fluid" style="max-height:100%" {{ society.logo | responsive_image.img }}
                         alt="Society logo" />
                 </div>
             </div>
@@ -110,8 +109,7 @@
     <div class="form-row">
         <div class="col-md-6 px-5">
             <div class="form-group">
-                {% set current_bbb_logo = "images/{}".format(society.bbb_logo) %}
-                <img width="80%" height="250" src="{{ url_for('static', filename=current_bbb_logo) }}"
+                <img width="80%" height="250" {{ society.bbb_logo | responsive_image.img }}
                     alt="Society wide logo" class="img-thumbnail mx-auto d-block">
             </div>
             <div class="form-group">

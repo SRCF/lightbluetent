@@ -15,12 +15,11 @@
             </div>
             <div class="card-body">
                 <div id="card-intro" class="d-flex justify-content-between align-items-center">
-                    {% set current_logo = "images/{}".format(society.logo) %}
-                    {% if society.logo != config["DEFAULT_LOGO"] %}
+                    {% if society.logo is not None %}
                     <div class="ml-3 order-1 d-flex align-items-center justify-content-center"
                         style="width:14vmax;height:14vmax;max-width:128px;max-height:128px;">
                         <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            src="{{ url_for('static', filename=current_logo) }}" alt="Society logo" />
+                            {{ society.logo | responsive_image.img }} alt="Society logo" />
                     </div>
                     {% endif %}
                     <div>
