@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, flash, abort, redirect, u
 from lightbluetent.models import db, Group, User, Room, Authentication
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import delete_logo, gen_unique_string, gen_room_id, get_form_values
+from lightbluetent.utils import path_sanitise, delete_logo, gen_unique_string, gen_room_id, get_form_values
 from flask_babel import _
 from datetime import datetime
 from PIL import Image
@@ -70,8 +70,9 @@ def update(group_id, update_type):
                 if not delete_logo(group.id):
                     abort(500)
 
+                safe_gid = path_sanitise(group.id)
                 static_filename = (
-                    group.id + "_" + gen_unique_string() + extension
+                    safe_gid + "_" + gen_unique_string() + extension
                 )
 
                 images_dir = current_app.config["IMAGES_DIR"]
