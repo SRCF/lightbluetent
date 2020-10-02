@@ -38,8 +38,8 @@ $('.limit_option').hide();
 var value = $('#limit_select').val();
 if (value == "until") {
     $('#limit_box_until').show();
-} else if (value == "number") {
-    $('#limit_box_number').show();
+} else if (value == "count") {
+    $('#limit_box_count').show();
 }
 
 /* Show the auth div if the values change */
@@ -61,8 +61,8 @@ $('input[type="checkbox"]').click(function() {
     }
 });
 
-/* Show the recurring options if they're selected on page load */
-if ($("recurring_checkbox").checked) {
+/* Show the recurrence settings if they're selected on page load */
+if ($("#recurring_checkbox").is(":checked")) {
     $("#recurring_box").show();
 } else {
     $("#recurring_box").hide();
@@ -81,8 +81,8 @@ $('#limit_select').change(function() {
     var value = $(this).val();
     if (value == "until") {
         $('#limit_box_until').show();
-    } else if (value == "number") {
-        $('#limit_box_number').show();
+    } else if (value == "count") {
+        $('#limit_box_count').show();
     }
 });
 

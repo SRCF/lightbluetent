@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 77104d875dac
+Revision ID: d207d8a0ab7a
 Revises: 
-Create Date: 2020-10-01 11:26:31.883187
+Create Date: 2020-10-02 12:30:11.894258
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '77104d875dac'
+revision = 'd207d8a0ab7a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -113,7 +113,8 @@ def upgrade():
     sa.Column('start', sa.DateTime(), nullable=False),
     sa.Column('end', sa.DateTime(), nullable=False),
     sa.Column('recur', sa.Enum('NONE', 'DAILY', 'WEEKDAYS', 'WEEKLY', 'MONTHLY', 'YEARLY', name='recurrence'), nullable=False),
-    sa.Column('limit', sa.Enum('FOREVER', 'COUNT', 'UNTIL', name='recurrencelimit'), nullable=True),
+    sa.Column('count', sa.Integer(), nullable=True),
+    sa.Column('until', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
