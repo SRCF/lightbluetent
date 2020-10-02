@@ -11,7 +11,7 @@ from flask import (
     url_for,
     current_app,
 )
-from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, Session
+from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, RecurrenceType, Session
 from lightbluetent.config import RoleType
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
@@ -182,51 +182,44 @@ def update(room_id, update_type):
 
     elif update_type == "room_times":
 
-        # Is there a better way to do this?
-        valid_start_date = validate_date(values["start_date"]) and values["start_hour"].isdigit() and values["start_min"].isdigit()
-        valid_end_date = validate_date(values["end_date"]) and values["end_hour"].isdigit() and values["end_min"].isdigit()
+        valid_datetime = True
+        try:
+            start_str = values["start_date"] + " " + values["start_hour"] + ":" + values["start_min"]
+            start = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            errors["start"] = "Invalid start date or time."
+            valid_datetime = False
 
-        if not valid_start_date:
-            errors["start"] = "You must specify a starting time and date."
-        elif not valid_end_date:
-            errors["end"] = "You must specify a ending time and date."
-        else:
-            if int(values["start_hour"]) > 24 or int(values["start_min"]) > 60:
-                errors["start"] = "Invalid start time."
-            if int(values["end_hour"]) > 24 or int(values["end_min"]) > 60:
-                errors["end"] = "Invalid end time."
+        try:
+            end_str = values["end_date"] + " " + values["end_hour"] + ":" + values["end_min"]
+            end = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            errors["end"] = "Invalid end date or time."
+            valid_datetime = False
 
-            start_date = values["start_date"].split("-")
-            start_year = int(start_date[0])
-            start_month = int(start_date[1])
-            start_day = int(start_date[2])
+        if valid_datetime:
 
-            end_date = values["end_date"].split("-")
-            end_year = int(end_date[0])
-            end_month = int(end_date[1])
-            end_day = int(end_date[2])
-
-            start = datetime(start_year, start_month, start_day, int(values["start_hour"]), int(values["start_min"]))
-            end = datetime(end_year, end_month, end_day, int(values["end_hour"]), int(values["end_min"]))
+            if start > end:
+                errors["end"] = "This event is finished before it starts!"
 
             limit_until = None
             limit_count = None
 
             if values["recurring"]:
 
-                if values["frequency"] == "":
+                if not values["frequency"]:
                     errors["frequency"] = "Select a frequency of recurrence."
                 if values["limit"] == "":
                     errors["limit"] = "Select when the event will end."
-                valid_frequency = (values["frequency"] == "daily"
-                        or values["frequency"] == "weekdays"
-                        or values["frequency"] == "weekly"
-                        or values["frequency"] == "monthly"
-                        or values["frequency"] == "yearly")
+                valid_frequency = (values["frequency"] == Recurrence.DAILY.value
+                        or values["frequency"] == Recurrence.WEEKDAYS.value
+                        or values["frequency"] == Recurrence.WEEKLY.value
+                        or values["frequency"] == Recurrence.MONTHLY.value
+                        or values["frequency"] == Recurrence.YEARLY.value)
 
-                valid_limit = (values["limit"] == "forever"
-                        or values["limit"] == "until"
-                        or values["limit"] == "count")
+                valid_limit = (values["limit"] == RecurrenceType.FOREVER.value
+                    or values["limit"] == RecurrenceType.UNTIL.value
+                    or values["limit"] == RecurrenceType.COUNT.value)
 
                 if not valid_frequency:
                     errors["frequency"] = "Invalid frequency of recurrence."
@@ -234,15 +227,10 @@ def update(room_id, update_type):
                     errors["limit"] = "Invalid recurrence limit."
 
                 if values["limit"] == "until":
-                    if not validate_date(values["limit_until"]):
+                    try:
+                        limit_until = datetime.strptime(values["limit_until"], "%Y-%m-%d")
+                    except ValueError:
                         errors["limit"] = "Invalid finishing date."
-                    else:
-                        until_date = values["limit_until"].split("-")
-                        until_year = int(until_date[0])
-                        until_month = int(until_date[1])
-                        until_day = int(until_date[2])
-
-                        limit_until = datetime(until_year, until_month, until_day)
 
                 elif values["limit"] == "count":
                     if values["limit_count"] == "":

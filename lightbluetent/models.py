@@ -49,6 +49,10 @@ class Recurrence(enum.Enum):
     MONTHLY = "monthly"
     YEARLY = "yearly"
 
+class RecurrenceType(enum.Enum):
+    FOREVER = "forever"
+    UNTIL = "until"
+    COUNT = "count"
 
 
 class LinkType(enum.Enum):

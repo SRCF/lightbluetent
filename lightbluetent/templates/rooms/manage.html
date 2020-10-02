@@ -260,19 +260,27 @@
                         <select class="custom-select {% if errors.frequency is defined %} is-invalid{% endif %}"
                                 id="recurrence_select" name="frequency">
                             <option {% if frequency is not defined %}selected{% endif %}>Choose...</option>
-                            <option {% if frequency == 'daily' %}selected{% endif %} value="daily">day</option>
-                            <option {% if frequency == 'weekdays' %}selected{% endif %} value="weekdays">weekday</option>
-                            <option {% if frequency == 'weekly' %}selected{% endif %} value="weekly">week</option>
-                            <option {% if frequency == 'monthly' %}selected{% endif %} value="monthly">month</option>
-                            <option {% if frequency == 'yearly' %}selected{% endif %} value="yearly">year</option>
+                            <option {% if frequency == recurrence.DAILY.value %}selected{% endif %}
+                                    value="{{ recurrence.DAILY.value }}">day</option>
+                            <option {% if frequency == recurrence.WEEKDAYS.value %}selected{% endif %}
+                                    value="{{ recurrence.WEEKDAYS.value }}">weekday</option>
+                            <option {% if frequency == recurrence.WEEKLY.value %}selected{% endif %}
+                                    value="{{ recurrence.WEEKLY.value }}">week</option>
+                            <option {% if frequency == recurrence.MONTHLY.value %}selected{% endif %}
+                                    value="{{ recurrence.MONTHLY.value }}">month</option>
+                            <option {% if frequency == recurrence.YEARLY.value %}selected{% endif %}
+                                    value="{{ recurrence.YEARLY.value }}">year</option>
                         </select>
                         <div class="input-group-append">
                             <select class="custom-select {% if errors.limit is defined %} is-invalid{% endif %}"
                                     id="limit_select" name="limit">
                                 <option {% if limit is not defined %}selected{% endif %}>Choose...</option>
-                                <option {% if limit == 'forever' %}selected{% endif %} value="forever">forever</option>
-                                <option {% if limit == 'until' %}selected{% endif %} value="until">until...</option>
-                                <option {% if limit == 'count' %}selected{% endif %} value="count">a certain number of times...</option>
+                                <option {% if limit == recurrence_type.FOREVER.value %}selected{% endif %}
+                                        value="{{ recurrence_type.FOREVER.value }}">forever</option>
+                                <option {% if limit == recurrence_type.UNTIL.value %}selected{% endif %}
+                                        value="{{ recurrence_type.UNTIL.value }}">until...</option>
+                                <option {% if limit == recurrence_type.COUNT.value %}selected{% endif %}
+                                        value="{{ recurrence_type.COUNT.value }}">a certain number of times...</option>
                             </select>
                         </div>
                         {%- if errors.frequency is defined %}

@@ -62,11 +62,9 @@ $('input[type="checkbox"]').click(function() {
 });
 
 /* Show the recurrence settings if they're selected on page load */
-if (document.getElementById("recurring_checkbox").checked) {
-    console.log("Is checked")
+if ($("#recurring_checkbox").is(":checked")) {
     $("#recurring_box").show();
 } else {
-    console.log("Is unchecked")
     $("#recurring_box").hide();
 }
 
