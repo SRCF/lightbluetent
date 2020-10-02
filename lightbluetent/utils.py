@@ -6,7 +6,7 @@ import requests
 from jinja2 import is_undefined
 from flask import render_template, current_app
 import traceback
-from lightbluetent.models import db
+from lightbluetent.models import db, Group, Asset
 from PIL import Image
 import math
 import re
@@ -171,21 +171,6 @@ def fetch_lookup_data(crsid):
     else:
         # something bad happened, don't prefill any fields
         return None
-
-def delete_logo(path):
-
-    images_dir = current_app.config["IMAGES_DIR"]
-
-    if not os.path.isdir(images_dir):
-        current_app.logger.info(f"'{ images_dir }':  no such directory.")
-        abort(500)
-
-    if not os.path.isfile(path):
-        current_app.logger.info(f"no logo to delete")
-        return
-
-    os.remove(path)
-    current_app.logger.info(f"Deleted logo '{ path }'")
 
 def get_form_values(request, keys):
     values = {}

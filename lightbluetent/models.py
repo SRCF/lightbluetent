@@ -78,9 +78,7 @@ class Group(db.Model):
     description = db.Column(db.String, unique=False, nullable=True)
     links = db.relationship("Link", backref="group", lazy=True)
 
-    logo = db.Column(
-        db.String, unique=False, nullable=False, default="default_group_logo.png"
-    )
+    logo = db.Column(db.String, db.ForeignKey('assets.key'), unique=False, nullable=True)
 
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

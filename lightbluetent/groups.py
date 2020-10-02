@@ -2,10 +2,10 @@ import re
 import os
 
 from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
-from lightbluetent.models import db, Group, User, Room, Authentication
+from lightbluetent.models import db, Group, User, Room, Authentication, Asset
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import path_sanitise, delete_logo, gen_unique_string, gen_room_id, get_form_values, resize_image
+from lightbluetent.utils import path_sanitise, gen_unique_string, gen_room_id, get_form_values, resize_image
 from flask_babel import _
 from datetime import datetime
 from PIL import Image, UnidentifiedImageError
@@ -27,9 +27,7 @@ def home(group_id):
     if group.description is not None:
         desc_paragraphs=group.description.split("\n")
 
-    has_logo = True
-    if group.logo == current_app.config["DEFAULT_GROUP_LOGO"]:
-        has_logo = False
+    has_logo = group.logo is not None
 
     return render_template("groups/home.html", page_title=f"{ group.name }",
                            group=group, desc_paragraphs=desc_paragraphs,
@@ -99,10 +97,11 @@ def update(group_id, update_type):
                     current_app.logger.info(
                         f"Saved new logo '{ path }' for group '{ group.id }'"
                     )
-                    group.logo = static_filename
-
-            else:
-                errors["logo"] = "Invalid file."
+                    key = f"logo:{group.id}"
+                    asset = Asset(key=key, path=static_filename)
+                    db.session.add(asset)
+                    group.logo = key
+                    db.session.commit()
 
         if not errors:
             group.name = values["name"]
@@ -227,6 +226,17 @@ def manage(group_id):
     )
 
 
+def delete_logo_variant(path):
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+        return False
+    if not os.path.isfile(path):
+        current_app.logger.info("no logo to delete")
+        return False
+
+    os.remove(path)
+    current_app.logger.info(f"Deleted logo '{ path }'")
+
 # Delete logo on disk for the group with given group_id
 def delete_logo(group_id):
     group = Group.query.filter_by(id=group_id).first()
@@ -234,24 +244,16 @@ def delete_logo(group_id):
     if not group:
         return False
 
-    if group.logo == current_app.config["DEFAULT_GROUP_LOGO"]:
+    if group.logo is None:
         return True
     else:
         images_dir = current_app.config["IMAGES_DIR"]
         current_app.logger.info(f"For id='{ group.id }': deleting logo...")
-        old_logo = os.path.join(images_dir, group.logo)
-
-        if not os.path.isdir(images_dir):
-            current_app.logger.info(f"'{ images_dir }':  no such directory.")
-            return False
-        if not os.path.isfile(old_logo):
-            current_app.logger.info("no logo to delete")
-            return False
-
-        os.remove(old_logo)
-        current_app.logger.info(f"Deleted logo '{ old_logo }'")
-
-        group.logo = current_app.config["DEFAULT_GROUP_LOGO"]
+        for asset in Asset.query.filter_by(key=group.logo):
+            old_logo = os.path.join(images_dir, asset.path)
+            delete_logo_variant(old_logo)
+            db.session.delete(asset)
+        group.logo = None
         db.session.commit()
         return True
 

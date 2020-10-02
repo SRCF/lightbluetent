@@ -17,7 +17,6 @@ from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
 from lightbluetent.utils import (
     gen_unique_string,
-    delete_logo,
     get_form_values,
     fetch_lookup_data,
     validate_room_alias
