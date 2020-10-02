@@ -11,6 +11,11 @@ from lightbluetent.models import db
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 short_name_re = re.compile(r"\w{1,12}")
 alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
+time_re = re.compile(r"\d{2}:\d{2}")
+
+
+def match_time(time):
+    return time_re.match(time)
 
 
 def table_exists(name):
@@ -25,6 +30,7 @@ def gen_unique_string():
 def gen_room_id(name):
     id = str(uuid.uuid4())
     return f"{name}-{id[:3]}-{id[3:6]}"
+
 
 # Based on https://github.com/SRCF/control-panel/blob/master/control/webapp/utils.py#L249.
 # Checks email is a valid email address and belongs to the currently authenticated crsid.
@@ -54,6 +60,7 @@ def validate_email(crsid, email):
 
 def validate_short_name(short_name):
     return short_name_re.match(short_name)
+
 
 def validate_room_alias(alias):
     return alias_re.match(alias)
@@ -141,20 +148,15 @@ def fetch_lookup_data(crsid):
         else:
             email = f"{crsid}@cam.ac.uk"
 
-        return {
-            "name": response["visibleName"],
-            "email": email
-        }
+        return {"name": response["visibleName"], "email": email}
     elif res.status_code == 401:
         # not authorized, we're outside of the cudn
         # feed us dummy data
-        return {
-            "email": "mug99@cam.ac.uk",
-            "name": "Testing Software"
-        }
+        return {"email": "mug99@cam.ac.uk", "name": "Testing Software"}
     else:
         # something bad happened, don't prefill any fields
         return None
+
 
 def delete_logo(path):
 
@@ -170,6 +172,7 @@ def delete_logo(path):
 
     os.remove(path)
     current_app.logger.info(f"Deleted logo '{ path }'")
+
 
 def get_form_values(request, keys):
     values = {}
