@@ -50,7 +50,7 @@ class User(db.Model):
         return perm in [p.name for p in self.role.permissions]
 
     def __repr__(self):
-        return f"User('{self.crsid}': '{self.full_name}', '{self.email}')"
+        return f"User({self.crsid!r}: {self.full_name!r}, {self.email!r})"
 
 
 class Group(db.Model):
@@ -86,7 +86,7 @@ class Group(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Group('{self.name}')"
+        return f"Group({self.name!r})"
 
 
 # Different levels of authentication for attendees joining a room
@@ -144,7 +144,7 @@ class Room(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Room(group: '{self.group}', name: '{self.name}')"
+        return f"Room(group: {self.group!r}, name: {self.name!r})"
 
 
 class Recurrence(enum.Enum):
@@ -173,7 +173,7 @@ class Session(db.Model):
     limit = db.Column(db.Enum(RecurrenceLimit), nullable=True)
 
     def __repr__(self):
-        return f"Session(group: '{self.group}', start: '{self.start}', end: '{self.end}', reccur: '{self.recur}', limit: '{self.limit}')"
+        return f"Session(group: {self.group!r}, start: {self.start!r}, end: {self.end!r}, reccur: {self.recur!r}, limit: {self.limit!r})"
 
 
 class LinkType(enum.Enum):
@@ -205,7 +205,7 @@ class Setting(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return f"Setting('{self.name}', '{self.enabled}')"
+        return f"Setting({self.name!r}, {self.enabled!r})"
 
 
 class Role(db.Model):
@@ -226,7 +226,7 @@ class Role(db.Model):
     users = db.relationship("User", backref="role", lazy=True)
 
     def __repr__(self):
-        return f"Role('{self.name}', '{self.description}')"
+        return f"Role({self.name!r}, {self.description!r})"
 
 
 class Permission(db.Model):
@@ -236,4 +236,4 @@ class Permission(db.Model):
     name = db.Column(db.Enum(PermissionType), unique=False, nullable=False)
 
     def __repr__(self):
-        return f"Permission('{self.name}')"
+        return f"Permission({self.name!r})"
