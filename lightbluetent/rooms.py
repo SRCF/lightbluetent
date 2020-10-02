@@ -13,7 +13,7 @@ from flask import (
 )
 from lightbluetent.models import db, User, Society
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time
+from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time, resize_image
 from PIL import Image, UnidentifiedImageError
 from flask_babel import _
 from datetime import time, datetime
@@ -185,21 +185,19 @@ def manage(uid):
                         )
                         abort(500)
 
-                    maxwidth, maxheight = current_app.config["MAX_LOGO_SIZE"]
-                    ratio = min(maxwidth / logo_img.width, maxheight / logo_img.height)
-                    # possible optimization with reduce here?
-                    logo_resized = logo_img.resize(
-                        (round(logo_img.width * ratio), round(logo_img.height * ratio))
-                    )
-                    logo_resized.save(path)
+                    try:
+                        _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
+                        img.save(path)
+                    except StopIteration:
+                        errors["logo"] = "Failed to resize image."
+                    else:
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': saved new logo '{ path }'"
+                        )
 
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': saved new logo '{ path }'"
-                    )
-
-                    society.logo = static_filename
-                    db.session.commit()
-                    current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
+                        society.logo = static_filename
+                        db.session.commit()
+                        current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
 
             if bbb_logo and bbb_logo_filename != "":
                 try:
@@ -224,18 +222,21 @@ def manage(uid):
                         )
                         abort(500)
 
-                    bbb_logo_resized = bbb_logo_img.resize((100, 30))
-                    bbb_logo_resized.save(path)
+                    try:
+                        _, img = next(resize_image(bbb_logo_img, (100,30), hidpi=[2,1]))
+                        img.save(path)
+                    except StopIteration:
+                        errors["bbb_logo"] = "Failed to resize image."
+                    else:
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
+                        )
 
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
-                    )
-
-                    society.bbb_logo = static_filename
-                    db.session.commit()
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': updated bbb_logo."
-                    )
+                        society.bbb_logo = static_filename
+                        db.session.commit()
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': updated bbb_logo."
+                        )
 
         # TODO: tweak these values when their ideal maximum lengths become apparent
         if len(values["welcome_text"]) > 100:
