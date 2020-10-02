@@ -6,6 +6,9 @@ from jinja2 import is_undefined
 from flask import render_template
 import traceback
 from lightbluetent.models import db
+import re
+import unicodedata
+import hashlib
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
 time_re = re.compile(r"\d{2}:\d{2}")
@@ -18,6 +21,23 @@ def table_exists(name):
 
 def gen_unique_string():
     return str(uuid.uuid4()).replace("-", "")
+
+
+def path_sanitise(unsafe, maintain_uniqueness=4, forbidden=r'[^a-zA-Z0-9_-]'):
+    """generate a string safe for use in filenames etc from unsafe;
+    if maintain_uniqueness is not False, then we append a hashed version
+    of unsafe to minimise risk of collision between, e.g.,
+      cafe
+    and
+      café
+    maintain_uniqueness should be the number of bytes of entropy to retain
+    """
+    normed = unicodedata.normalize('NFD', unsafe)
+    safe = re.sub(forbidden, '_', normed)
+    if maintain_uniqueness is not False:
+        hash_ = hashlib.sha256(unsafe.encode()).hexdigest()
+        safe += '_' + hash_[:int(2*maintain_uniqueness)]
+    return safe
 
 
 # Based on https://github.com/SRCF/control-panel/blob/master/control/webapp/utils.py#L249.
