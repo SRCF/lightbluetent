@@ -13,8 +13,8 @@ from flask import (
 )
 from lightbluetent.models import db, User, Society, Asset
 from lightbluetent.users import auth_decorator
-from lightbluetent.utils import gen_unique_string, match_social, get_social_by_id, match_time
-from PIL import Image
+from lightbluetent.utils import gen_unique_string, path_sanitise, match_social, get_social_by_id, match_time, resize_image
+from PIL import Image, UnidentifiedImageError
 from flask_babel import _
 from datetime import time, datetime
 from sqlalchemy.orm.attributes import flag_modified
@@ -163,13 +163,17 @@ def manage(uid):
             images_dir = current_app.config["IMAGES_DIR"]
 
             if logo and logo_filename != "":
-                if logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
-
+                try:
+                    logo_img = Image.open(logo)
+                except UnidentifiedImageError:
+                    errors["logo"] = "Invalid file."
+                else:
                     # Delete the old logo if it's not the default
                     delete_society_logo(uid)
 
+                    safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        society.uid + "_" + gen_unique_string() + logo_extension
+                        safe_uid + "_" + gen_unique_string() + logo_extension
                     )
                     path = os.path.join(images_dir, static_filename)
 
@@ -182,36 +186,35 @@ def manage(uid):
                         )
                         abort(500)
 
-                    maxwidth, maxheight = current_app.config["MAX_LOGO_SIZE"]
-                    logo_img = Image.open(logo)
-                    ratio = min(maxwidth / logo_img.width, maxheight / logo_img.height)
-                    # possible optimization with reduce here?
-                    logo_resized = logo_img.resize(
-                        (round(logo_img.width * ratio), round(logo_img.height * ratio))
-                    )
-                    logo_resized.save(path)
+                    try:
+                        _, img = next(resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"], hidpi=[2,1]))
+                        img.save(path)
+                    except StopIteration:
+                        errors["logo"] = "Failed to resize image."
+                    else:
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': saved new logo '{ path }'"
+                        )
 
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': saved new logo '{ path }'"
-                    )
-
-                    key = f"logo:{society.uid}"
-                    asset = Asset(key=key, path=static_filename)
-                    db.session.add(asset)
-                    society.logo = key
-                    db.session.commit()
-                    current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
-                else:
-                    errors["logo"] = "Invalid file."
+                        key = f"logo:{society.uid}"
+                        asset = Asset(key=key, path=static_filename)
+                        db.session.add(asset)
+                        society.logo = key
+                        db.session.commit()
+                        current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
 
             if bbb_logo and bbb_logo_filename != "":
-                if bbb_logo_extension in current_app.config["LOGO_ALLOWED_EXTENSIONS"]:
-
+                try:
+                    bbb_logo_img = Image.open(bbb_logo)
+                except UnidentifiedImageError:
+                    errors["bbb_logo"] = "Invalid file."
+                else:
                     # Delete the old logo if it's not the default
                     delete_society_bbb_logo(uid)
 
+                    safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        society.uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                        safe_uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
                     )
                     path = os.path.join(images_dir, static_filename)
 
@@ -224,24 +227,24 @@ def manage(uid):
                         )
                         abort(500)
 
-                    bbb_logo_img = Image.open(bbb_logo)
-                    bbb_logo_resized = bbb_logo_img.resize((100, 30))
-                    bbb_logo_resized.save(path)
+                    try:
+                        _, img = next(resize_image(bbb_logo_img, (100,30), hidpi=[2,1]))
+                        img.save(path)
+                    except StopIteration:
+                        errors["bbb_logo"] = "Failed to resize image."
+                    else:
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
+                        )
 
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': saved new bbb_logo to '{ path }'"
-                    )
-
-                    key = f"logo-bbb:{society.uid}"
-                    asset = Asset(key=key, path=static_filename)
-                    db.session.add(asset)
-                    society.bbb_logo = key
-                    db.session.commit()
-                    current_app.logger.info(
-                        f"For uid='{ society.uid }': updated bbb_logo."
-                    )
-                else:
-                    errors["bbb_logo"] = "Invalid file."
+                        key = f"logo-bbb:{society.uid}"
+                        asset = Asset(key=key, path=static_filename)
+                        db.session.add(asset)
+                        society.bbb_logo = key
+                        db.session.commit()
+                        current_app.logger.info(
+                            f"For uid='{ society.uid }': updated bbb_logo."
+                        )
 
         # TODO: tweak these values when their ideal maximum lengths become apparent
         if len(values["welcome_text"]) > 100:
