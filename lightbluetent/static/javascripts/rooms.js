@@ -33,23 +33,6 @@ $('#alias_checkbox').click(function () {
     if(!$(this).is(":checked")) aliasInput.val("")
 });
 
-/* Show the recurring options if they're selected on page load */
-var recurring_checkbox = document.getElementById("recurring_checkbox")
-if (recurring_checkbox.checked) {
-    $("#recurring_box").show();
-} else {
-    $("#recurring_box").hide();
-}
-
-/* Enable the alias input if selected on page load */
-var alias_checkbox = document.getElementById("alias_checkbox")
-var alias_input = document.getElementById("alias_input")
-if (alias_checkbox.checked) {
-    alias_input.disabled = false;
-} else {
-    alias_input.disabled = true;
-}
-
 /* Show the correct limit box on page load */
 $('.limit_option').hide();
 var value = $('#limit_select').val();
