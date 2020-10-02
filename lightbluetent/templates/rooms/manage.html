@@ -251,6 +251,7 @@
                         Recurring?
                     </label>
                 </div>
+                {% if recurring %}
                 <div id="recurring_box">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -273,28 +274,30 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="limit_option" id="limit_box_until">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Until</span>
-                        </div>
-                        <input type="date" id="limit_until" name="limit_until" placeholder="DD/MM/YYYY"
-                            class="form-control{% if errors.limit_until is defined %} is-invalid{% endif %}"
-                            value="{% if limit_until is not none %}{{ limit_until }}{% endif %}"
-                            pattern="\d{2}\/\d{2}\/d{4}">
-                    </div>
-                </div>
-                <div class="limit_option" id="limit_box_number">
-                    <div class="input-group">
-                        <input type="text" id="limit_number" name="limit_number" maxlength="2" pattern="\d{1,2}"
-                            class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
-                            value="{% if limit_number is not none %}{{ limit_number }}{% endif %}">
-                        <div class="input-group-append">
-                            <span class="input-group-text">times</span>
+                    <div class="limit_option" id="limit_box_until">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Until</span>
+                            </div>
+                            <input type="date" id="limit_until" name="limit_until" placeholder="DD/MM/YYYY"
+                                class="form-control{% if errors.limit_until is defined %} is-invalid{% endif %}"
+                                value="{% if limit_until is not none %}{{ limit_until }}{% endif %}"
+                                pattern="\d{2}\/\d{2}\/d{4}">
                         </div>
                     </div>
+                    <div class="limit_option" id="limit_box_number">
+                        <div class="input-group">
+                            <input type="text" id="limit_number" name="limit_number" maxlength="2" pattern="\d{1,2}"
+                                class="form-control{% if errors.begin is defined %} is-invalid{% endif %}"
+                                value="{% if limit_number is not none %}{{ limit_number }}{% endif %}">
+                            <div class="input-group-append">
+                                <span class="input-group-text">times</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                {% endif %}
+
             </article>
         </section>
         {{submit_button()}}
