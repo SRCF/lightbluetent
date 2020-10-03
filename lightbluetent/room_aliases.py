@@ -40,6 +40,7 @@ def home(room_id=None, room_alias=None):
         abort(404)
 
     group = Group.query.filter_by(id=room.group_id).first()
+    has_logo = group.logo is not None
 
     desc_paragraphs = {}
     # Split the description into paragraphs so it renders nicely.
@@ -61,7 +62,7 @@ def home(room_id=None, room_alias=None):
             flash("This meeting is no longer running.")
             return render_template("room_aliases/home.html", page_title=f"{ room.name }",
                 room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                running=running, errors=errors, **values)
+                has_logo=has_logo, running=running, errors=errors, **values)
 
         if len(values["name"]) <= 1:
                 errors["name"] = "That name is too short."
@@ -77,7 +78,7 @@ def home(room_id=None, room_alias=None):
             else:
                 return render_template("room_aliases/home.html", page_title=f"{ room.name }",
                     room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                    running=running, errors=errors, **values)
+                    has_logo=has_logo, running=running, errors=errors, **values)
 
         # Public room
         else:
@@ -88,7 +89,7 @@ def home(room_id=None, room_alias=None):
             else:
                 return render_template("room_aliases/home.html", page_title=f"{ room.name }",
                     room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-                    running=running, errors=errors, **values)
+                    has_logo=has_logo, running=running, errors=errors, **values)
 
 
     # If not authenticated
@@ -122,5 +123,5 @@ def home(room_id=None, room_alias=None):
 
     return render_template("room_aliases/home.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
         room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-        running=running, errors=errors)
+        has_logo=has_logo, running=running, errors=errors)
 
