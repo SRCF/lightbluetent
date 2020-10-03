@@ -1,10 +1,10 @@
 import os, subprocess, logging
 from flask import Flask
 from . import rooms, room_aliases, users, groups, admins, general
-from .flask_seasurf import SeaSurf
+from lightbluetent.flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-from .utils import gen_unique_string, ordinal, sif, page_not_found, server_error, table_exists
+from lightbluetent.utils import gen_unique_string, ordinal, sif, page_not_found, server_error, table_exists, responsive_image
 from lightbluetent.models import db, migrate, Setting, Role, Permission, User, Recurrence, RecurrenceType
 from lightbluetent.config import PermissionType, RoleType
 import click
@@ -51,6 +51,7 @@ def create_app(config_name=None):
     app.jinja_env.globals["permission_type"] = PermissionType
     app.jinja_env.globals["recurrence"] = Recurrence
     app.jinja_env.globals["recurrence_type"] = RecurrenceType
+    responsive_image.initialise_filters(app)
 
     db.init_app(app)
     migrate.init_app(app, db)

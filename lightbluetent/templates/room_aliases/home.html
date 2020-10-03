@@ -10,7 +10,9 @@
 <meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
+{% if group.logo is not none %}
 <meta property="og:image" content="{{ group.logo | responsive_image.main }}" />
+{% endif %}
 {% endblock %}
 
 {% block title %}
@@ -19,8 +21,10 @@
 
 {% block static %}
 <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+{% if group.logo is not none %}
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/svg">
+{% endif %}
 {% endblock %}
 
 {% block nav %}

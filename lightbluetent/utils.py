@@ -285,7 +285,7 @@ class responsive_image:
             if variant.variant is None:
                 main = path
                 main_res = float('inf')
-            elif (m := resp_re.match(variant.variant)) is not None:
+            elif (m := self.resp_re.match(variant.variant)) is not None:
                 v = m.group(1)
                 vf = float(v)
                 if (vf := float(v)) > main_res:
@@ -310,7 +310,7 @@ class responsive_image:
             attrs = Markup(attrs)
         return attrs
 
-    def css(self, prop='background-image'):
+    def css(self, raw=False, prop='background-image'):
         # not too widely supported, would be better to provide
         # tooling for generating appropriate media queries
 
@@ -326,12 +326,14 @@ class responsive_image:
             props = Markup(props)
         return props
 
-@current_app.template_filter('responsive_image.img')
-def responsive_image_filter_img(key):
-    return responsive_image(key).img_attr()
-@current_app.template_filter('responsive_image.css')
-def responsive_image_filter_css(key, prop='background-image'):
-    return responsive_image(key).css(prop)
-@current_app.template_filter('responsive_image.main')
-def responsive_image_filter_main(key):
-    return responsive_image(key).main
+    @classmethod
+    def initialise_filters(cls, app):
+        @app.template_filter('responsive_image.img')
+        def responsive_image_filter_img(key):
+            return cls(key).img_attr()
+        @app.template_filter('responsive_image.css')
+        def responsive_image_filter_css(key, prop='background-image'):
+            return cls(key).css(prop)
+        @app.template_filter('responsive_image.main')
+        def responsive_image_filter_main(key):
+            return cls(key).main
