@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
+{% import 'macros/StackedList.html' as StackedList %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 {% endblock %}
 
 {% macro social_field(n, placeholder="e.g. a social media URL", id=("social-"+gen_unique_string())) -%}
@@ -175,6 +178,7 @@
                         </div>
                     </div>
                 </div>
+                {{ StackedList.render("links-list")}}
                 <div class="form-group mt-3 float-right">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
                         class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>

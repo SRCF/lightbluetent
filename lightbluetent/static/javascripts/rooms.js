@@ -86,3 +86,6 @@ $('#limit_select').change(function() {
     }
 });
 
+let sortable = new Sortable($('#links-list'), {
+    handle: ".lbt-draggable"
+})

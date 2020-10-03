@@ -273,65 +273,65 @@ def resize_image(image, max_dimensions, *, preserve_aspect=True, grow=False, fil
         yield px_density, image.resize((out_width, out_height))
 
 
-class responsive_image:
-    resp_re = re.compile(r'^@([0-9]+(.[0-9]+)?)x$')
-    def __init__(self, key):
-        main_res = 0
-        main = None
-        variants = {}
-        for variant in Asset.query.filter_by(key=key):
-            path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], variant.path)
-            path = url_for('static', filename=path)
-            if variant.variant is None:
-                main = path
-                main_res = float('inf')
-            elif (m := resp_re.match(variant.variant)) is not None:
-                v = m.group(1)
-                vf = float(v)
-                if (vf := float(v)) > main_res:
-                    main_res = vf
-                    main = path
-                variants[v] = path
-            else:
-                # should we warn/throw an error?
-                pass
-        self.main = main
-        self.variants = variants
+# class responsive_image:
+#     resp_re = re.compile(r'^@([0-9]+(.[0-9]+)?)x$')
+#     def __init__(self, key):
+#         main_res = 0
+#         main = None
+#         variants = {}
+#         for variant in Asset.query.filter_by(key=key):
+#             path = os.path.join(current_app.config["IMAGES_DIR_FROM_STATIC"], variant.path)
+#             path = url_for('static', filename=path)
+#             if variant.variant is None:
+#                 main = path
+#                 main_res = float('inf')
+#             elif (m := resp_re.match(variant.variant)) is not None:
+#                 v = m.group(1)
+#                 vf = float(v)
+#                 if (vf := float(v)) > main_res:
+#                     main_res = vf
+#                     main = path
+#                 variants[v] = path
+#             else:
+#                 # should we warn/throw an error?
+#                 pass
+#         self.main = main
+#         self.variants = variants
 
-    def img_attr(self, raw=False):
-        srcset = []
-        for res, url in self.variants.items():
-            srcset.append(f"{url} {res}x")
-        srcset = ", ".join(srcset)
-        if srcset:
-            srcset = f" srcset=\"{srcset}\""
-        attrs = f"src=\"{self.main}\"" + srcset
-        if not raw:
-            attrs = Markup(attrs)
-        return attrs
+#     def img_attr(self, raw=False):
+#         srcset = []
+#         for res, url in self.variants.items():
+#             srcset.append(f"{url} {res}x")
+#         srcset = ", ".join(srcset)
+#         if srcset:
+#             srcset = f" srcset=\"{srcset}\""
+#         attrs = f"src=\"{self.main}\"" + srcset
+#         if not raw:
+#             attrs = Markup(attrs)
+#         return attrs
 
-    def css(self, prop='background-image'):
-        # not too widely supported, would be better to provide
-        # tooling for generating appropriate media queries
+#     def css(self, prop='background-image'):
+#         # not too widely supported, would be better to provide
+#         # tooling for generating appropriate media queries
 
-        srcset = []
-        for res, url in self.variants.items():
-            srcset.append(f"url({url}) {res}x")
-        srcset = ", ".join(srcset)
-        props = f"{prop}:url({self.main});"
-        if srcset:
-            props += f"{prop}:-webkit-image-set({srcset});"
-            props += f"{prop}:image-set({srcset});"
-        if not raw:
-            props = Markup(props)
-        return props
+#         srcset = []
+#         for res, url in self.variants.items():
+#             srcset.append(f"url({url}) {res}x")
+#         srcset = ", ".join(srcset)
+#         props = f"{prop}:url({self.main});"
+#         if srcset:
+#             props += f"{prop}:-webkit-image-set({srcset});"
+#             props += f"{prop}:image-set({srcset});"
+#         if not raw:
+#             props = Markup(props)
+#         return props
 
-@current_app.template_filter('responsive_image.img')
-def responsive_image_filter_img(key):
-    return responsive_image(key).img_attr()
-@current_app.template_filter('responsive_image.css')
-def responsive_image_filter_css(key, prop='background-image'):
-    return responsive_image(key).css(prop)
-@current_app.template_filter('responsive_image.main')
-def responsive_image_filter_main(key):
-    return responsive_image(key).main
+# @current_app.template_filter('responsive_image.img')
+# def responsive_image_filter_img(key):
+#     return responsive_image(key).img_attr()
+# @current_app.template_filter('responsive_image.css')
+# def responsive_image_filter_css(key, prop='background-image'):
+#     return responsive_image(key).css(prop)
+# @current_app.template_filter('responsive_image.main')
+# def responsive_image_filter_main(key):
+#     return responsive_image(key).main
