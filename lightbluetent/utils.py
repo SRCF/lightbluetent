@@ -1,7 +1,6 @@
 import os
 import uuid
 import re
-import os
 import sys
 import requests
 from jinja2 import is_undefined, Markup
@@ -10,7 +9,6 @@ import traceback
 from lightbluetent.models import db, Asset, LinkType
 from PIL import Image
 import math
-import re
 import unicodedata
 import hashlib
 
@@ -19,7 +17,7 @@ short_name_re = re.compile(r"\w{1,12}")
 alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
 time_re = re.compile(r"\d{2}:\d{2}")
 date_re = re.compile(r"\d{4}-\d{2}-\d{2}")
-link_name_re = re.compile(r"^[a-zA-Z0-9 ]{0,40}$")
+link_name_re = re.compile(r"^[a-zA-Z0-9 ()!?.,-]{0,40}$")
 
 
 def match_time(time):
@@ -113,13 +111,13 @@ def get_form_values(request, keys):
 def match_link(value):
     if re.search(email_re, value):
         return LinkType.EMAIL
-    elif any(match in value for match in ["facebook.", "fb.me", "fb.com"]):
+    elif any(match in value.lower() for match in ["facebook.", "fb.me", "fb.com"]):
         return LinkType.FACEBOOK
-    elif any(match in value for match in ["twitter.", "t.co", "fb.com"]):
+    elif any(match in value.lower() for match in ["twitter.", "t.co", "fb.com"]):
         return LinkType.TWITTER
-    elif "instagram." in value:
+    elif "instagram." in value.lower():
         return LinkType.INSTAGRAM
-    elif any(match in value for match in ["youtube.", "youtu.be"]):
+    elif any(match in value.lower() for match in ["youtube.", "youtu.be"]):
         return LinkType.YOUTUBE
     else:
         return LinkType.OTHER

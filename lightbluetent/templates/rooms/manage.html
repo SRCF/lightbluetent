@@ -13,6 +13,23 @@
 </div>
 {%- endmacro %}
 
+{% block heading %}
+<nav class="d-flex justify-content-between align-items-center">
+{%- if page_title is defined %}
+<h2>
+    {%- if page_parent is defined %}
+    <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+    {%- endif %}
+    {{ page_title }}
+    {%- if page_subtitle is defined %}
+    <small class="text-muted">{{ page_subtitle }}</small>
+    {%- endif %}
+</h2>
+{%- endif %}
+<a class="btn btn-info" href="{{ url_for("room_aliases.home", room_id=room.id) }}">Preview</a>
+</nav>
+{% endblock %}
+
 {% block body %}
 
 <nav class="my-4">

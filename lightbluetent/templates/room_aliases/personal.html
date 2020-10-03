@@ -38,9 +38,17 @@
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
+                {% if room.links %}
+                <ul class="mb-0 lbt-icon-ul">
+                    {% for link in room.links %}
+                    {{ LinkList.match_link(link) }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 <div class="row no-gutters overflow-hidden">
-                    <div class="col-sm px-4 mt-3 mt-sm-0">
+                    <div class="col px-4 mt-3 mt-sm-0">
                         {% if room.description %}
+                        <hr>
                         <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}

@@ -5,6 +5,6 @@
 {% block body %}
 
 <p>{{ _("Welcome to the SRCF's platform for events. For event organisers, this website allows you to host a custom web page that connects to our <a href=\"https://timeout.srcf.net\">free video conferencing service, Timeout</a>.") }}</p>
-  <a href="{{ url_for('users.register') }}" class="btn btn-lg btn-outline-primary"><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Log in with Raven") }}</a>
+  <a href="{{ url_for('users.register') }}" class="btn btn-lg btn-outline-success"><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Log in with Raven") }}</a>
 
 {% endblock %}

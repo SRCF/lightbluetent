@@ -45,6 +45,13 @@
             <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
                 <div class="row no-gutters overflow-hidden">
+                    {% if group.logo is not none %}
+                    <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
+                        style="width:100%;max-width:150px;max-height:150px;">
+                        <img class="img-fluid rounded" style="max-height:100%" {{ group.logo | responsive_image.img }} 
+                            alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
+                    </div>
+                    {% endif %}
                     <div class="col-sm px-4 mt-3 mt-sm-0">
                         {% if room.description %}
                         <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>

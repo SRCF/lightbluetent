@@ -170,6 +170,7 @@ def update(room_id, update_type):
                     errors[f"{link.id}-name"] = "Choose a shorter link name"
                 elif not match_link_name(name_field):
                     errors[f"{link.id}-name"] = "You must use valid characters"
+                    current_app.logger.info(f"Failed to validate link name: {name_field}")
 
                 if not errors:
                     link.url = url_field
