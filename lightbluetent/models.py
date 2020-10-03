@@ -72,6 +72,7 @@ class Link(db.Model):
     room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
     name = db.Column(db.String, nullable=True)
     url = db.Column(db.String, nullable=True)
+    display_order = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
 
     def __repr__(self):
@@ -98,7 +99,6 @@ class Room(db.Model):
     )  # For user-owned rooms
     sessions = db.relationship("Session", backref="room", lazy=True)
     links = db.relationship("Link", backref="room", lazy=True)
-    links_order = db.Column(db.String, unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
 
     welcome_text = db.Column(db.String, unique=False, nullable=True)

@@ -1,8 +1,8 @@
 """First migration
 
-Revision ID: b9f807f35e93
+Revision ID: 8e94eac89fda
 Revises: 
-Create Date: 2020-10-03 16:42:54.781992
+Create Date: 2020-10-03 17:54:24.164593
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b9f807f35e93'
+revision = '8e94eac89fda'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -79,7 +79,6 @@ def upgrade():
     sa.Column('alias', sa.String(length=100), nullable=True),
     sa.Column('group_id', sa.String(length=12), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('links_order', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('welcome_text', sa.String(), nullable=True),
     sa.Column('banner_text', sa.String(), nullable=True),
@@ -112,6 +111,7 @@ def upgrade():
     sa.Column('room_id', sa.String(length=16), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('url', sa.String(), nullable=True),
+    sa.Column('display_order', sa.Integer(), nullable=False),
     sa.Column('type', sa.Enum('EMAIL', 'FACEBOOK', 'TWITTER', 'INSTAGRAM', 'YOUTUBE', 'OTHER', name='linktype'), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
     sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
