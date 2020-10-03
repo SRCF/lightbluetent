@@ -132,7 +132,7 @@ ul.traceback li {
     animation: red-pulse 1300ms infinite;
 }
 
-.lbt-site-setting :not(:last-child) {
+.lbt-site-setting > :not(:last-child) {
     border-bottom: 1px solid #dee2e6;
 }
 

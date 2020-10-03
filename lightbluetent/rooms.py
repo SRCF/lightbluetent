@@ -123,7 +123,7 @@ def update(room_id, update_type):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
     if room.group_id:
-        parent_page = url_for("groups.manage", group_id=room.group.id)
+        parent_page = url_for("groups.rooms", group_id=room.group.id)
         group_id = room.group_id
         group = Group.query.filter_by(id=room.group_id).first()
         if group not in user.groups:
@@ -423,7 +423,7 @@ def manage(room_id):
         return redirect(url_for("users.register"))
 
     if room.group_id:
-        parent_page = url_for("groups.manage", group_id=room.group.id)
+        parent_page = url_for("groups.rooms", group_id=room.group.id)
         group_id = room.group_id
         group = Group.query.filter_by(id=room.group_id).first()
         if group not in user.groups:

@@ -4,22 +4,25 @@ import enum
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+
 class PermissionType(enum.Enum):
-    CAN_VIEW_ADMIN_PAGE = "can_view_admin_page"                 # Admins
-    CAN_MANAGE_ALL_GROUPS = "can_manage_all_groups"             # Admins
-    CAN_MANAGE_ALL_ROOMS = "can_manage_all_rooms"               # Admins
-    CAN_START_ALL_ROOMS = "can_start_all_rooms"                 # Admins
-    CAN_DELETE_ALL_ROOMS = "can_delete_all_rooms"               # Admins
-    CAN_CREATE_OWN_ROOMS = "can_create_own_rooms"               # Users
-    CAN_DELETE_OWN_ROOMS = "can_delete_own_rooms"               # Users
-    CAN_MANAGE_OWN_ROOMS = "can_manage_own_rooms"               # Users
-    CAN_START_OWN_ROOMS = "can_start_rooms"                     # Users
-    CAN_JOIN_WHITELISTED_ROOMS = "can_join_whitelisted_rooms"   # Visitors
+    CAN_VIEW_ADMIN_PAGE = "can_view_admin_page"  # Admins
+    CAN_MANAGE_ALL_GROUPS = "can_manage_all_groups"  # Admins
+    CAN_MANAGE_ALL_ROOMS = "can_manage_all_rooms"  # Admins
+    CAN_START_ALL_ROOMS = "can_start_all_rooms"  # Admins
+    CAN_DELETE_ALL_ROOMS = "can_delete_all_rooms"  # Admins
+    CAN_CREATE_OWN_ROOMS = "can_create_own_rooms"  # Users
+    CAN_DELETE_OWN_ROOMS = "can_delete_own_rooms"  # Users
+    CAN_MANAGE_OWN_ROOMS = "can_manage_own_rooms"  # Users
+    CAN_START_OWN_ROOMS = "can_start_rooms"  # Users
+    CAN_JOIN_WHITELISTED_ROOMS = "can_join_whitelisted_rooms"  # Visitors
+
 
 class RoleType(enum.Enum):
     VISITOR = "visitor"
     USER = "user"
     ADMINISTRATOR = "administrator"
+
 
 class Config(object):
     """Base configuration"""
@@ -53,14 +56,11 @@ class Config(object):
     # getting the URL of the bbb_logo to pass to BBB.
     IMAGES_DIR_FROM_STATIC = "images"
 
-
     # defines the default roles that come with the app
     # a role has permissions associated with it
     ROLES_INFO = []
 
-    visitor_permissions = [
-        PermissionType.CAN_JOIN_WHITELISTED_ROOMS
-    ]
+    visitor_permissions = [PermissionType.CAN_JOIN_WHITELISTED_ROOMS]
 
     ROLES_INFO.append(
         {
@@ -74,7 +74,7 @@ class Config(object):
         PermissionType.CAN_CREATE_OWN_ROOMS,
         PermissionType.CAN_DELETE_OWN_ROOMS,
         PermissionType.CAN_MANAGE_OWN_ROOMS,
-        PermissionType.CAN_START_OWN_ROOMS
+        PermissionType.CAN_START_OWN_ROOMS,
     ]
 
     ROLES_INFO.append(
@@ -90,7 +90,7 @@ class Config(object):
         PermissionType.CAN_MANAGE_ALL_GROUPS,
         PermissionType.CAN_MANAGE_ALL_ROOMS,
         PermissionType.CAN_START_ALL_ROOMS,
-        PermissionType.CAN_DELETE_ALL_ROOMS
+        PermissionType.CAN_DELETE_ALL_ROOMS,
     ]
 
     ROLES_INFO.append(
@@ -113,10 +113,23 @@ class Config(object):
     )
     SITE_SETTINGS.append(
         {
+            "name": "enable_room_viewing",
+            "enabled": os.getenv("ENABLE_PERSONAL_ROOM_VIEWING", True),
+        }
+    ) 
+    SITE_SETTINGS.append(
+        {
             "name": "enable_group_creation",
             "enabled": os.getenv("ENABLE_GROUP_CREATION", True),
         }
     )
+    SITE_SETTINGS.append(
+        {
+            "name": "enable_group_room_creation",
+            "enabled": os.getenv("ENABLE_GROUP_ROOM_CREATION", True),
+        }
+    )
+   
 
 
 class ProductionConfig(Config):

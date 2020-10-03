@@ -27,7 +27,7 @@
     {%- endif %}
 </h2>
 {%- endif %}
-<a class="btn btn-info" href="{{ url_for("room_aliases.home", room_id=room.id) }}">Preview</a>
+<a class="btn btn-secondary" href="{{ url_for("room_aliases.home", room_id=room.id) }}">View page</a>
 </nav>
 {% endblock %}
 
@@ -72,7 +72,7 @@
                         </div>
                         <input type="text" id="alias_input" name="alias"
                             class="form-control{% if errors.alias is defined %} is-invalid{% endif %}"
-                            value="{% if alias %}{{ alias }}{% endif %}" {% if not alias %}disabled{% endif %}>
+                            value="{{alias if alias}}" {% if not alias %}disabled{% endif %}>
                         {%- if errors.alias is defined %}
                         <small class="text-danger">{{ errors.alias }}</small>
                         {%- endif %}

@@ -1,0 +1,39 @@
+{% macro render(room) -%}
+<div class="card my-3">
+    <div class="card-body">
+        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ room.name }} <small
+                class="text-muted">{{ room.id }}</small>
+        </h4>
+        <ul class="lbt-icon-ul">
+            <li>
+                <i class="fa fa-link lbt-icon-li" title="Room URL"></i>
+                <a href="{{ url_for('room_aliases.home', room_id=room.id) }}">
+                    {{ url_for('room_aliases.home', room_id=room.id, _external=True) }}</a>
+            </li>
+            <li>
+                {% if room.authentication.value == "raven" %}
+                <i class="fa fa-address-book lbt-icon-li"></i>
+                <span> Uses Raven</span>
+                {% elif room.authentication.value == "password" %}
+                <i class="fa fa-key lbt-icon-li"></i>
+                <span>Password-protected</span>
+                {% elif room.authentication.value == "whitelist" %}
+                <i class="fa fa-user-plus lbt-icon-li"></i>
+                <span> Has a whitelist</span>
+                {% else %}
+                <i class="fa fa-globe lbt-icon-li"></i>
+                <span> Public</span>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-primary mr-1"><i
+                class="fa fa-home"></i> Room page</a>
+        <a href="{{ url_for('rooms.begin', room_id=room.id) }}" class="btn btn-info mr-1"><i
+                class="fa fa-play"></i> {{ _("Start room") }}</a>
+        <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-secondary"><i
+                class="fa fa-cog"></i> {{ _("Room settings") }}</a>
+    </div>
+</div>
+{%- endmacro %}

@@ -47,7 +47,6 @@ def home():
     return render_template(
         "users/home.html",
         page_title="Home",
-        settings=Setting.query.all(),
         user=user
     )
 

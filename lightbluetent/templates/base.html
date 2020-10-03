@@ -8,8 +8,7 @@
     {% block meta %}
     <meta property="og:title" content="{{ _("SRCF Events") }}" />
     <meta property="og:type" content="website" />
-    <meta property="og:description"
-        content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+    <meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
     <meta property="og:url" content="{{ request.base_url }}" />
     <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
     {% endblock %}
@@ -35,8 +34,10 @@
     {% include 'shared/header.html' %}
     {% endblock %}
 
+    {% include 'shared/flashes.html' %}
+
     <main role="main" class="flex-shrink-0">
-        <div class="container my-4">
+        <div class="container my-3">
             {% block heading %}
             {%- if page_title is defined %}
             <h2>
@@ -51,38 +52,7 @@
             {%- endif %}
             {% endblock %}
 
-            {% with messages = get_flashed_messages(category_filter=["error"]) %}
-            {% for message in messages %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-            {% endwith %}
 
-            {% with messages = get_flashed_messages(category_filter=["success"]) %}
-            {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-            {% endwith %}
-
-            {% with messages = get_flashed_messages(category_filter=["message"]) %}
-            {% for message in messages %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
-            {% endwith %}
             {% block body %}{% endblock %}
         </div>
     </main>

@@ -3,7 +3,6 @@ from flask import (
     render_template,
     request,
     flash,
-    session,
     url_for,
     redirect,
     abort,
@@ -17,6 +16,7 @@ from lightbluetent.config import PermissionType
 
 
 bp = Blueprint("admins", __name__, url_prefix="/admin")
+
 
 @auth_decorator
 @bp.route("/", methods=("GET", "POST"))
@@ -32,9 +32,8 @@ def manage():
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",
-            settings=Setting.query.all(),
             groups=Group.query.all(),
-            user=user
+            user=user,
         )
     else:
         abort(404)
@@ -42,22 +41,21 @@ def manage():
 
 @bp.route("/update_setting", methods=["POST"])
 def update_setting():
-    if request.method == "POST":
-        setting = request.get_json(force=True)
-        db_setting = Setting.query.filter_by(name=setting["name"]).first()
-        if db_setting:
-            db_setting.enabled = setting["enabled"]
-            db_setting.updated_at = datetime.now()
-            db.session.commit()
-            flash("Site setting updated successfully", 'success')
-        else:
-            flash("Error occurred when finding entry in database", 'error')
-        return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
+    setting = request.get_json(force=True)
+    db_setting = Setting.query.filter_by(name=setting["name"]).first()
+    if db_setting:
+        db_setting.enabled = setting["enabled"]
+        db_setting.updated_at = datetime.now()
+        db.session.commit()
+        flash("Site setting updated successfully", "success")
+    else:
+        flash("Error occurred when finding entry in database", "error")
+    return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
+
 
 @bp.route("/update_setting_error", methods=["POST"])
 def update_setting_error():
-    if request.method == "POST":
-        error = request.get_json(force=True)
-        if error["code"]:
-            flash("Site setting was not updated successfully", 'error')
+    error = request.get_json(force=True)
+    if error["code"]:
+        flash("Site setting was not updated successfully", "error")
     return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
