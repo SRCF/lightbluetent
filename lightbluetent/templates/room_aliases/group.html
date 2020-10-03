@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% import 'rooms/macros/LinkList.html' as LinkList %}
+
+{% block meta %}
+<meta property="og:title"
+    content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
+<meta property="og:type" content="website" />
+{% if room.description %}
+<meta property="og:description" content="{{ room.description | truncate(200) }}" />
+{% else %}
+<meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+{% endif %}
+<meta property="og:url" content="{{ request.base_url }}" />
+{% if group.logo is not none %}
+<meta property="og:image" content="{{ group.logo | responsive_image.main }}" />
+{% endif %}
+{% endblock %}
+
+{% block title %}
+<title>{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}</title>
+{% endblock %}
+
+{% block static %}
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+{% if group.logo is not none %}
+<link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+<link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/svg">
+{% endif %}
+{% endblock %}
+
+{% block nav %}
+<header></header>
+{% endblock %}
+
+{% block heading %}
+<div></div>
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-lg">
+        <div class="card my-3 shadow-sm">
+            <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
+            <div class="card-body">
+                <div class="row no-gutters overflow-hidden">
+                    <div class="col-sm px-4 mt-3 mt-sm-0">
+                        {% if room.description %}
+                        <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
+                        <div class="card-text mb-auto">
+                            {% for paragraph in desc_paragraphs %}
+                            {% if loop.index == desc_paragraphs | length %}
+                            <!-- This is the last paragraph -->
+                            <p class="mb-0">{{ paragraph }}</p>
+                            {% else %}
+                            <p>{{ paragraph }}</p>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg">
+        <div class="card my-3 shadow-sm">
+            <h5 class="card-header">Session times</h5>
+            <div class="card-body">
+                <h6 class="card-title text-muted">Join the live session</h6>
+
+                <form method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+                    {% if room.authentication.value == "public" %}
+
+                    <div class="form-group">
+                        <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                            name="name" id="name" placeholder="Enter your name..."
+                            {% if not running %}disabled{% endif %}>{{ name }}</input>
+                        {%- if errors.name is defined %}
+                        <small class="invalid-feedback">{{ errors.name }}</small>
+                        {%- endif %}
+                    </div>
+
+                    <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
+
+                    {% elif room.authentication.value == "raven" %}
+
+                    {% if user is none %}
+                    <p>You must sign in to join this event.</p>
+                    <a href="{{ url_for('general.log_in_and_redirect_to_room', room_id=room.id) }}"
+                        class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Sign in with Raven") }}</a>
+                    {% else %}
+                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
+                    {% endif %}
+
+                    {% elif room.authentication.value == "password" %}
+
+                    <div class="form-group">
+                        <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
+                            name="name" id="name" placeholder="Enter your name..."
+                            {% if not running %}disabled{% endif %}>
+                        {%- if errors.name is defined %}
+                        <small class="invalid-feedback">{{ errors.name }}</small>
+                        {%- endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password"
+                            class="form-control {% if errors.password is defined %} is-invalid{% endif %}"
+                            name="password" id="password" placeholder="Room password"
+                            {% if not running %}disabled{% endif %}>
+                        {%- if errors.password is defined %}
+                        <small class="invalid-feedback">{{ errors.password }}</small>
+                        {%- endif %}
+                    </div>
+
+                    <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
+
+                    {% else %}
+                    <!-- Whitelist -->
+
+                    {% if user is none or user not in room.whitelisted_users %}
+
+                    <p>You do not have permission to join this event.</p>
+
+                    {% else %}
+
+                    <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+                        {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join") }}</a>
+
+                    {% endif %}
+
+
+                    {% endif %}
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
