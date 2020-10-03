@@ -87,23 +87,25 @@ def update(group_id, update_type):
                         )
                     abort(500)
 
-                try:
-                    key = f"logo:{group.id}"
-                    for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
-                        variant = f"@{dpi}x"
-                        subpath = static_filename(variant)
-                        path = os.path.join(images_dir, subpath)
-                        img.save(path)
+                key = f"logo:{group.id}"
+                success = False
 
-                        variant = Asset(key=key, variant=variant, path=static_filename)
-                        db.session.add(variant)
-                        current_app.logger.info(
-                            f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
-                        )
-                    else:
-                        raise StopIteration
-                except StopIteration:
+                for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                    variant = f"@{dpi}x"
+                    subpath = static_filename(variant)
+                    path = os.path.join(images_dir, subpath)
+                    img.save(path)
+
+                    variant = Asset(key=key, variant=variant, path=subpath)
+                    db.session.add(variant)
+                    current_app.logger.info(
+                        f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
+                    )
+                    success = True
+
+                if not success:
                     errors["logo"] = "Failed to resize image."
+
                 else:
                     current_app.logger.info(
                         f"Saved new logo for group '{ group.id }'"
