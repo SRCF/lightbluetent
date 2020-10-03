@@ -153,12 +153,6 @@ class Room(db.Model):
             out[link.display_order] = str(link.id)
         return "|".join(out)
 
-    def get_link_by_id(self, id):
-        # since we do lazy=True, we can't query the SQL obj
-        for link in self.links:
-            if link.id == id:
-                return link
-        return None
 
     def preserve_display_order(self):
         sorted_links = (
@@ -222,6 +216,39 @@ class Group(db.Model):
 
     def __repr__(self):
         return f"Group({self.name!r})"
+
+    def get_display_order(self):
+        out = [0] * len(self.links)
+        for link in self.links:
+            out[link.display_order] = str(link.id)
+        return "|".join(out)
+
+    def preserve_display_order(self):
+        sorted_links = (
+            Link.query.filter_by(group_id=self.id)
+            .order_by(Link.display_order.asc())
+            .all()
+        )
+        for order, link in enumerate(sorted_links):
+            link.display_order = order
+        return sorted_links
+
+    def get_next_link(self):
+        # have we already created an empty link?
+        # add default for when self.links is empty
+        next_link = next((link for link in self.links if not link.url), False)
+        # if not, let's create one
+        if next_link:
+            return next_link
+        else:
+            # make sure that we preserve link order
+            sorted_links = self.preserve_display_order()
+            next_order = sorted_links[-1].display_order + 1 if sorted_links else 0
+            new_link = Link(display_order=next_order)
+            self.links.append(new_link)
+            db.session.commit()
+            current_app.logger.info(f"Created empty link: {new_link}")
+            return new_link
 
 
 class Session(db.Model):

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% import 'rooms/macros/LinkList.html' as LinkList %}
+{% import 'groups/macros/LinkList.html' as LinkList %}
 
 {% block meta %}
 <meta property="og:title"
@@ -14,6 +14,8 @@
 <meta property="og:url" content="{{ request.base_url }}" />
 {% if group.logo is not none %}
 <meta property="og:image" content="{{ group.logo | responsive_image.main }}" />
+{% else %}
+<meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}" />
 {% endif %}
 {% endblock %}
 
@@ -26,6 +28,9 @@
 {% if group.logo is not none %}
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/svg">
+{% else %}
+<link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
+<link href="{{ url_for('static', filename='favicon.svg') }}" rel="icon" type="image/svg">
 {% endif %}
 {% endblock %}
 

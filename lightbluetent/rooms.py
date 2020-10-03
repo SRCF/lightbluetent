@@ -8,7 +8,18 @@ from flask import (
     url_for,
     current_app,
 )
-from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, RecurrenceType, Session, Link
+from lightbluetent.models import (
+    db,
+    User,
+    Group,
+    Room,
+    Authentication,
+    Role,
+    Recurrence,
+    RecurrenceType,
+    Session,
+    Link,
+)
 from lightbluetent.config import RoleType
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
@@ -18,13 +29,14 @@ from lightbluetent.utils import (
     fetch_lookup_data,
     validate_room_alias,
     match_link,
-    match_link_name
+    match_link_name,
 )
 from flask_babel import _
 from datetime import datetime
 import json
 
 bp = Blueprint("rooms", __name__, url_prefix="/r")
+
 
 @bp.route("/<room_id>/begin", methods=("GET", "POST"))
 def begin(room_id):
@@ -54,7 +66,9 @@ def begin(room_id):
         if user.id != room.user_id:
             abort(403)
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        current_app.logger.error(
+            f"Room { room.name } has neither a group_id nor a user_id."
+        )
         abort(500)
 
     lookup_data = fetch_lookup_data(crsid)
@@ -66,13 +80,20 @@ def begin(room_id):
     if not running:
 
         if room.alias:
-            join_url = url_for("room_aliases.home", room_alias=room.alias, _external=True)
+            join_url = url_for(
+                "room_aliases.home", room_alias=room.alias, _external=True
+            )
         else:
             join_url = url_for("room_aliases.home", id=room.id, _external=True)
-        moderator_msg = _("To invite others to this event, share your room link: %(join_url)s", join_url=join_url)
+        moderator_msg = _(
+            "To invite others to this event, share your room link: %(join_url)s",
+            join_url=join_url,
+        )
 
         success, message = meeting.create(moderator_msg)
-        current_app.logger.info(f"User '{ full_name }' with CRSid '{ crsid }' created room '{ room.name }', meetingID: '{ room.id }'")
+        current_app.logger.info(
+            f"User '{ full_name }' with CRSid '{ crsid }' created room '{ room.name }', meetingID: '{ room.id }'"
+        )
 
         if success:
             url = meeting.moderator_url(full_name)
@@ -80,11 +101,14 @@ def begin(room_id):
         else:
             # For some reason the meeting wasn't created.
             current_app.logger.error(f"Creation of stall failed: { message }")
-            flash(f"The meeting could not be created. Please contact an administrator at support@srcf.net and include the following: { message }")
+            flash(
+                f"The meeting could not be created. Please contact an administrator at support@srcf.net and include the following: { message }"
+            )
 
     else:
         url = meeting.moderator_url(full_name)
         return redirect(url)
+
 
 @bp.route("/<room_id>/update/<update_type>", methods=["POST"])
 @auth_decorator
@@ -114,11 +138,18 @@ def update(room_id, update_type):
 
     if update_type == "room_details":
 
-        keys = ("name", "authentication", "password", "whitelist", "alias", "description")
-        values = get_form_values(request, keys)     
+        keys = (
+            "name",
+            "authentication",
+            "password",
+            "whitelist",
+            "alias",
+            "description",
+        )
+        values = get_form_values(request, keys)
 
         for key in ("alias_checked",):
-            values[key] = bool(request.form.get(key, False))  
+            values[key] = bool(request.form.get(key, False))
 
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
@@ -169,7 +200,9 @@ def update(room_id, update_type):
                     errors[f"{link.id}-name"] = "Choose a shorter link name"
                 elif not match_link_name(name_field):
                     errors[f"{link.id}-name"] = "You must use valid characters"
-                    current_app.logger.info(f"Failed to validate link name: {name_field}")
+                    current_app.logger.info(
+                        f"Failed to validate link name: {name_field}"
+                    )
 
                 if not errors:
                     link.url = url_field
@@ -194,7 +227,18 @@ def update(room_id, update_type):
 
     elif update_type == "room_times":
 
-        keys = ("start_date", "start_hour", "start_min", "end_date", "end_hour", "end_min", "frequency", "limit", "limit_count", "limit_until")
+        keys = (
+            "start_date",
+            "start_hour",
+            "start_min",
+            "end_date",
+            "end_hour",
+            "end_min",
+            "frequency",
+            "limit",
+            "limit_count",
+            "limit_until",
+        )
         values = get_form_values(request, keys)
 
         for key in ("recurring",):
@@ -202,14 +246,22 @@ def update(room_id, update_type):
 
         valid_datetime = True
         try:
-            start_str = values["start_date"] + " " + values["start_hour"] + ":" + values["start_min"]
+            start_str = (
+                values["start_date"]
+                + " "
+                + values["start_hour"]
+                + ":"
+                + values["start_min"]
+            )
             start = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
         except ValueError:
             errors["start"] = "Invalid start date or time."
             valid_datetime = False
 
         try:
-            end_str = values["end_date"] + " " + values["end_hour"] + ":" + values["end_min"]
+            end_str = (
+                values["end_date"] + " " + values["end_hour"] + ":" + values["end_min"]
+            )
             end = datetime.strptime(end_str, "%Y-%m-%d %H:%M")
         except ValueError:
             errors["end"] = "Invalid end date or time."
@@ -229,13 +281,17 @@ def update(room_id, update_type):
                     errors["frequency"] = "Select a frequency of recurrence."
                 if values["limit"] == "":
                     errors["limit"] = "Select when the event will end."
-                valid_frequency = (values["frequency"] == Recurrence.DAILY.value
-                        or values["frequency"] == Recurrence.WEEKDAYS.value
-                        or values["frequency"] == Recurrence.WEEKLY.value)
+                valid_frequency = (
+                    values["frequency"] == Recurrence.DAILY.value
+                    or values["frequency"] == Recurrence.WEEKDAYS.value
+                    or values["frequency"] == Recurrence.WEEKLY.value
+                )
 
-                valid_limit = (values["limit"] == RecurrenceType.FOREVER.value
+                valid_limit = (
+                    values["limit"] == RecurrenceType.FOREVER.value
                     or values["limit"] == RecurrenceType.UNTIL.value
-                    or values["limit"] == RecurrenceType.COUNT.value)
+                    or values["limit"] == RecurrenceType.COUNT.value
+                )
 
                 if not valid_frequency:
                     errors["frequency"] = "Invalid frequency of recurrence."
@@ -244,23 +300,24 @@ def update(room_id, update_type):
 
                 if values["limit"] == "until":
                     try:
-                        limit_until = datetime.strptime(values["limit_until"], "%Y-%m-%d")
+                        limit_until = datetime.strptime(
+                            values["limit_until"], "%Y-%m-%d"
+                        )
                     except ValueError:
                         errors["limit"] = "Invalid finishing date."
 
                 elif values["limit"] == "count":
                     if values["limit_count"] == "":
-                        errors["limit_count"] == "You must specify when the recurrence finishes."
+                        errors[
+                            "limit_count"
+                        ] == "You must specify when the recurrence finishes."
                     else:
                         limit_count = values["limit_count"]
 
         if not errors:
             if not values["recurring"]:
                 session = Session(
-                    room_id=room.id,
-                    start=start,
-                    end=end,
-                    recur=Recurrence.NONE,
+                    room_id=room.id, start=start, end=end, recur=Recurrence.NONE,
                 )
             else:
                 if limit_until:
@@ -269,7 +326,7 @@ def update(room_id, update_type):
                         start=start,
                         end=end,
                         recur=Recurrence(values["frequency"]),
-                        until=limit_until
+                        until=limit_until,
                     )
                 elif limit_count:
                     session = Session(
@@ -277,7 +334,7 @@ def update(room_id, update_type):
                         start=start,
                         end=end,
                         recur=Recurrence(values["frequency"]),
-                        count=limit_count
+                        count=limit_count,
                     )
                 else:
                     session = Session(
@@ -289,11 +346,10 @@ def update(room_id, update_type):
 
             db.session.add(session)
 
-
     elif update_type == "room_features":
 
         keys = ("welcome_text", "banner_text", "banner_color")
-        values = get_form_values(request, keys)        
+        values = get_form_values(request, keys)
 
         for key in ("mute_on_start", "disable_private_chat"):
             values[key] = bool(request.form.get(key, False))
@@ -304,8 +360,12 @@ def update(room_id, update_type):
             errors["banner_text"] = "Banner text is too long."
 
         if not errors:
-            room.welcome_text = values["welcome_text"] if values["welcome_text"] != "" else None
-            room.banner_text = values["banner_text"] if values["banner_text"] != "" else None
+            room.welcome_text = (
+                values["welcome_text"] if values["welcome_text"] != "" else None
+            )
+            room.banner_text = (
+                values["banner_text"] if values["banner_text"] != "" else None
+            )
             room.banner_color = values["banner_color"]
 
             room.mute_on_start = values["mute_on_start"]
@@ -314,7 +374,9 @@ def update(room_id, update_type):
     elif update_type == "links_order":
         links_order = request.get_json(force=True)
         for index, val in enumerate(links_order["order"]):
-            room.get_link_by_id(int(val)).display_order = index
+            Link.query.filter_by(room_id=room.id).filter_by(
+                id=int(val)
+            ).first().display_order = index
         db.session.commit()
         return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 
@@ -334,14 +396,13 @@ def update(room_id, update_type):
             errors=errors,
             page_parent=parent_page,
             now=datetime.now(),
-            **values
+            **values,
         )
     else:
         room.updated_at = datetime.now()
         db.session.commit()
         flash("Settings saved.", "success")
         return redirect(url_for("rooms.manage", room_id=room.id))
-
 
 
 @bp.route("/<room_id>/manage", methods=["GET"])
@@ -389,7 +450,7 @@ def manage(room_id):
         "end_date": None,
         "end_hour": None,
         "end_min": None,
-        "recurring": False
+        "recurring": False,
     }
 
     return render_template(
@@ -434,9 +495,10 @@ def new_password(room_id):
         if user.id != room.user_id:
             abort(403)
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        current_app.logger.error(
+            f"Room { room.name } has neither a group_id nor a user_id."
+        )
         abort(500)
-
 
     new_pw = gen_unique_string()[0:6]
 
@@ -444,6 +506,7 @@ def new_password(room_id):
     db.session.commit()
 
     return redirect(url_for("rooms.manage", id=room.id))
+
 
 @bp.route("/<room_id>/unwhitelist/<crsid_to_remove>")
 @auth_decorator
@@ -474,9 +537,10 @@ def unwhitelist(room_id, crsid_to_remove):
         if user.id != room.user_id:
             abort(403)
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        current_app.logger.error(
+            f"Room { room.name } has neither a group_id nor a user_id."
+        )
         abort(500)
-
 
     user_to_remove = User.query.filter_by(crsid=crsid_to_remove).first()
 
@@ -520,7 +584,9 @@ def delete_session(id):
         if user.id != room.user_id:
             abort(403)
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        current_app.logger.error(
+            f"Room { room.name } has neither a group_id nor a user_id."
+        )
         abort(500)
 
     db.session.delete(session)
@@ -538,7 +604,6 @@ def delete_session(id):
 def delete(room_id):
 
     room = Room.query.filter_by(id=room_id).first()
-
 
     if not room:
         abort(404)
@@ -563,17 +628,15 @@ def delete(room_id):
         if user.id != room.user_id:
             abort(403)
     else:
-        current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
+        current_app.logger.error(
+            f"Room { room.name } has neither a group_id nor a user_id."
+        )
         abort(500)
-
 
     db.session.delete(room)
     db.session.commit()
 
-    current_app.logger.info(
-        f"User { crsid } deleted room with id = '{ room.id }'"
-    )
+    current_app.logger.info(f"User { crsid } deleted room with id = '{ room.id }'")
 
     return redirect(url_for("groups.manage", group_id=group.id))
-
 

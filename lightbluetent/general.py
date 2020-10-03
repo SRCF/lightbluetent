@@ -13,6 +13,9 @@ def index():
     # Check whether the directory page is enabled
     has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
 
+    if auth_decorator.principal:
+        return redirect(url_for("users.home"))
+
     if has_directory_page:
         groups = Group.query.all()
 
