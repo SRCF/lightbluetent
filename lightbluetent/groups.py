@@ -90,7 +90,7 @@ def rooms_create(group_id):
 
     errors = {}
     keys = ("room_name",)
-    values = get_form_values(keys)
+    values = get_form_values(request, keys)
 
     if len(values["room_name"]) <= 1:
         errors["room_name"] = "That name is too short."

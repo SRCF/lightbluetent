@@ -1,0 +1,19 @@
+{% import 'macros/flash.html' as flash %}
+
+{% with messages = get_flashed_messages(category_filter=["error"]) %}
+{% for message in messages %}
+{{ flash.render("danger", message) }}
+{% endfor %}
+{% endwith %}
+
+{% with messages = get_flashed_messages(category_filter=["success"]) %}
+{% for message in messages %}
+{{ flash.render("success", message) }}
+{% endfor %}
+{% endwith %}
+
+{% with messages = get_flashed_messages(category_filter=["message"]) %}
+{% for message in messages %}
+{{ flash.render("info", message) }}
+{% endfor %}
+{% endwith %}
