@@ -55,6 +55,8 @@ Verbs:
   stop     stop a daemon
   restart  restart a daemon (= stop start)
   scrap    flush all related docker and db state
+  reset    wipe the entire database but keep schema
+  db       open a bash session in the db container
   rebuild  rebuild in case of schema changes (= scrap build)
 
   up       (= rebuild tail)
