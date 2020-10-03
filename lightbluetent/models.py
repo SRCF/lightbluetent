@@ -1,11 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 from flask_migrate import Migrate
 from datetime import datetime
 from lightbluetent.config import PermissionType, RoleType
+from flask import current_app
 import enum
 
 db = SQLAlchemy()
 migrate = Migrate()
+
 
 # Association table between users and groups.
 user_group = db.Table(
@@ -40,16 +43,19 @@ class Authentication(enum.Enum):
     PASSWORD = "password"
     WHITELIST = "whitelist"
 
+
 class Recurrence(enum.Enum):
     NONE = "none"
     DAILY = "daily"
     WEEKDAYS = "weekdays"
     WEEKLY = "weekly"
 
+
 class RecurrenceType(enum.Enum):
     FOREVER = "forever"
     UNTIL = "until"
     COUNT = "count"
+
 
 class LinkType(enum.Enum):
     EMAIL = "email"
@@ -59,14 +65,20 @@ class LinkType(enum.Enum):
     YOUTUBE = "youtube"
     OTHER = "other"
 
+
 class Link(db.Model):
     __tablename__ = "links"
 
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
     room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
-    url = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=True)
+    url = db.Column(db.String, nullable=True)
+    display_order = db.Column(db.Integer, nullable=False)
     type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
+
+    def __repr__(self):
+        return f"Link(room: {self.room!r}, name: {self.name!r}, url: {self.url!r})"
 
 
 class Room(db.Model):
@@ -117,6 +129,40 @@ class Room(db.Model):
 
     def __repr__(self):
         return f"Room(group: {self.group!r}, name: {self.name!r})"
+
+    def get_next_link(self):
+        # have we already created an empty link?
+        # add default for when self.links is empty
+        next_link = next((link for link in self.links if not link.url), False)
+        # if not, let's create one
+        if next_link:
+            return next_link
+        else:
+            # make sure that we preserve link order
+            sorted_links = self.preserve_display_order()
+            next_order = sorted_links[-1].display_order + 1 if sorted_links else 0
+            new_link = Link(display_order=next_order)
+            self.links.append(new_link)
+            db.session.commit()
+            current_app.logger.info(f"Created empty link: {new_link}")
+            return new_link
+
+    def get_display_order(self):
+        out = [0] * len(self.links)
+        for link in self.links:
+            out[link.display_order] = str(link.id)
+        return "|".join(out)
+
+
+    def preserve_display_order(self):
+        sorted_links = (
+            Link.query.filter_by(room_id=self.id)
+            .order_by(Link.display_order.asc())
+            .all()
+        )
+        for order, link in enumerate(sorted_links):
+            link.display_order = order
+        return sorted_links
 
 
 class User(db.Model):
@@ -170,6 +216,39 @@ class Group(db.Model):
 
     def __repr__(self):
         return f"Group({self.name!r})"
+
+    def get_display_order(self):
+        out = [0] * len(self.links)
+        for link in self.links:
+            out[link.display_order] = str(link.id)
+        return "|".join(out)
+
+    def preserve_display_order(self):
+        sorted_links = (
+            Link.query.filter_by(group_id=self.id)
+            .order_by(Link.display_order.asc())
+            .all()
+        )
+        for order, link in enumerate(sorted_links):
+            link.display_order = order
+        return sorted_links
+
+    def get_next_link(self):
+        # have we already created an empty link?
+        # add default for when self.links is empty
+        next_link = next((link for link in self.links if not link.url), False)
+        # if not, let's create one
+        if next_link:
+            return next_link
+        else:
+            # make sure that we preserve link order
+            sorted_links = self.preserve_display_order()
+            next_order = sorted_links[-1].display_order + 1 if sorted_links else 0
+            new_link = Link(display_order=next_order)
+            self.links.append(new_link)
+            db.session.commit()
+            current_app.logger.info(f"Created empty link: {new_link}")
+            return new_link
 
 
 class Session(db.Model):
@@ -256,3 +335,30 @@ class Asset(db.Model):
         if self.variant is None:
             return f"Asset({self.key!r}: {self.path!r})"
         return f"Asset({self.key!r}/{self.variant!r}: {self.path!r})"
+
+
+# @event.listens_for(Link, "after_insert")
+# @event.listens_for(Link, "after_delete")
+# def preserve_display_order(mapper, conn, target):
+#     sorted_links = None
+#     link_table = Link.__table__
+#     if target.group:
+#         sorted_links = (
+#             Link.query.filter_by(group_id=target.group.id)
+#             .order_by(Link.display_order.asc())
+#             .all()
+#         )
+#     elif target.room:
+#         sorted_links = (
+#             Link.query.filter_by(room_id=target.room.id)
+#             .order_by(Link.display_order.asc())
+#             .all()
+#         )
+#     for order, link in enumerate(sorted_links):
+#         link.display_order = order
+#     conn.execute(
+#         link_table.update().
+#         where(link_table.c.id==target.id).
+
+#     )
+

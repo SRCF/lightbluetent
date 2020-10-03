@@ -1,11 +1,29 @@
 import re
 import os
+import json
 
-from flask import Blueprint, render_template, request, flash, abort, redirect, url_for, current_app
-from lightbluetent.models import db, Group, User, Room, Authentication, Asset
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    flash,
+    abort,
+    redirect,
+    url_for,
+    current_app,
+)
+from lightbluetent.models import db, Group, User, Room, Authentication, Asset, Link
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
-from lightbluetent.utils import path_sanitise, gen_unique_string, gen_room_id, get_form_values, resize_image
+from lightbluetent.utils import (
+    path_sanitise,
+    gen_unique_string,
+    gen_room_id,
+    get_form_values,
+    resize_image,
+    match_link,
+    match_link_name,
+)
 from flask_babel import _
 from datetime import datetime
 from PIL import Image, UnidentifiedImageError
@@ -13,6 +31,7 @@ from PIL import Image, UnidentifiedImageError
 bp = Blueprint("groups", __name__, url_prefix="/g")
 
 email_re = re.compile(r"^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$")
+
 
 @bp.route("/<group_id>")
 def home(group_id):
@@ -25,10 +44,15 @@ def home(group_id):
     desc_paragraphs = {}
     # Split the description into paragraphs so it renders nicely.
     if group.description is not None:
-        desc_paragraphs=group.description.split("\n")
+        desc_paragraphs = group.description.split("\n")
 
-    return render_template("groups/home.html", page_title=f"{ group.name }",
-                           group=group, desc_paragraphs=desc_paragraphs, errors={})
+    return render_template(
+        "groups/home.html",
+        page_title=f"{ group.name }",
+        group=group,
+        desc_paragraphs=desc_paragraphs,
+        errors={},
+    )
 
 
 @auth_decorator
@@ -56,7 +80,7 @@ def update(group_id, update_type):
             logo = request.files["logo"]
             filename, extension = os.path.splitext(logo.filename)
 
-            has_valid_name = (filename != "")
+            has_valid_name = filename != ""
 
             try:
                 assert filename != ""
@@ -79,15 +103,15 @@ def update(group_id, update_type):
                 )
 
                 if not os.path.isdir(images_dir):
-                    current_app.logger.error(
-                        f"'{ images_dir }': no such directory."
-                        )
+                    current_app.logger.error(f"'{ images_dir }': no such directory.")
                     abort(500)
 
                 key = f"logo:{group.id}"
                 success = False
 
-                for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                for dpi, img in resize_image(
+                    logo_img, current_app.config["MAX_LOGO_SIZE"]
+                ):
                     variant = f"@{dpi}x"
                     subpath = static_filename(variant)
                     path = os.path.join(images_dir, subpath)
@@ -104,16 +128,44 @@ def update(group_id, update_type):
                     errors["logo"] = "Failed to resize image."
 
                 else:
-                    current_app.logger.info(
-                        f"Saved new logo for group '{ group.id }'"
-                    )
+                    current_app.logger.info(f"Saved new logo for group '{ group.id }'")
                     group.logo = key
                     db.session.commit()
 
+        for link in group.links:
+            url_field = request.form.get(f"{link.id}-url", "").strip()
+            name_field = request.form.get(f"{link.id}-name", "").strip()
+            # this means the link has been filled by the user
+            if url_field != "":
+                # validate name
+                if len(name_field) > 40:
+                    errors[f"{link.id}-name"] = "Choose a shorter link name"
+                elif not match_link_name(name_field):
+                    errors[f"{link.id}-name"] = "You must use valid characters"
+                    current_app.logger.info(
+                        f"Failed to validate link name: {name_field}"
+                    )
+
+                if not errors:
+                    link.url = url_field
+                    link.name = name_field
+                    link.type = match_link(link.url)
+                    if link in db.session.dirty:
+                        current_app.logger.info(f"Updated link: {link}")
+
+            else:
+                # has the field been filled before?
+                # ie, the user wants to delete it
+                if link.url is not None:
+                    db.session.delete(link)
+                    group.preserve_display_order()
+                    current_app.logger.info(f"Deleted link: {link}")
+
         if not errors:
             group.name = values["name"]
-            group.description = values["description"] if values["description"] != "" else None
-
+            group.description = (
+                values["description"] if values["description"] != "" else None
+            )
 
     elif update_type == "group_events":
 
@@ -131,7 +183,7 @@ def update(group_id, update_type):
                 page_parent=url_for("users.home"),
                 page_title=f"Settings for { group.name }",
                 errors=errors,
-                **values
+                **values,
             )
 
         else:
@@ -145,15 +197,16 @@ def update(group_id, update_type):
                 moderator_pw=gen_unique_string(),
                 authentication=Authentication.PUBLIC,
                 password=gen_unique_string()[0:6],
-                whitelisted_users=group.owners
+                whitelisted_users=group.owners,
             )
 
             db.session.add(room)
             db.session.commit()
             user.groups.append(group)
-            current_app.logger.info(f"User { crsid } created room {values['room_name']}")
+            current_app.logger.info(
+                f"User { crsid } created room {values['room_name']}"
+            )
             return redirect(url_for("groups.manage", group_id=group.id))
-
 
     elif update_type == "advanced_settings":
 
@@ -172,8 +225,17 @@ def update(group_id, update_type):
                     f"New owner '{ new_owner.full_name }' added to group '{ group.id }'."
                 )
             else:
-                errors["new_owner_crsid"] = "That user is not registered yet. Users must register before being added as owners."
-
+                errors[
+                    "new_owner_crsid"
+                ] = "That user is not registered yet. Users must register before being added as owners."
+    elif update_type == "links_order":
+        links_order = request.get_json(force=True)
+        for index, val in enumerate(links_order["order"]):
+            Link.query.filter_by(group_id=group.id).filter_by(
+                id=int(val)
+            ).first().display_order = index
+        db.session.commit()
+        return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
     else:
         current_app.logger.error(
             f"Attempted to update room page at incorrect endpoint: {update_type}"
@@ -188,7 +250,7 @@ def update(group_id, update_type):
             user=user,
             errors=errors,
             page_parent=url_for("users.home"),
-            **values
+            **values,
         )
 
     else:
@@ -229,7 +291,7 @@ def manage(group_id):
         page_parent=url_for("users.home"),
         page_title=f"Settings for { group.name }",
         errors={},
-        **values
+        **values,
     )
 
 
@@ -240,6 +302,7 @@ def delete_logo_variant(path):
 
     os.remove(path)
     current_app.logger.info(f"Deleted logo '{ path }'")
+
 
 # Delete logo on disk for the group with given group_id
 def delete_logo(group_id):
@@ -254,7 +317,7 @@ def delete_logo(group_id):
 
     if group.logo is None:
         return True
-    
+
     current_app.logger.info(f"For id='{ group.id }': deleting logo...")
     for asset in Asset.query.filter_by(key=group.logo):
         old_logo = os.path.join(images_dir, asset.path)
@@ -263,6 +326,7 @@ def delete_logo(group_id):
     group.logo = None
     db.session.commit()
     return True
+
 
 @bp.route("/<group_id>/delete_logo")
 @auth_decorator
@@ -372,14 +436,25 @@ def begin_session(uid):
             errors["full_name"] = "That name is too short."
 
         if errors:
-            return render_template("groups/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("users.home"), errors=errors)
+            return render_template(
+                "groups/begin_session.html",
+                page_title=page_title,
+                user=user,
+                running=running,
+                page_parent=url_for("users.home"),
+                errors=errors,
+            )
 
         if not running:
             join_url = url_for("groups.welcome", uid=group.uid, _external=True)
-            moderator_only_message = _("To invite others into this session, share your stall link: %(join_url)s", join_url=join_url)
+            moderator_only_message = _(
+                "To invite others into this session, share your stall link: %(join_url)s",
+                join_url=join_url,
+            )
             success, message = meeting.create(moderator_only_message)
-            current_app.logger.info(f"Moderator '{ full_name }' with CRSid '{ crsid }' created stall for '{ group.name }', bbb_id: '{ group.bbb_id }'")
+            current_app.logger.info(
+                f"Moderator '{ full_name }' with CRSid '{ crsid }' created stall for '{ group.name }', bbb_id: '{ group.bbb_id }'"
+            )
 
             if success:
                 url = meeting.moderator_url(full_name)
@@ -387,12 +462,23 @@ def begin_session(uid):
             else:
                 # For some reason the meeting wasn't created.
                 current_app.logger.error(f"Creation of stall failed: { message }")
-                flash(f"The session could not be created. Please contact an administrator at support@srcf.net and include the following: { message }")
+                flash(
+                    f"The session could not be created. Please contact an administrator at support@srcf.net and include the following: { message }"
+                )
 
         else:
             url = meeting.moderator_url(full_name)
-            current_app.logger.info(f"Moderator '{ full_name }' with CRSid '{ crsid }' joined stall for '{ group.name }', bbb_id: '{ group.bbb_id }'")
+            current_app.logger.info(
+                f"Moderator '{ full_name }' with CRSid '{ crsid }' joined stall for '{ group.name }', bbb_id: '{ group.bbb_id }'"
+            )
             return redirect(url)
 
-    return render_template("groups/begin_session.html", page_title=page_title,
-                           user=user, running=running, page_parent=url_for("users.home"), errors={})
+    return render_template(
+        "groups/begin_session.html",
+        page_title=page_title,
+        user=user,
+        running=running,
+        page_parent=url_for("users.home"),
+        errors={},
+    )
+

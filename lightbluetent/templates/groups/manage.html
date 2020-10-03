@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
+{% import 'groups/macros/LinkList.html' as LinkList %}
+
 {% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/Sortable.min.js') }}"></script>
 <script src="{{ url_for('static', filename='javascripts/groups.js') }}"></script>
 {% endblock %}
 
@@ -9,6 +12,23 @@
     <input type="submit" class="btn btn-primary" value="Update">
 </div>
 {%- endmacro %}
+
+{% block heading %}
+<nav class="d-flex justify-content-between align-items-center">
+{%- if page_title is defined %}
+<h2>
+    {%- if page_parent is defined %}
+    <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+    {%- endif %}
+    {{ page_title }}
+    {%- if page_subtitle is defined %}
+    <small class="text-muted">{{ page_subtitle }}</small>
+    {%- endif %}
+</h2>
+{%- endif %}
+<a class="btn btn-info" href="{{ url_for("groups.home", group_id=group.id) }}">Preview</a>
+</nav>
+{% endblock %}
 
 {% block body %}
 
@@ -43,7 +63,7 @@
                 </div>
                 <div class="form-group">
                     <label for="description">{{ _("Group description") }}</label>
-                    <textarea id="description" name="description" rows=10
+                    <textarea id="description" name="description" rows=5
                         class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ description }}{% endif %}</textarea>
                     {%- if errors.description is defined %}
                     <small class="invalid-feedback">{{ errors.description }}</small>
@@ -51,6 +71,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
+                {% if group.logo is not none %}
                 <div class="form-group">
                     <div class="mx-auto d-flex align-items-center justify-content-center"
                         style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
@@ -58,6 +79,7 @@
                             {{ group.logo | responsive_image.img }} alt="Logo" />
                     </div>
                 </div>
+                {% endif %}
                 <div class="form-group">
                     <label for="logo">Logo</label>
                     <input type="file" id="logo" name="logo"
@@ -75,6 +97,12 @@
                 </div>
             </div>
         </div>
+        <section class="row">
+            <article class="col mb-3">
+                <h5>Group links</h5>
+                {{ LinkList.render("links-list", group, errors)}}
+            </article>
+        </section>
         {{ submit_button() }}
     </form>
 

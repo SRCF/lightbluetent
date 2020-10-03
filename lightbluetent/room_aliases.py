@@ -120,7 +120,12 @@ def home(room_id=None, room_alias=None):
     else:
         raven_join_url = None
 
-    return render_template("room_aliases/home.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
-        room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
-        running=running, errors=errors)
+    if room.group:
+        return render_template("room_aliases/group.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
+            room=room, group=group, user=user, desc_paragraphs=desc_paragraphs,
+            running=running, errors=errors)
+    else:
+        return render_template("room_aliases/personal.html", page_title=f"{ room.name }", raven_join_url=raven_join_url,
+            room=room, user=user, desc_paragraphs=desc_paragraphs,
+            running=running, errors=errors)        
 

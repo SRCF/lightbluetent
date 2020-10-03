@@ -1,16 +1,14 @@
 import os
 import uuid
 import re
-import os
 import sys
 import requests
 from jinja2 import is_undefined, Markup
 from flask import render_template, url_for, current_app
 import traceback
-from lightbluetent.models import db, Asset
+from lightbluetent.models import db, Asset, LinkType
 from PIL import Image
 import math
-import re
 import unicodedata
 import hashlib
 
@@ -19,6 +17,7 @@ short_name_re = re.compile(r"\w{1,12}")
 alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
 time_re = re.compile(r"\d{2}:\d{2}")
 date_re = re.compile(r"\d{4}-\d{2}-\d{2}")
+link_name_re = re.compile(r"^[a-zA-Z0-9 ()!?.,-]{0,40}$")
 
 
 def match_time(time):
@@ -28,6 +27,10 @@ def match_time(time):
 def table_exists(name):
     ret = db.engine.dialect.has_table(db.engine, name)
     return ret
+
+
+def match_link_name(name):
+    return link_name_re.match(name)
 
 
 def gen_unique_string():
@@ -105,19 +108,19 @@ def get_form_values(request, keys):
 
 
 # write an enum for this?
-def match_social(value):
+def match_link(value):
     if re.search(email_re, value):
-        return "email"
-    elif any(match in value for match in ["facebook.", "fb.me", "fb.com"]):
-        return "facebook"
-    elif any(match in value for match in ["twitter.", "t.co", "fb.com"]):
-        return "twitter"
-    elif "instagram." in value:
-        return "instagram"
-    elif any(match in value for match in ["youtube.", "youtu.be"]):
-        return "youtube"
+        return LinkType.EMAIL
+    elif any(match in value.lower() for match in ["facebook.", "fb.me", "fb.com"]):
+        return LinkType.FACEBOOK
+    elif any(match in value.lower() for match in ["twitter.", "t.co", "fb.com"]):
+        return LinkType.TWITTER
+    elif "instagram." in value.lower():
+        return LinkType.INSTAGRAM
+    elif any(match in value.lower() for match in ["youtube.", "youtu.be"]):
+        return LinkType.YOUTUBE
     else:
-        return "link"
+        return LinkType.OTHER
 
 
 def get_social_by_id(id, socials):

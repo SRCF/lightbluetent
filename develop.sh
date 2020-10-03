@@ -20,6 +20,13 @@ stop() {
   docker-compose -p development -f docker/development.yml down
 }
 
+reset(){(
+  docker volume rm development_pgdata
+  docker-compose -p development -f docker/development.yml up -d
+  pipenv run -- flask db upgrade
+  docker-compose -p development -f docker/development.yml stop
+)}
+
 stop_() {
   stop >/dev/null 2>&1
 }
@@ -30,6 +37,10 @@ start() {
 
 tail() {
   docker-compose -p development -f docker/development.yml up
+}
+
+db() {
+    docker exec -i development_db_1 bash
 }
 
 help() {
@@ -68,6 +79,8 @@ for verb in "$@"; do
     scrap) stop_; scrap;;
     start) stop_; start;;
     restart) stop_; start;;
+    reset) stop_; reset;;
+    db) db;;
     stop) stop;;
     tail) stop_; tail;;
     build) stop_; build;;

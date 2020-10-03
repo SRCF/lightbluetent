@@ -1,0 +1,77 @@
+{% macro render(id, room, errors={}) %}
+<ul id="{{id}}" class="list-group" data-links-order="{{ room.get_display_order() }}"
+    data-path="{{ url_for("rooms.update", room_id=room.id, update_type="links_order")}}" data-csrf="{{csrf_token()}}">
+    {% set next_link = room.get_next_link() %}
+    {% for link in room.links %}
+    {{ render_link(link, errors)}}
+    {% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro render_link(link, errors) %}
+<li class="list-group-item d-flex align-items-center" data-id="{{link.id}}">
+    <i class="fa fa-fw fa-bars lbt-draggable mr-3"></i>
+    <article class="flex-grow-1">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Link address</span>
+            </div>
+            <input type="text" id="{{link.id}}-url" name="{{link.id}}-url"
+                class="form-control {% if errors[link.id ~ '-url'] %}is-invalid{% endif %}"
+                placeholder="eg. https://www.srcf.net" value="{{link.url if link.url}}">
+            {%- if errors[link.id ~ '-url'] %}
+            <small class="invalid-feedback">{{ errors[link.id ~ '-url'] }}</small>
+            {%- endif %}
+        </div>
+        <div class="input-group mb-1">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Link name</span>
+            </div>
+            <input type="text" id="{{link.id}}-name" name="{{link.id}}-name"
+                class="form-control {% if errors[link.id ~ '-name'] %}is-invalid{% endif %}"
+                placeholder="This is an Awesome Project!" value="{{link.name if link.name}}">
+            {% if errors[link.id ~ '-name'] %}
+            <small class="invalid-feedback">{{ errors[link.id ~ '-name'] }}</small>
+            {% endif %}
+        </div>
+        <small class="text-muted">Optionally add a link name that will be displayed</small>
+    </article>
+</li>
+{% endmacro %}
+
+{% macro match_link(link) -%}
+<!-- catch unfilled links -->
+{% if link.url %}
+<li>
+    {% if link.type == link_type.EMAIL %}
+    <!-- Email address -->
+    <i class="fa lbt-icon-li fa-envelope" title="Link {{link.id}}"></i>
+    {% elif link.type ==  link_type.FACEBOOK %}
+    <!-- Facebook -->
+    <i class="fa lbt-icon-li fa-facebook-square" title="Link {{link.id}}"></i>
+    {% elif link.type == link_type.TWITTER %}
+    <!-- Twitter -->
+    <i class="fa lbt-icon-li fa-twitter-square" title="Link {{link.id}}"></i>
+    {% elif link.type == link_type.INSTAGRAM %}
+    <!-- Instagram -->
+    <i class="fa lbt-icon-li fa-instagram" title="Link {{link.id}}"></i>
+    {% elif link.type == link_type.YOUTUBE %}
+    <!-- Youtube -->
+    <i class="fa lbt-icon-li fa-youtube-play" title="Link {{link.id}}"></i>
+    {% else %}
+    <!-- Other -->
+    <i class="fa lbt-icon-li fa-globe" title="Link {{link.id}}"></i>
+    {% endif %}
+
+    {% if link.type == link_type.EMAIL %}
+    <!-- Email address -->
+    <a href="mailto:{{ link.url }}">{{ link.name if link.name else link.url }}</a>
+    {% elif link.url.startswith("https://") or link.url.startswith("http://") %}
+    <a href="{{ link.url }}">{{ link.name if link.name else link.url}}</a>
+    {% else %}
+    <a href="http://{{ link.url }}">{{ link.name if link.name else link.url}}</a>
+    {% endif %}
+
+</li>
+{% endif %}
+{%- endmacro %}

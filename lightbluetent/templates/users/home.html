@@ -11,14 +11,12 @@
         {% else %}
         {% for group in user.groups %}
         <div class="card mb-3">
-            <div class="card-header">
-            </div>
             <div class="card-body d-flex justify-content-between align-items-center">
                 {% if group.logo is not none %}
                 <div class="ml-3 order-1 d-flex align-items-center justify-content-center"
                     style="width:14vmax;height:14vmax;max-width:128px;max-height:128px;">
-                    <img class="img-fluid img-thumbnail" style="max-height:100%"
-                        {{ group.logo | responsive_image.img }} alt="Group logo" />
+                    <img class="img-fluid img-thumbnail" style="max-height:100%" {{ group.logo | responsive_image.img }}
+                        alt="Group logo" />
                 </div>
                 {% endif %}
                 <div>
@@ -37,12 +35,12 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-footer">
-                    <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
-                            class="fa fa-home"></i> Group page</a>
-                    <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
-                            class="fa fa-cog"></i> Settings</a>
-                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
+                        class="fa fa-home"></i> Group page</a>
+                <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
+                        class="fa fa-cog"></i> Settings</a>
             </div>
         </div>
         {% endfor %}
@@ -50,8 +48,7 @@
 
         {% set enable_group_creation = settings | selectattr("name", "equalto", "enable_group_creation") | first %}
         {% if enable_group_creation.enabled %}
-        <a href="{{ url_for('users.register_group') }}"
-            class="btn btn-outline-primary">{{ _("Create group") }}</a>
+        <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create group") }}</a>
         {% endif %}
 
     </article>
@@ -86,8 +83,7 @@
 
         {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
         {% if enable_room_creation.enabled %}
-        <a href="{{ url_for('users.register_group') }}"
-            class="btn btn-outline-primary">{{ _("Create room") }}</a>
+        <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create room") }}</a>
         {% endif %}
 
     </article>

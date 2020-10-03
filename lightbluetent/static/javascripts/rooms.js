@@ -30,7 +30,7 @@ $('input[type="radio"]').change(function () {
 $('#alias_checkbox').click(function () {
     let aliasInput = $('#alias_input');
     aliasInput.prop("disabled", !$(this).is(":checked"));
-    if(!$(this).is(":checked")) aliasInput.val("")
+    if (!$(this).is(":checked")) aliasInput.val("")
 });
 
 /* Show the correct limit box on page load */
@@ -43,13 +43,13 @@ if (value == "until") {
 }
 
 /* Show the auth div if the values change */
-$('input[type="radio"]').change(function() {
- 	var auth_type = $(this).val();
+$('input[type="radio"]').change(function () {
+    var auth_type = $(this).val();
     $("div.auth-box").hide();
-    $("#auth_box_"+auth_type).show();
+    $("#auth_box_" + auth_type).show();
 });
 
-$('input[type="checkbox"]').click(function() {
+$('input[type="checkbox"]').click(function () {
 
     /* Show or hide the recurrence settings */
     if (this.id == "recurring_checkbox") {
@@ -76,7 +76,7 @@ if ($("alias_checkbox").checked) {
 }
 
 /* Show or hide the limit settings when the select changes */
-$('#limit_select').change(function() {
+$('#limit_select').change(function () {
     $('.limit_option').hide();
     var value = $(this).val();
     if (value == "until") {
@@ -86,3 +86,30 @@ $('#limit_select').change(function() {
     }
 });
 
+let sortable = new Sortable(document.querySelector("#links-list"), {
+    handle: ".lbt-draggable",
+    animation: 200,
+    store: {
+        get: function (sortable) {
+            let order = String($('#links-list').data('links-order'));
+            console.log(order);
+            order = order ? order.split('|') : [];
+            return order;
+        },
+        set: function (sortable) {
+            const list = $('#links-list');
+            let order = sortable.toArray();
+            const token = list.data('csrf')
+            $.ajax({
+                type: "POST",
+                url: list.data('path'),
+                data: JSON.stringify({order}),
+                dataType: 'json',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': token
+                },
+            })
+        },
+    },
+})
