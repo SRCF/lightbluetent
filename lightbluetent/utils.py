@@ -7,7 +7,7 @@ import requests
 from jinja2 import is_undefined, Markup
 from flask import render_template, url_for, current_app
 import traceback
-from lightbluetent.models import db, Asset
+from lightbluetent.models import db, Asset, LinkType
 from PIL import Image
 import math
 import re
@@ -105,19 +105,19 @@ def get_form_values(request, keys):
 
 
 # write an enum for this?
-def match_social(value):
+def match_link(value):
     if re.search(email_re, value):
-        return "email"
+        return LinkType.EMAIL
     elif any(match in value for match in ["facebook.", "fb.me", "fb.com"]):
-        return "facebook"
+        return LinkType.FACEBOOK
     elif any(match in value for match in ["twitter.", "t.co", "fb.com"]):
-        return "twitter"
+        return LinkType.TWITTER
     elif "instagram." in value:
-        return "instagram"
+        return LinkType.INSTAGRAM
     elif any(match in value for match in ["youtube.", "youtu.be"]):
-        return "youtube"
+        return LinkType.YOUTUBE
     else:
-        return "link"
+        return LinkType.OTHER
 
 
 def get_social_by_id(id, socials):
