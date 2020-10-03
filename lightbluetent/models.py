@@ -129,7 +129,8 @@ class Room(db.Model):
 
     def get_next_link(self):
         # have we already created an empty link?
-        next_link = next(link for link in self.links if not link.url)
+        # add default for when self.links is empty
+        next_link = next((link for link in self.links if not link.url), False)
         # if not, let's create one
         if next_link:
             return next_link

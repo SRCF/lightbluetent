@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% import 'macros/LinkList.html' as LinkList %}
+{% import 'rooms/macros/LinkList.html' as LinkList %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/Sortable.min.js') }}"></script>
 <script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 {% endblock %}
 
 {% macro submit_button() -%}
@@ -80,7 +80,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card">
+                <div class="card mb-3 ">
                     <div class="card-body">
                         <h5 class="card-title">Authentication</h5>
                         <div class="form-check">

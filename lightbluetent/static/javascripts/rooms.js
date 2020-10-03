@@ -86,6 +86,6 @@ $('#limit_select').change(function() {
     }
 });
 
-let sortable = new Sortable($('#links-list'), {
+let sortable = new Sortable(document.querySelector("#links-list"), {
     handle: ".lbt-draggable"
 })

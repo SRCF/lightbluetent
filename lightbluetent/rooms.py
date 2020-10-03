@@ -131,12 +131,6 @@ def update(room_id, update_type):
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
 
-        if start_date_entered or end_date_entered:
-            if not full_start_date:
-                errors["start"] = "Enter a full date and time."
-            if not full_end_date:
-                errors["end"] = "Enter a full date and time."
-
         if values["alias_checked"]:
             if values["alias"] == "":
                 errors["alias"] = "You must specify the name of your alias."

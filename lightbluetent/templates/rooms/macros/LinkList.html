@@ -1,11 +1,10 @@
 {% macro render(id, room, errors={}) %}
 <div>
     <ul id="{{id}}" class="list-group">
+        {% set next_link = room.get_next_link() %}
         {% for link in room.links %}
         {{ render_link(link, errors)}}
         {% endfor %}
-        {% set next_link = room.get_next_link() %}
-        {{ render_link(next_link, errors)}}
     </ul>
 </div>
 {% endmacro %}
@@ -17,23 +16,23 @@
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Link address</span>
         </div>
-        <input type="text" id="{{link.id}}-url" name="{{id}}-url"
-            class="form-control {% if errors[link.id + '-url'] %}is-invalid{% endif %}"
-            placeholder="eg. https://www.srcf.net" value="{{link.url}}">
+        <input type="text" id="{{link.id}}-url" name="{{link.id}}-url"
+            class="form-control {% if errors[link.id ~ '-url'] %}is-invalid{% endif %}"
+            placeholder="eg. https://www.srcf.net" value="{{link.url if link.url}}">
     </div>
-    {%- if errors[link.id + '-url'] %}
-    <small class="invalid-feedback">{{ errors[link.id + '-url'] }}</small>
+    {%- if errors[link.id ~ '-url'] %}
+    <small class="invalid-feedback">{{ errors[link.id ~ '-url'] }}</small>
     {%- endif %}
     <div class="input-group">
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Link name</span>
         </div>
         <input type="text" id="{{link.id}}-name" name="{{link.id}}-name"
-            class="form-control {% if errors[link.id + '-name'] %}is-invalid{% endif %}"
-            placeholder="optional sentence to describe your link" value="{{link.name}}">
+            class="form-control {% if errors[link.id ~ '-name'] %}is-invalid{% endif %}"
+            placeholder="My Awesome Project!" value="{{link.name if link.name}}">
     </div>
-    {%- if errors[link.id + '-name'] %}
-    <small class="invalid-feedback">{{ errors[link.id + '-name'] }}</small>
+    {%- if errors[link.id ~ '-name'] %}
+    <small class="invalid-feedback">{{ errors[link.id ~ '-name'] }}</small>
     {%- endif %}
 </li>
 {% endmacro %}
