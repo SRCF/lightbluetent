@@ -40,16 +40,19 @@ class Authentication(enum.Enum):
     PASSWORD = "password"
     WHITELIST = "whitelist"
 
+
 class Recurrence(enum.Enum):
     NONE = "none"
     DAILY = "daily"
     WEEKDAYS = "weekdays"
     WEEKLY = "weekly"
 
+
 class RecurrenceType(enum.Enum):
     FOREVER = "forever"
     UNTIL = "until"
     COUNT = "count"
+
 
 class LinkType(enum.Enum):
     EMAIL = "email"
@@ -59,12 +62,14 @@ class LinkType(enum.Enum):
     YOUTUBE = "youtube"
     OTHER = "other"
 
+
 class Link(db.Model):
     __tablename__ = "links"
 
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
     room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
+    name = db.Column(db.String, nullable=True)
     url = db.Column(db.String, nullable=False)
     type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
 
@@ -163,7 +168,9 @@ class Group(db.Model):
     description = db.Column(db.String, unique=False, nullable=True)
     links = db.relationship("Link", backref="group", lazy=True)
 
-    logo = db.Column(db.String, db.ForeignKey('assets.key'), unique=False, nullable=True)
+    logo = db.Column(
+        db.String, db.ForeignKey("assets.key"), unique=False, nullable=True
+    )
 
     time_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
