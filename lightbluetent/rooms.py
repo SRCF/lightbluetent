@@ -20,6 +20,8 @@ from lightbluetent.utils import (
     get_form_values,
     fetch_lookup_data,
     validate_room_alias,
+    match_link,
+    match_link_name
 )
 from PIL import Image
 from flask_babel import _
@@ -170,6 +172,30 @@ def update(room_id, update_type):
                     f"Registered visitor with CRSid { values['whitelist'] }"
                 )
                 room.whitelisted_users.append(user)
+
+        for link in room.links:
+            url_field = request.form.get(f"{link.id}-url", "").strip()
+            name_field = request.form.get(f"{link.id}-name", "").strip()
+            # this means the link has been filled by the user
+            if url_field != "":
+                # validate name
+                if len(name_field) > 40:
+                    errors[f"{link.id}-name"] = "Choose a shorter link name"
+                elif match_link_name(name_field):
+                    errors[f"{link.id}-name"] = "You must use valid characters"
+
+                if not errors:
+                    link.url = url_field
+                    link.name = name_field
+                    link.type = match_link(link.url)
+                    current_app.logger.info(f"Updated link: {link}")
+
+            else:
+                # has the field been filled before?
+                # ie, the user wants to delete it
+                if link.url is not None:
+                    db.session.delete(link)
+                    current_app.logger.info(f"Deleted link: {link}")
 
         if not errors:
             room.name = values["name"]

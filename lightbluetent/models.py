@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from lightbluetent.config import PermissionType, RoleType
+from flask import current_app
 import enum
 
 db = SQLAlchemy()
@@ -70,8 +71,11 @@ class Link(db.Model):
     group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
     room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
     name = db.Column(db.String, nullable=True)
-    url = db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=True)
     type = db.Column(db.Enum(LinkType), nullable=False, default=LinkType.OTHER)
+
+    def __repr__(self):
+        return f"Link(room: {self.room!r}, name: {self.name!r}, url: {self.url!r})"
 
 
 class Room(db.Model):
@@ -122,6 +126,20 @@ class Room(db.Model):
 
     def __repr__(self):
         return f"Room(group: {self.group!r}, name: {self.name!r})"
+
+    def get_next_link(self):
+        # have we already created an empty link?
+        next_link = next(link for link in self.links if not link.url)
+        # if not, let's create one
+        if next_link:
+            return next_link
+        else:
+            new_link = Link()
+            self.links.append(new_link)
+            db.session.commit()
+            current_app.logger.info(f"Created empty link: {link}")
+            return new_link
+
 
 
 class User(db.Model):

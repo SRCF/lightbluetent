@@ -19,6 +19,7 @@ short_name_re = re.compile(r"\w{1,12}")
 alias_re = re.compile(r"[a-zA-Z0-9_-]{2,30}")
 time_re = re.compile(r"\d{2}:\d{2}")
 date_re = re.compile(r"\d{4}-\d{2}-\d{2}")
+link_name_re = re.compile(r"^[a-zA-Z0-9 ]{0,40}$")
 
 
 def match_time(time):
@@ -28,6 +29,10 @@ def match_time(time):
 def table_exists(name):
     ret = db.engine.dialect.has_table(db.engine, name)
     return ret
+
+
+def match_link_name(name):
+    return link_name_re.match(name)
 
 
 def gen_unique_string():

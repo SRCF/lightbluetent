@@ -1,9 +1,11 @@
-{% macro render(id, links, errors) %}
+{% macro render(id, room, errors={}) %}
 <div>
     <ul id="{{id}}" class="list-group">
-        {% for link in links %}
-        {{ render_link(link.id, link.)}}
+        {% for link in room.links %}
+        {{ render_link(link, errors)}}
         {% endfor %}
+        {% set next_link = room.get_next_link() %}
+        {{ render_link(next_link, errors)}}
     </ul>
 </div>
 {% endmacro %}

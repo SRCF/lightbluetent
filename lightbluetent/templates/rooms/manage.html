@@ -168,7 +168,7 @@
                         </div>
                     </div>
                 </div>
-                {{ LinkList.render("links-list")}}
+                {{ LinkList.render("links-list", room, errors)}}
                 <div class="form-group mt-3 float-right">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
                         class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>
