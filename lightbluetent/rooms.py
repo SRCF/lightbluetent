@@ -72,7 +72,8 @@ def begin(room_id):
         abort(500)
 
     lookup_data = fetch_lookup_data(crsid)
-    full_name = lookup_data["visibleName"]
+    print(lookup_data)
+    full_name = lookup_data["name"]
 
     meeting = Meeting(room)
     running = meeting.is_running()
