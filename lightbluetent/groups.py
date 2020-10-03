@@ -237,9 +237,6 @@ def manage(group_id):
 
 
 def delete_logo_variant(path):
-    if not os.path.isdir(images_dir):
-        current_app.logger.info(f"'{ images_dir }':  no such directory.")
-        return False
     if not os.path.isfile(path):
         current_app.logger.info("no logo to delete")
         return False
@@ -249,23 +246,26 @@ def delete_logo_variant(path):
 
 # Delete logo on disk for the group with given group_id
 def delete_logo(group_id):
-    group = Group.query.filter_by(id=group_id).first()
+    images_dir = current_app.config["IMAGES_DIR"]
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+        return False
 
+    group = Group.query.filter_by(id=group_id).first()
     if not group:
         return False
 
     if group.logo is None:
         return True
-    else:
-        images_dir = current_app.config["IMAGES_DIR"]
-        current_app.logger.info(f"For id='{ group.id }': deleting logo...")
-        for asset in Asset.query.filter_by(key=group.logo):
-            old_logo = os.path.join(images_dir, asset.path)
-            delete_logo_variant(old_logo)
-            db.session.delete(asset)
-        group.logo = None
-        db.session.commit()
-        return True
+    
+    current_app.logger.info(f"For id='{ group.id }': deleting logo...")
+    for asset in Asset.query.filter_by(key=group.logo):
+        old_logo = os.path.join(images_dir, asset.path)
+        delete_logo_variant(old_logo)
+        db.session.delete(asset)
+    group.logo = None
+    db.session.commit()
+    return True
 
 @bp.route("/<group_id>/delete_logo")
 @auth_decorator
