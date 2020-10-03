@@ -167,12 +167,10 @@ def fetch_lookup_data(crsid):
         # request successful
         response = res.json()["result"]["person"]
 
-        email = ""
+        email = None
 
         if len(response["attributes"]) > 0:
             email = response["attributes"][0]["value"]
-        else:
-            email = f"{crsid}@cam.ac.uk"
 
         return {"name": response["visibleName"], "email": email}
     elif res.status_code == 401:

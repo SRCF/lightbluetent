@@ -1,0 +1,9 @@
+<meta property="og:title"
+    content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
+<meta property="og:type" content="website" />
+{% if room.description %}
+<meta property="og:description" content="{{ room.description | truncate(200) }}" />
+{% else %}
+<meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+{% endif %}
+<meta property="og:url" content="{{ request.base_url }}" />

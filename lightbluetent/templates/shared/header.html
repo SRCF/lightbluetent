@@ -1,0 +1,46 @@
+<header>
+    <nav class="navbar navbar-expand navbar-light bg-light">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="{{ url_for('users.home') }}">
+                    <img src="https://www.srcf.net/_srcf/images/logo.svg">
+                    <span class="d-none d-lg-inline">
+                        <span class="text-danger">Student-Run</span>
+                        <span class="text-primary">Computing Facility</span>
+                    </span>
+                    <span class="text-muted d-none d-lg-inline"> &mdash;</span>
+                    <span class="text-muted d-none d-sm-inline">{{ _("SRCF Events") }}
+                    </span>
+                </a>
+            </div>
+            <ul class="navbar-nav">
+                {% block extra_nav %}{% endblock %}
+                {% if user %}
+                <li class="nav-item dropdown ml-auto">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown">
+                        <i class="fa fa-fw fa-user-circle-o" aria-hidden="true"></i>
+                        <span class="d-none d-md-inline">{{ user.full_name }}</span>
+                    </a>
+                    <div class=" dropdown-menu">
+                        <a class="dropdown-item" href="{{ url_for('users.profile') }}"><i
+                                class="fa fa-fw fa-id-card mr-3" aria-hidden="true"></i>Profile</a>
+                        {% if  user.has_permission_to(permission_type.CAN_VIEW_ADMIN_PAGE) %}
+                        <a class="dropdown-item" href="{{ url_for('admins.manage') }}"><i
+                                class="fa fa-fw fa-server mr-3" aria-hidden="true"></i>Administration</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"
+                            href="https://docs.srcf.net/timeout/#reporting-problems-and-getting-help"><i
+                                class="fa fa-fw fa-exclamation mr-3" aria-hidden="true"></i>Report problem</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ml-2" href="{{ url_for('general.logout') }}"><i class="fa fa-fw fa-sign-out"
+                            aria-hidden="true"></i>(Log out)</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
