@@ -4,7 +4,15 @@ from . import rooms, room_aliases, users, groups, admins, general
 from lightbluetent.flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-
+from lightbluetent.utils import (
+    gen_unique_string,
+    ordinal,
+    sif,
+    page_not_found,
+    server_error,
+    table_exists,
+    responsive_image,
+)
 from lightbluetent.models import (
     db,
     migrate,
@@ -17,7 +25,6 @@ from lightbluetent.models import (
     LinkType,
     Authentication
 )
-
 from lightbluetent.config import PermissionType, RoleType
 import click
 from datetime import datetime, timedelta
@@ -25,7 +32,7 @@ from datetime import datetime, timedelta
 
 def create_app(config_name=None):
 
-    if config_name == None:
+    if config_name is None:
         config_name = "production"
 
     app = Flask(__name__, template_folder="templates")
