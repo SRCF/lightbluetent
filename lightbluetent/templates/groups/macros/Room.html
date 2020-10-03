@@ -12,7 +12,7 @@
             </li>
             <li>
                 {% if room.authentication.value == "raven" %}
-                <i class="fa fa-address-book lbt-icon-li"></i>
+                <img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 1rem">
                 <span> Uses Raven</span>
                 {% elif room.authentication.value == "password" %}
                 <i class="fa fa-key lbt-icon-li"></i>

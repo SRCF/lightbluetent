@@ -72,7 +72,7 @@ def begin(room_id):
         abort(500)
 
     lookup_data = fetch_lookup_data(crsid)
-    full_name = lookup_data["visibleName"]
+    full_name = lookup_data["name"]
 
     meeting = Meeting(room)
     running = meeting.is_running()
@@ -84,7 +84,7 @@ def begin(room_id):
                 "room_aliases.home", room_alias=room.alias, _external=True
             )
         else:
-            join_url = url_for("room_aliases.home", id=room.id, _external=True)
+            join_url = url_for("room_aliases.home", room_id=room.id, _external=True)
         moderator_msg = _(
             "To invite others to this event, share your room link: %(join_url)s",
             join_url=join_url,
