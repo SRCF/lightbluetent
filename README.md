@@ -96,7 +96,7 @@ Make someone an admin by running `flask change-role [list of crsids] administrat
 git clone https://github.com/SRCF/lightbluetent.git
 ```
 
-1. Start the containers: `cd lightbluetent` and then `docker-compose -p development -f docker/development.yml up -d`
+1. Start the containers: `cd lightbluetent` and then `./develop.sh up`
 1. Navigate to localhost:5000 to see the app
 
 ## Application structure
@@ -134,6 +134,7 @@ git clone https://github.com/SRCF/lightbluetent.git
 * Remove the env var if you want to perform any database migrations or upgrade, in this case we want to load the variables so psycopg2 can connect
 * `docker-compose -p development -f docker/development.yml up -d` to build and run the Flask container and the PostgreSQL container, attach the `-d` flag optionally to run the containers as daemons in the background
 * `docker-compose -p development -f docker/development.yml down` to tear down the containers
+* `./develop.sh` automates much of the above and below
 
 #### Database management
 
