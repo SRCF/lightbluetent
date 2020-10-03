@@ -27,11 +27,8 @@ def home(group_id):
     if group.description is not None:
         desc_paragraphs=group.description.split("\n")
 
-    has_logo = group.logo is not None
-
     return render_template("groups/home.html", page_title=f"{ group.name }",
-                           group=group, desc_paragraphs=desc_paragraphs,
-                           has_logo=has_logo, errors={})
+                           group=group, desc_paragraphs=desc_paragraphs, errors={})
 
 
 @auth_decorator
