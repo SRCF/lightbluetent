@@ -57,7 +57,7 @@ def begin(room_id):
 
     # If this room is associated with a group
     if room.group_id:
-        group = Group.query.filter_by(id=group_id).first()
+        group = Group.query.filter_by(id=room.group_id).first()
 
         # ensure that the user belongs to the group they're editing
         if group not in user.groups:
@@ -125,7 +125,7 @@ def update(room_id, update_type):
     if room.group_id:
         parent_page = url_for("groups.manage", group_id=room.group.id)
         group_id = room.group_id
-        group = Group.query.filter_by(id=group_id).first()
+        group = Group.query.filter_by(id=room.group_id).first()
         if group not in user.groups:
             abort(403)
     else:
@@ -425,7 +425,7 @@ def manage(room_id):
     if room.group_id:
         parent_page = url_for("groups.manage", group_id=room.group.id)
         group_id = room.group_id
-        group = Group.query.filter_by(id=group_id).first()
+        group = Group.query.filter_by(id=room.group_id).first()
         if group not in user.groups:
             abort(403)
     else:
@@ -528,7 +528,7 @@ def unwhitelist(room_id, crsid_to_remove):
 
     # If this room is associated with a group
     if room.group_id:
-        group = Group.query.filter_by(id=group_id).first()
+        group = Group.query.filter_by(id=room.group_id).first()
 
         # ensure that the user belongs to the group they're editing
         if group not in user.groups:
@@ -575,7 +575,7 @@ def delete_session(id):
 
     # If this room is associated with a group
     if room.group_id:
-        group = Group.query.filter_by(id=group_id).first()
+        group = Group.query.filter_by(id=room.group_id).first()
 
         # ensure that the user belongs to the group they're editing
         if group not in user.groups:
