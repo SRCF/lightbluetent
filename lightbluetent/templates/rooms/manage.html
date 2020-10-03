@@ -1,21 +1,11 @@
 {% extends "base.html" %}
 
-{% import 'macros/StackedList.html' as StackedList %}
+{% import 'macros/LinkList.html' as LinkList %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='javascripts/rooms.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 {% endblock %}
-
-{% macro social_field(n, placeholder="e.g. a social media URL", id=("social-"+gen_unique_string())) -%}
-<div {% if n != 0 %}class="pt-2" {% endif %}>
-    <input type="text" id="{{id}}" name="{{id}}" placeholder="{{placeholder}}"
-        class="form-control{% if errors[id] %}is-invalid{% endif %}" value="{{sif(kwargs["url"])}}">
-    {%- if errors[id] %}
-    <small class="invalid-feedback">{{ errors[id] }}</small>
-    {%- endif %}
-</div>
-{%- endmacro %}
 
 {% macro submit_button() -%}
 <div class="form-group mt-2 form-row float-right">
@@ -178,7 +168,7 @@
                         </div>
                     </div>
                 </div>
-                {{ StackedList.render("links-list")}}
+                {{ LinkList.render("links-list")}}
                 <div class="form-group mt-3 float-right">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
                         class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>
