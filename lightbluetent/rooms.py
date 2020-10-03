@@ -8,7 +8,7 @@ from flask import (
     url_for,
     current_app,
 )
-from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, RecurrenceType, Session
+from lightbluetent.models import db, User, Group, Room, Authentication, Role, Recurrence, RecurrenceType, Session, Link
 from lightbluetent.config import RoleType
 from lightbluetent.users import auth_decorator
 from lightbluetent.api import Meeting
@@ -56,7 +56,6 @@ def begin(room_id):
     else:
         current_app.logger.error(f"Room { room.name } has neither a group_id nor a user_id.")
         abort(500)
-
 
     lookup_data = fetch_lookup_data(crsid)
     full_name = lookup_data["visibleName"]
@@ -176,13 +175,15 @@ def update(room_id, update_type):
                     link.url = url_field
                     link.name = name_field
                     link.type = match_link(link.url)
-                    current_app.logger.info(f"Updated link: {link}")
+                    if link in db.session.dirty:
+                        current_app.logger.info(f"Updated link: {link}")
 
             else:
                 # has the field been filled before?
                 # ie, the user wants to delete it
                 if link.url is not None:
                     db.session.delete(link)
+                    room.preserve_display_order()
                     current_app.logger.info(f"Deleted link: {link}")
 
         if not errors:
@@ -312,7 +313,8 @@ def update(room_id, update_type):
 
     elif update_type == "links_order":
         links_order = request.get_json(force=True)
-        room.links_order = links_order["order"]
+        for index, val in enumerate(links_order["order"]):
+            room.get_link_by_id(int(val)).display_order = index
         db.session.commit()
         return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 

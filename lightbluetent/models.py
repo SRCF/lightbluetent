@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 from flask_migrate import Migrate
 from datetime import datetime
 from lightbluetent.config import PermissionType, RoleType
@@ -7,6 +8,7 @@ import enum
 
 db = SQLAlchemy()
 migrate = Migrate()
+
 
 # Association table between users and groups.
 user_group = db.Table(
@@ -136,11 +138,37 @@ class Room(db.Model):
         if next_link:
             return next_link
         else:
-            new_link = Link()
+            # make sure that we preserve link order
+            sorted_links = self.preserve_display_order()
+            next_order = sorted_links[-1].display_order + 1 if sorted_links else 0
+            new_link = Link(display_order=next_order)
             self.links.append(new_link)
             db.session.commit()
             current_app.logger.info(f"Created empty link: {new_link}")
             return new_link
+
+    def get_display_order(self):
+        out = [0] * len(self.links)
+        for link in self.links:
+            out[link.display_order] = str(link.id)
+        return "|".join(out)
+
+    def get_link_by_id(self, id):
+        # since we do lazy=True, we can't query the SQL obj
+        for link in self.links:
+            if link.id == id:
+                return link
+        return None
+
+    def preserve_display_order(self):
+        sorted_links = (
+            Link.query.filter_by(room_id=self.id)
+            .order_by(Link.display_order.asc())
+            .all()
+        )
+        for order, link in enumerate(sorted_links):
+            link.display_order = order
+        return sorted_links
 
 
 class User(db.Model):
@@ -280,3 +308,30 @@ class Asset(db.Model):
         if self.variant is None:
             return f"Asset({self.key!r}: {self.path!r})"
         return f"Asset({self.key!r}/{self.variant!r}: {self.path!r})"
+
+
+# @event.listens_for(Link, "after_insert")
+# @event.listens_for(Link, "after_delete")
+# def preserve_display_order(mapper, conn, target):
+#     sorted_links = None
+#     link_table = Link.__table__
+#     if target.group:
+#         sorted_links = (
+#             Link.query.filter_by(group_id=target.group.id)
+#             .order_by(Link.display_order.asc())
+#             .all()
+#         )
+#     elif target.room:
+#         sorted_links = (
+#             Link.query.filter_by(room_id=target.room.id)
+#             .order_by(Link.display_order.asc())
+#             .all()
+#         )
+#     for order, link in enumerate(sorted_links):
+#         link.display_order = order
+#     conn.execute(
+#         link_table.update().
+#         where(link_table.c.id==target.id).
+
+#     )
+

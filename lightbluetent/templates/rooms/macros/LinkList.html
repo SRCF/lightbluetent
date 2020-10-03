@@ -1,5 +1,5 @@
 {% macro render(id, room, errors={}) %}
-<ul id="{{id}}" class="list-group" data-links-order="{{ room.links_order if room.links_order}}"
+<ul id="{{id}}" class="list-group" data-links-order="{{ room.get_display_order() }}"
     data-path="{{ url_for("rooms.update", room_id=room.id, update_type="links_order")}}" data-csrf="{{csrf_token()}}">
     {% set next_link = room.get_next_link() %}
     {% for link in room.links %}

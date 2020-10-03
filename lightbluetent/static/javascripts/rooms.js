@@ -92,6 +92,7 @@ let sortable = new Sortable(document.querySelector("#links-list"), {
     store: {
         get: function (sortable) {
             let order = String($('#links-list').data('links-order'));
+            console.log(order);
             order = order ? order.split('|') : [];
             return order;
         },
@@ -102,7 +103,7 @@ let sortable = new Sortable(document.querySelector("#links-list"), {
             $.ajax({
                 type: "POST",
                 url: list.data('path'),
-                data: JSON.stringify({order: order.join('|')}),
+                data: JSON.stringify({order}),
                 dataType: 'json',
                 contentType: 'application/json',
                 headers: {
