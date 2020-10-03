@@ -24,14 +24,14 @@
 {%- endmacro %}
 
 {% macro group_entry(group) -%}
-<a href="{{ url_for('group.welcome', uid=group.uid) }}"
+<a href="{{ url_for('groups.home', group_id=group.id) }}"
     class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100  justify-content-between">
         <h5 class="mb-1 mr-1 text-truncate">{{group.name}}        <small class="text-muted">{{ group.short_name }}</small>
         </h5>
         <small>Last updated {{group.updated_at.strftime("%b %d %H:%M")}}</small>
     </div>
-    {% if group.description is not none %}
+    {% if group.description %}
     <p class="mb-1">{{group.description | truncate(200) }}</p>
     {% endif %}
     <small>{{group.owners | length}} owner(s)</small>
@@ -48,7 +48,9 @@
                 <section class="lbt-site-setting">
                     {{ site_setting("enable-signups", "enable_signups", "Toggle whether new users should be allowed to sign up")}}
                     {{ site_setting("enable-room-creation", "enable_room_creation", "Toggle whether users should be allowed to create rooms")}}
+                    {{ site_setting("enable-room-viewing", "enable_room_viewing", "Toggle whether users should be allowed to view their personal rooms")}}
                     {{ site_setting("enable-group-creation", "enable_group_creation", "Toggle whether users should be allowed to create groups")}}
+                    {{ site_setting("enable-group-room-creation", "enable_group_room_creation", "Toggle whether users should be allowed to create rooms in groups")}}
                 </section>
             </div>
         </div>

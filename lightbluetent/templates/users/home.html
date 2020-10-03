@@ -59,6 +59,9 @@
 
     </article>
     <article class="mb-3 col-lg-6">
+        {% set enable_room_viewing = settings | selectattr("name", "equalto", "enable_room_viewing") | first %}
+        
+        {% if enable_room_viewing.enabled %}
         <h3>Your personal rooms</h3>
         {% if not user.rooms %}
         <p>{{ _("You currently have no registered rooms.") }}</p>
@@ -92,6 +95,7 @@
         <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create room") }}</a>
         {% endif %}
 
+        {% endif %}
     </article>
 </section>
 

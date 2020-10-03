@@ -113,10 +113,23 @@ class Config(object):
     )
     SITE_SETTINGS.append(
         {
+            "name": "enable_room_viewing",
+            "enabled": os.getenv("ENABLE_PERSONAL_ROOM_VIEWING", True),
+        }
+    ) 
+    SITE_SETTINGS.append(
+        {
             "name": "enable_group_creation",
             "enabled": os.getenv("ENABLE_GROUP_CREATION", True),
         }
     )
+    SITE_SETTINGS.append(
+        {
+            "name": "enable_group_room_creation",
+            "enabled": os.getenv("ENABLE_GROUP_ROOM_CREATION", True),
+        }
+    )
+   
 
 
 class ProductionConfig(Config):

@@ -32,7 +32,6 @@ def manage():
         return render_template(
             "admins/index.html",
             page_title="Administrator panel",
-            settings=Setting.query.all(),
             groups=Group.query.all(),
             user=user,
         )

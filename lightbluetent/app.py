@@ -4,8 +4,26 @@ from . import rooms, room_aliases, users, groups, admins, general
 from lightbluetent.flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-from lightbluetent.utils import gen_unique_string, ordinal, sif, page_not_found, server_error, table_exists, responsive_image
-from lightbluetent.models import db, migrate, Setting, Role, Permission, User, Recurrence, RecurrenceType, LinkType
+from lightbluetent.utils import (
+    gen_unique_string,
+    ordinal,
+    sif,
+    page_not_found,
+    server_error,
+    table_exists,
+    responsive_image,
+)
+from lightbluetent.models import (
+    db,
+    migrate,
+    Setting,
+    Role,
+    Permission,
+    User,
+    Recurrence,
+    RecurrenceType,
+    LinkType,
+)
 from lightbluetent.config import PermissionType, RoleType
 import click
 from datetime import datetime, timedelta
@@ -74,6 +92,10 @@ def create_app(config_name=None):
             .decode()
         )
 
+    @app.context_processor
+    def inject_settings():
+        return dict(settings=Setting.query.all())
+
     @app.template_test()
     def equalto(value, other):
         return value == other
@@ -85,7 +107,11 @@ def create_app(config_name=None):
 
     @app.template_filter()
     def get_ordinal(n):
-        return f"{n}th" if 11<=n<=13 else {1: f"{n}st", 2: f"{n}nd", 3: f"{n}rd" }.get(n%10, f"{n}th")
+        return (
+            f"{n}th"
+            if 11 <= n <= 13
+            else {1: f"{n}st", 2: f"{n}nd", 3: f"{n}rd"}.get(n % 10, f"{n}th")
+        )
 
     @app.cli.command("change-role")
     @click.argument("crsids", nargs=-1)
@@ -100,7 +126,9 @@ def create_app(config_name=None):
                 if role:
                     user.role = role
                     db.session.commit()
-                    click.echo(f"Changed {user.full_name}'s role from {prev_role.role} to {role.role}")
+                    click.echo(
+                        f"Changed {user.full_name}'s role from {prev_role.role} to {role.role}"
+                    )
                 else:
                     click.echo("Role does not exist")
 
@@ -111,9 +139,10 @@ def create_app(config_name=None):
             for setting in app.config["SITE_SETTINGS"]:
                 has_setting = Setting.query.filter_by(name=setting["name"]).first()
                 if not has_setting:
-                    new_setting = Setting(name=setting["name"], enabled=setting["enabled"])
+                    new_setting = Setting(
+                        name=setting["name"], enabled=setting["enabled"]
+                    )
                     db.session.add(new_setting)
-
 
         if table_exists("roles"):
 
@@ -121,7 +150,9 @@ def create_app(config_name=None):
             for role_info in app.config["ROLES_INFO"]:
                 has_role = Role.query.filter_by(role=role_info["role"]).first()
                 if not has_role:
-                    new_role = Role(role=role_info["role"], description=role_info["description"])
+                    new_role = Role(
+                        role=role_info["role"], description=role_info["description"]
+                    )
                     db.session.add(new_role)
 
         if table_exists("permissions"):
@@ -137,7 +168,9 @@ def create_app(config_name=None):
             for role_info in app.config["ROLES_INFO"]:
                 role = Role.query.filter_by(role=role_info["role"]).first()
                 for permission_name in role_info["permissions"]:
-                    permission = Permission.query.filter_by(name=permission_name).first()
+                    permission = Permission.query.filter_by(
+                        name=permission_name
+                    ).first()
                     if not permission in role.permissions:
                         role.permissions.append(permission)
 

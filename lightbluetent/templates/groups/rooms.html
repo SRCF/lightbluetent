@@ -6,8 +6,11 @@
 {% set errors = errors | default(none) %}
 <form method="post" action="{{url_for("groups.rooms_create", group_id=group.id)}}">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    {% set enable_group_room_creation = settings | selectattr("name", "equalto", "enable_group_room_creation") | first %}
+    {% if enable_group_room_creation.enabled %}
     <div class="input-group mt-3">
-        <input type="text" name="room_name" class="form-control {% if errors.room_name is defined %} is-invalid{% endif %}" placeholder="Room name">
+        <input type="text" name="room_name"
+            class="form-control {% if errors.room_name is defined %} is-invalid{% endif %}" placeholder="Room name">
         <div class="input-group-append">
             <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i>
                 {{ _("Create room") }}</button>
@@ -16,6 +19,7 @@
     {%- if errors.room_name is defined %}
     <small class="text-danger">{{ errors.room_name }}</small>
     {%- endif %}
+    {% endif %}
     <section class="row">
         {%- for room_col in group.rooms | slice(2) %}
         <article class="col-lg-6">

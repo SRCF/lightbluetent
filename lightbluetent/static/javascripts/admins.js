@@ -49,6 +49,17 @@ $('#enable-room-creation .dropdown-menu').on('click', '> *', function () {
     changeSiteSetting(paths, data, token)
 });
 
+// change whether personal room viewing should be enabled
+$('#enable-room-viewing .dropdown-menu').on('click', '> *', function () {
+    const parent = $('#enable-room-viewing');
+    const paths = {
+        success: parent.data('path'), error: parent.data('path-error')
+    };
+    const data = { name: "enable_room_viewing", enabled: $(this).data('action') == "enable" }
+    const token = parent.data('csrf');
+    changeSiteSetting(paths, data, token)
+});
+
 // change whether group creation should be enabled
 $('#enable-group-creation .dropdown-menu').on('click', '> *', function () {
     const parent = $('#enable-group-creation');
@@ -56,6 +67,17 @@ $('#enable-group-creation .dropdown-menu').on('click', '> *', function () {
         success: parent.data('path'), error: parent.data('path-error')
     };
     const data = { name: "enable_group_creation", enabled: $(this).data('action') == "enable" }
+    const token = parent.data('csrf');
+    changeSiteSetting(paths, data, token)
+});
+
+// change whether group room creation should be enabled
+$('#enable-group-room-creation .dropdown-menu').on('click', '> *', function () {
+    const parent = $('#enable-group-room-creation');
+    const paths = {
+        success: parent.data('path'), error: parent.data('path-error')
+    };
+    const data = { name: "enable_group_room_creation", enabled: $(this).data('action') == "enable" }
     const token = parent.data('csrf');
     changeSiteSetting(paths, data, token)
 });

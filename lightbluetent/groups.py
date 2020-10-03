@@ -101,7 +101,7 @@ def rooms_create(group_id):
             "groups/rooms.html",
             group=group,
             user=user,
-            page_parent=url_for("groups.rooms", group_id=group.id),
+            page_parent=url_for("groups.home", group_id=group.id),
             page_title=f"{ group.name }'s rooms",
             errors=errors,
             **values,
