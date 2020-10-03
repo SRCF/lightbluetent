@@ -33,13 +33,19 @@
                             <i class="fa fa-users lbt-icon-li" title="Owners"></i>
                             {{ group.owners|map(attribute="crsid")|join(", ") }}
                         </li>
+                        <li>
+                            <i class="fa fa-globe lbt-icon-li" title="Rooms"></i>
+                            {{ group.rooms | length }} room(s)
+                        </li>
                     </ul>
                 </div>
             </div>
             <div class="card-footer">
                 <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
                         class="fa fa-home"></i> Group page</a>
-                <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
+                <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-success mr-1 "><i
+                        class="fa fa-wrench"></i> Manage rooms</a>
+                <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-primary"><i
                         class="fa fa-cog"></i> Settings</a>
             </div>
         </div>

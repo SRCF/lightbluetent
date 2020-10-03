@@ -26,7 +26,7 @@
     {%- endif %}
 </h2>
 {%- endif %}
-<a class="btn btn-info" href="{{ url_for("groups.home", group_id=group.id) }}">Preview</a>
+<a class="btn btn-secondary" href="{{ url_for("groups.home", group_id=group.id) }}">View page</a>
 </nav>
 {% endblock %}
 
@@ -36,8 +36,6 @@
     <div class="nav nav-tabs justify-content-center" id="nav-tab">
         <a class="nav-link active" id="nav-group-settings-tab" data-toggle="tab" href="#nav-group-settings"><i
                 class="fa fa-fw fa-cog mr-0 mr-md-1"></i><span class="d-none d-md-inline">Group settings</span></a>
-        <a class="nav-link" id="nav-group-events-tab" data-toggle="tab" href="#nav-group-events"><i
-                class="fa fa-fw fa-calendar mr-0 mr-md-1"></i><span class="d-none d-md-inline">What's on</span></a>
         <a class="nav-link" id="nav-advanced-settings-tab" data-toggle="tab" href="#nav-group-advanced-settings"><i
                 class="fa fa-fw fa-cogs mr-0 mr-md-1"></i><span class="d-none d-md-inline">Advanced settings</span></a>
     </div>
@@ -105,50 +103,6 @@
         </section>
         {{ submit_button() }}
     </form>
-
-    <form class="tab-pane fade" id="nav-group-events" method="post"
-        action="{{url_for("groups.update", group_id=group.id, update_type="group_events")}}">
-
-        {% if group.rooms %}
-        <ul class="list-group">
-        {% for room in group.rooms %}
-            <li class="list-group-item">
-            <h4 style="margin-bottom: 0">{{ room.name }}</h4>
-            <p>Event times go here</p>
-
-            {% if room.authentication.value == "raven" %}
-            <p><i class="fa fa-address-book"></i>   Uses Raven</p>
-            {% elif room.authentication.value == "password" %}
-            <p><i class="fa fa-key"></i>   Password-protected</p>
-            {% elif room.authentication.value == "whitelist" %}
-            <p><i class="fa fa-user-plus"></i>   Has a whitelist</p>
-            {% else %}
-            <p><i class="fa fa-users"></i>   Public</p>
-            {% endif %}
-
-            <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary"><i class="fa fa-home"></i>   Home page</a>
-            <a href="{{ url_for('rooms.begin', room_id=room.id) }}"
-                class="btn btn-outline-success float-right"><i class="fa fa-play"></i>   {{ _("Start event") }}</a>
-            <a href="{{ url_for('rooms.manage', room_id=room.id) }}"
-                class="btn btn-outline-primary float-right"><i class="fa fa-cog"></i>   {{ _("Event settings") }}</a>
-            </li>
-        {% endfor %}
-        </ul>
-        <br />
-        {% else %}
-        <p>There are no events at the moment.</p>
-        {% endif %}
-
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-        <div class="input-group mb-3">
-            <input type="text" name="room_name" class="form-control" placeholder="Event name">
-            <div class="input-group-append">
-                <button type="submit" class="btn btn-outline-primary"><i class="fa fa-plus"></i>   {{ _("Add event") }}</button>
-            </div>
-        </div>
-    </form>
-
     <form class="tab-pane fade" id="nav-group-advanced-settings" method="post"
         action="{{url_for("groups.update", group_id=group.id, update_type="advanced_settings")}}">
 

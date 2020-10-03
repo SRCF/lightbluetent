@@ -56,6 +56,79 @@ def home(group_id):
 
 
 @auth_decorator
+@bp.route("/<group_id>/rooms", methods=["GET"])
+def rooms(group_id):
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    group = Group.query.filter_by(id=group_id).first()
+
+    if not group:
+        abort(404)
+    if group not in user.groups:
+        abort(403)
+
+    return render_template(
+        "groups/rooms.html",
+        group=group,
+        user=user,
+        page_parent=url_for("users.home"),
+        page_title=f"{ group.name }'s rooms",
+    )
+
+
+@auth_decorator
+@bp.route("/<group_id>/rooms/create", methods=["POST"])
+def rooms_create(group_id):
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+    group = Group.query.filter_by(id=group_id).first()
+
+    if not group:
+        abort(404)
+    if group not in user.groups:
+        abort(403)
+
+    errors = {}
+    keys = ("room_name",)
+    values = get_form_values(keys)
+
+    if len(values["room_name"]) <= 1:
+        errors["room_name"] = "That name is too short."
+
+    if errors:
+        flash("There were errors with the information you provided", "error")
+        return render_template(
+            "groups/rooms.html",
+            group=group,
+            user=user,
+            page_parent=url_for("groups.rooms", group_id=group.id),
+            page_title=f"{ group.name }'s rooms",
+            errors=errors,
+            **values,
+        )
+    else:
+        id = gen_room_id(group.id)
+
+        room = Room(
+            id=id,
+            name=values["room_name"],
+            group_id=group.id,
+            attendee_pw=gen_unique_string(),
+            moderator_pw=gen_unique_string(),
+            authentication=Authentication.PUBLIC,
+            password=gen_unique_string()[0:6],
+            whitelisted_users=group.owners,
+        )
+
+        db.session.add(room)
+        user.groups.append(group)
+        db.session.commit()
+        current_app.logger.info(f"User { crsid } created room {values['room_name']}")
+        flash("Created room successfully", "success")
+        return redirect(url_for("groups.rooms", group_id=group.id))
+
+
+@auth_decorator
 @bp.route("/<group_id>/update/<update_type>", methods=["POST"])
 def update(group_id, update_type):
     crsid = auth_decorator.principal
@@ -166,47 +239,6 @@ def update(group_id, update_type):
             group.description = (
                 values["description"] if values["description"] != "" else None
             )
-
-    elif update_type == "group_events":
-
-        values["room_name"] = request.form.get("room_name", "").strip()
-
-        if len(values["room_name"]) <= 1:
-            errors["room_name"] = "That name is too short."
-
-        if errors:
-
-            return render_template(
-                "groups/manage.html",
-                group=group,
-                user=user,
-                page_parent=url_for("users.home"),
-                page_title=f"Settings for { group.name }",
-                errors=errors,
-                **values,
-            )
-
-        else:
-            id = gen_room_id(group.id)
-
-            room = Room(
-                id=id,
-                name=values["room_name"],
-                group_id=group.id,
-                attendee_pw=gen_unique_string(),
-                moderator_pw=gen_unique_string(),
-                authentication=Authentication.PUBLIC,
-                password=gen_unique_string()[0:6],
-                whitelisted_users=group.owners,
-            )
-
-            db.session.add(room)
-            db.session.commit()
-            user.groups.append(group)
-            current_app.logger.info(
-                f"User { crsid } created room {values['room_name']}"
-            )
-            return redirect(url_for("groups.manage", group_id=group.id))
 
     elif update_type == "advanced_settings":
 

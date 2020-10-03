@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% import 'groups/macros/Room.html' as Room  %}
+
+{% block body %}
+<form method="post" action="{{url_for("groups.rooms_create", group_id=group.id)}}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <div class="input-group mt-3">
+        <input type="text" name="room_name" class="form-control" placeholder="Room name">
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i>
+                {{ _("Create room") }}</button>
+        </div>
+    </div>
+    <section class="row">
+        {%- for room_col in group.rooms | slice(2) %}
+        <article class="col-lg-6">
+            {%- for room in room_col %}
+            {{Room.render(room)}}
+            {%- endfor %}
+        </article>
+        {% else %}
+        <p>This group has no rooms.</p>
+        {%- endfor %}
+    </section>
+</form>
+{% endblock %}
