@@ -193,8 +193,10 @@ def register():
                 attendee_pw=gen_unique_string(),
                 moderator_pw=gen_unique_string(),
                 authentication=Authentication.PUBLIC,
+                password=gen_unique_string()[0:6],
             )
 
+            home_room.whitelisted_users.append(user)
             user.rooms.append(home_room)
 
             db.session.add(user)

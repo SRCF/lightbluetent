@@ -506,7 +506,7 @@ def new_password(room_id):
     room.password = new_pw
     db.session.commit()
 
-    return redirect(url_for("rooms.manage", id=room.id))
+    return redirect(url_for("rooms.manage", room_id=room.id))
 
 
 @bp.route("/<room_id>/unwhitelist/<crsid_to_remove>")
