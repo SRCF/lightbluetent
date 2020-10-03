@@ -4,29 +4,32 @@
 
 <form method="post">
 
-<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-<div class="form-row">
-    <div class="col">
-        <div class="form-group">
-            <label for="full_name">Enter the name you would like to use in your stall:</label>
-            <input type="full_name" id="full_name" name="full_name" placeholder="Your name"
-                    class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}" value="{{user.full_name}}" required>
-            {%- if errors.full_name is defined %}
-            <small class="invalid-feedback">{{ errors.full_name }}</small>
-            {%- endif %}
-            <small class="form-text text-muted">You will join the meeting as a moderator and the default presenter. Read more about what these terms mean <a href="https://docs.srcf.net/timeout/more-info.html">here</a>.</small>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label for="full_name">Enter the name you would like to use in your stall:</label>
+                <input type="full_name" id="full_name" name="full_name" placeholder="Your name"
+                    class="form-control {% if errors.full_name is defined %} is-invalid{% endif %}"
+                    value="{{user.full_name}}" required>
+                {%- if errors.full_name is defined %}
+                <small class="invalid-feedback">{{ errors.full_name }}</small>
+                {%- endif %}
+                <small class="form-text text-muted">You will join the meeting as a moderator and the default presenter.
+                    Read more about what these terms mean <a
+                        href="https://docs.srcf.net/timeout/more-info.html">here</a>.</small>
 
-            <br />
-
-            {% if running %}
-            <input type="submit" class="btn btn-outline-success" value="{{ _('Join session') }}">
-            {% else %}
-            <input type="submit" class="btn btn-outline-success" value="{{ _('Begin session') }}">
-            {% endif %}
+            </div>
+            <div class="form-group">
+                {% if running %}
+                <input type="submit" class="btn btn-outline-success" value="{{ _('Join session') }}">
+                {% else %}
+                <input type="submit" class="btn btn-outline-success" value="{{ _('Begin session') }}">
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 
 </form>
 
