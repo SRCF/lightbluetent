@@ -5,7 +5,7 @@ import os
 import sys
 import requests
 from jinja2 import is_undefined, Markup
-from flask import render_template, url_for
+from flask import render_template, url_for, current_app
 import traceback
 from lightbluetent.models import db, Asset
 from PIL import Image
@@ -285,7 +285,7 @@ class responsive_image:
             if variant.variant is None:
                 main = path
                 main_res = float('inf')
-            elif (m := resp_re.match(variant.variant)) is not None:
+            elif (m := self.resp_re.match(variant.variant)) is not None:
                 v = m.group(1)
                 vf = float(v)
                 if (vf := float(v)) > main_res:
