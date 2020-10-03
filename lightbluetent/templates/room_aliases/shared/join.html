@@ -1,11 +1,15 @@
+{% import 'rooms/macros/sessions.html' as sessions %}
+
 <div class="card my-3 shadow-sm">
     <h5 class="card-header">Session times</h5>
     <div class="card-body">
+        {{ sessions.show_sessions(room) }}
+        <br><br>
         <h6 class="card-title text-muted">Join the live session</h6>
         <form method="post">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-            {% if room.authentication.value == "public" %}
+            {% if room.authentication == authentication.PUBLIC %}
 
             <div class="form-group">
                 <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
@@ -18,7 +22,7 @@
             <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
                 {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
 
-            {% elif room.authentication.value == "raven" %}
+            {% elif room.authentication == authentication.RAVEN %}
 
             {% if user is none %}
             <p>You must sign in to join this event.</p>
@@ -30,7 +34,7 @@
                 {% if not running %}style="pointer-events: none;" {% endif %}><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Join with Raven") }}</a>
             {% endif %}
 
-            {% elif room.authentication.value == "password" %}
+            {% elif room.authentication == authentication.PASSWORD %}
 
             <div class="form-group">
                 <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
@@ -55,7 +59,7 @@
 
             {% else %}
 
-            <!-- Whitelist -->
+            <!-- room.authentication == authentication.WHITELIST -->
             {% if user is none or user not in room.whitelisted_users %}
             <p>You do not have permission to join this event.</p>
             {% else %}

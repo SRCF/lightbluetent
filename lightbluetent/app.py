@@ -4,15 +4,7 @@ from . import rooms, room_aliases, users, groups, admins, general
 from lightbluetent.flask_seasurf import SeaSurf
 from flask_talisman import Talisman
 from flask_babel import Babel
-from lightbluetent.utils import (
-    gen_unique_string,
-    ordinal,
-    sif,
-    page_not_found,
-    server_error,
-    table_exists,
-    responsive_image,
-)
+
 from lightbluetent.models import (
     db,
     migrate,
@@ -23,7 +15,9 @@ from lightbluetent.models import (
     Recurrence,
     RecurrenceType,
     LinkType,
+    Authentication
 )
+
 from lightbluetent.config import PermissionType, RoleType
 import click
 from datetime import datetime, timedelta
@@ -70,6 +64,7 @@ def create_app(config_name=None):
     app.jinja_env.globals["recurrence"] = Recurrence
     app.jinja_env.globals["recurrence_type"] = RecurrenceType
     app.jinja_env.globals["link_type"] = LinkType
+    app.jinja_env.globals["authentication"] = Authentication
     responsive_image.initialise_filters(app)
 
     db.init_app(app)

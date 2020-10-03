@@ -97,12 +97,16 @@ def home(room_id=None, room_alias=None):
         # assume no user
         user = None
 
+        raven_join_url = None
+
         # if authenticated
         if crsid:
+
+            lookup_data = fetch_lookup_data(crsid)
+
             user = User.query.filter_by(crsid=crsid).first()
             if not user:
                 # Create a visitor user if they're signed in with Raven but not actually in the DB
-                lookup_data = fetch_lookup_data(crsid)
                 user = User(
                     email=lookup_data["email"],
                     full_name=lookup_data["name"],
@@ -113,10 +117,8 @@ def home(room_id=None, room_alias=None):
                 current_app.logger.info(f"Registered visitor with CRSid { crsid }")
                 db.session.commit()
 
-        raven_join_url = None
-
-        if room.authentication.value in ("raven", "whitelist") and user:
-            raven_join_url = meeting.attendee_url(lookup_data["name"])
+            if room.authentication.value in ("raven", "whitelist") and user:
+                raven_join_url = meeting.attendee_url(lookup_data["name"])
 
         if room.group:
             return render_template(

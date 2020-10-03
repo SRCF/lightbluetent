@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% import 'rooms/macros/LinkList.html' as LinkList %}
+{% import 'rooms/macros/sessions.html' as sessions %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='javascripts/Sortable.min.js') }}"></script>
@@ -103,24 +104,24 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_public" value="public"
-                                {% if authentication.value == "public" %}checked{% endif %}>
+                                {% if authentication == authentication.PUBLIC %}checked{% endif %}>
                             <label for="authentication_public">{{ _("Open to the public") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication" id="authentication_raven"
-                                value="raven" {% if authentication.value == "raven" %}checked{% endif %}>
+                                value="raven" {% if authentication == authentication.RAVEN %}checked{% endif %}>
                             <label for="authentication_raven">{{ _("Raven users only") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_password" value="password"
-                                {% if authentication.value == "password" %}checked{% endif %}>
+                                {% if authentication == authentication.PASSWORD %}checked{% endif %}>
                             <label for="authentication_password">{{ _("Use a password") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_whitelist" value="whitelist"
-                                {% if authentication.value == "whitelist" %}checked{% endif %}>
+                                {% if authentication == authentication.WHITELIST %}checked{% endif %}>
                             <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
                         </div>
                         <small class="form-text text-muted">Restrict who can join this room.</small>
@@ -209,77 +210,8 @@
 
         <div class="card mb-3">
             <div class="card-body">
-                <!-- TODO: this doesn't handle events that span multiple days -->
-                <h5 class="card-title">Upcoming sessions</h5>
-                {% if room.sessions %}
-                {% for session in room.sessions %}
-                {% if session.recur == recurrence.NONE %}
-                <!-- One-off sessions -->
-                <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
-                {% if not session | ended_hours_ago(2) %}
-                {% if session.start.date() != session.end.date() %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}"
-                    class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash;
-                    {{ session.end.strftime("%A %d %b %H:%M") }}</a>
-                {% else %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}"
-                    class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash;
-                    {{ session.end.strftime("%H:%M") }}</a>
-                {% endif %}
-                {% endif %}
-                {% elif session.until %}
-                <!-- Recurring until a certain date -->
-                {% if session.recur == recurrence.DAILY %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day
-                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
-                    &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
-                {% elif session.recur == recurrence.WEEKDAYS %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
-                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
-                    &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
-                {% else %}
-                <!-- recurrence.WEEKLY -->
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
-                    {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from
-                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until
-                    {{ session.until.strftime("%d %b") }}</a>
-                {% endif %}
-                {% elif session.count %}
-                {% if session.recur == recurrence.DAILY %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day
-                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
-                    &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
-                {% elif session.recur == recurrence.WEEKDAYS %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
-                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
-                    &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
-                {% else %}
-                <!-- recurrence.WEEKLY -->
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
-                    {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from
-                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for
-                    {{ session.count }} weeks</a>
-                {% endif %}
-                {% else %}
-                <!-- Recurring forever -->
-                {% if session.recur == recurrence.DAILY %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day from
-                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                {% elif session.recur == recurrence.WEEKDAYS %}
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
-                    from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                {% else %}
-                <!-- recurrence.WEEKLY -->
-                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
-                    {{ session.start.strftime("%A") }} from {{ session.start.strftime("%H:%M") }} &mdash;
-                    {{ session.end.strftime("%H:%M") }}</a>
-                {% endif %}
-                {% endif %}
-                <small class="form-text text-muted">Click to remove a session.</small>
-                {% endfor %}
-                {% else %}
-                <p class="mb-0">There are no sessions.</p>
-                {% endif %}
+                <h5 class="card-title">Session times</h5>
+                {{ sessions.show_sessions(room, removable=True) }}
             </div>
         </div>
         <section class="row">

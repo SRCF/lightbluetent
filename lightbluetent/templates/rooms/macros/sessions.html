@@ -1,0 +1,66 @@
+{% macro badge(id, text, removable=False) %}
+
+{% if removable %}
+<a href="{{ url_for('rooms.delete_session', id=id) }}" class="badge badge-primary">{{ text }}</a>
+{% else %}
+<span class="badge badge-primary">{{ text }}</span>
+{% endif %}
+
+{% endmacro %}
+
+
+{% macro show_sessions(room, removable=False) %}
+
+<!-- TODO: this doesn't handle events that span multiple days -->
+{% if room.sessions %}
+{% for session in room.sessions %}
+
+{% if session.recur == recurrence.NONE %}
+    <!-- One-off sessions -->
+    <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
+    {% if not session | ended_hours_ago(2) %}
+        {% if session.start.date() != session.end.date() %}
+        {{ badge(session.id, session.start.strftime("%A %d %b %H:%M") + "—" + session.end.strftime("%A %d %b %H:%M"), removable=removable) }}
+        {% else %}
+        {{ badge(session.id, session.start.strftime("%A %d %b %H:%M") + "—" + session.end.strftime("%H:%M"), removable=removable) }}
+        {% endif %}
+    {% endif %}
+{% elif session.until %}
+    <!-- Recurring until a certain date -->
+    {% if session.recur == recurrence.DAILY %}
+    {{ badge(session.id, "Every day starting on " + session.start.strftime("%A %d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " until " + session.until.strftime("%A %d %b"), removable=removable) }}
+    {% elif session.recur == recurrence.WEEKDAYS %}
+    {{ badge(session.id, "Every weekday starting on " + session.start.strftime("%A %d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " until " + session.until.strftime("%A %d %b"), removable=removable) }}
+    {% else %}
+    <!-- recurrence.WEEKLY -->
+    {{ badge(session.id, "Every " + session.start.strftime("%A") + " starting on " + session.start.strftime("%d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " until " + session.until.strftime("%d %b"), removable=removable) }}
+    {% endif %}
+{% elif session.count %}
+    {% set count = session.count|string %}
+    {% if session.recur == recurrence.DAILY %}
+    {{ badge(session.id, "Every day starting on " + session.start.strftime("%A %d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " for " + count + " days", removable=removable) }}
+    {% elif session.recur == recurrence.WEEKDAYS %}
+    {{ badge(session.id, "Every weekday starting on " + session.start.strftime("%A %d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " for " + count + " days", removable=removable) }}
+    {% else %}
+    <!-- recurrence.WEEKLY -->
+    {{ badge(session.id, "Every " + session.start.strftime("%A") + " starting on " + session.start.strftime("%d %b") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M") + " for " + count + " weeks", removable=removable) }}
+    {% endif %}
+{% else %}
+    <!-- Recurring forever -->
+    {% if session.recur == recurrence.DAILY %}
+    {{ badge(session.id, "Every day from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M"), removable=removable) }}
+    {% elif session.recur == recurrence.WEEKDAYS %}
+    {{ badge(session.id, "Every weekday from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M"), removable=removable) }}
+    {% else %}
+    <!-- recurrence.WEEKLY -->
+    {{ badge(session.id, "Every " + session.start.strftime("%A") + " from " + session.start.strftime("%H:%M") + "—" + session.end.strftime("%H:%M"), removable=removable) }}
+    {% endif %}
+{% endif %}
+{% if removable %}<small class="form-text text-muted">Click to remove a session.</small>{% endif %}
+{% endfor %}
+
+{% else %}
+<p class="mb-0">There are no sessions.</p>
+{% endif %}
+
+{% endmacro %}
