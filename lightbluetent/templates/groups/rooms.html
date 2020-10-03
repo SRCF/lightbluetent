@@ -3,15 +3,19 @@
 {% import 'groups/macros/Room.html' as Room  %}
 
 {% block body %}
+{% set errors = errors | default(none) %}
 <form method="post" action="{{url_for("groups.rooms_create", group_id=group.id)}}">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <div class="input-group mt-3">
-        <input type="text" name="room_name" class="form-control" placeholder="Room name">
+        <input type="text" name="room_name" class="form-control {% if errors.room_name is defined %} is-invalid{% endif %}" placeholder="Room name">
         <div class="input-group-append">
             <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i>
                 {{ _("Create room") }}</button>
         </div>
     </div>
+    {%- if errors.room_name is defined %}
+    <small class="text-danger">{{ errors.room_name }}</small>
+    {%- endif %}
     <section class="row">
         {%- for room_col in group.rooms | slice(2) %}
         <article class="col-lg-6">
