@@ -441,6 +441,7 @@ def manage(room_id):
         "banner_text": room.banner_text,
         "banner_color": room.banner_color,
         "authentication": room.authentication,
+        "description": room.description,
         "alias": room.alias,
         "mute_on_start": room.mute_on_start,
         "disable_private_chat": room.disable_private_chat,
