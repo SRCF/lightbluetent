@@ -6,6 +6,7 @@
 <section class="row">
     <article class="mb-3 col-lg-6">
         <h3>Your groups</h3>
+        <p>A group is what allows many users to share rooms and manage them together. A group has a unique page and can set defaults for their rooms.</p>
         {% if not user.groups %}
         <p>{{ _("You currently have no registered groups.") }}</p>
         {% else %}
@@ -45,7 +46,7 @@
                         class="fa fa-home"></i> Group page</a>
                 <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-success mr-1 "><i
                         class="fa fa-wrench"></i> Manage rooms</a>
-                <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-primary"><i
+                <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
                         class="fa fa-cog"></i> Settings</a>
             </div>
         </div>
@@ -60,7 +61,7 @@
     </article>
     <article class="mb-3 col-lg-6">
         {% set enable_room_viewing = settings | selectattr("name", "equalto", "enable_room_viewing") | first %}
-        
+
         {% if enable_room_viewing.enabled %}
         <h3>Your personal rooms</h3>
         {% if not user.rooms %}
