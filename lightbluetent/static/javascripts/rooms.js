@@ -88,11 +88,12 @@ $('#limit_select').change(function () {
 
 let sortable = new Sortable(document.querySelector("#links-list"), {
     handle: ".lbt-draggable",
-    animation: 150,
+    animation: 200,
     store: {
         get: function (sortable) {
-            let order = $('#links-list').data('links-order');
-            return order ? order.split('|') : [];
+            let order = String($('#links-list').data('links-order'));
+            order = order ? order.split('|') : [];
+            return order;
         },
         set: function (sortable) {
             const list = $('#links-list');
@@ -108,7 +109,6 @@ let sortable = new Sortable(document.querySelector("#links-list"), {
                     'X-CSRFToken': token
                 },
             })
-
         },
     },
 })

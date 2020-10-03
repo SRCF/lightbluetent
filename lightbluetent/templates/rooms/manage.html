@@ -190,7 +190,7 @@
         action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-body">
                 <!-- TODO: this doesn't handle events that span multiple days -->
                 <h5 class="card-title">Upcoming sessions</h5>
@@ -261,13 +261,10 @@
                 <small class="form-text text-muted">Click to remove a session.</small>
                 {% endfor %}
                 {% else %}
-                <p>There are no sessions.</p>
+                <p class="mb-0">There are no sessions.</p>
                 {% endif %}
             </div>
         </div>
-
-        <br>
-
         <section class="row">
             <article class="col-md-6">
                 <div class="input-group mb-3">
