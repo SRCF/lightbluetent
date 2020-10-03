@@ -1,6 +1,10 @@
+{% import 'rooms/macros/sessions.html' as sessions %}
+
 <div class="card my-3 shadow-sm">
     <h5 class="card-header">Session times</h5>
     <div class="card-body">
+        {{ sessions.show_sessions(room) }}
+        <br><br>
         <h6 class="card-title text-muted">Join the live session</h6>
         <form method="post">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
