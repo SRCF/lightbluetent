@@ -16,10 +16,9 @@ from lightbluetent.utils import (
     validate_email,
     fetch_lookup_data,
     validate_short_name,
+    get_form_values,
 )
-from lightbluetent.api import Meeting
 from flask_babel import _
-from sqlalchemy.orm.attributes import flag_modified
 
 import ucam_webauth
 import ucam_webauth.raven
@@ -49,6 +48,53 @@ def home():
         page_title="Home",
         user=user
     )
+
+
+@auth_decorator
+@bp.route("/rooms/create", methods=["POST"])
+def rooms_create():
+    crsid = auth_decorator.principal
+    user = User.query.filter_by(crsid=crsid).first()
+
+    errors = {}
+    keys = ("room_name",)
+    values = get_form_values(request, keys)
+
+    if len(values["room_name"]) <= 1:
+        errors["room_name"] = "That name is too short."
+
+    if errors:
+        flash("There were errors with the information you provided", "error")
+        return render_template(
+            "users/home.html",
+            user=user,
+            page_title="Home",
+            errors=errors,
+            **values,
+        )
+    else:
+
+        try_id = gen_room_id(auth_decorator.principal)
+            
+        # this might be expensive and unnecessary
+        while Room.query.filter_by(id=try_id).first():
+            try_id = gen_room_id(auth_decorator.principal)
+
+        new_room = Room(
+            id=try_id,
+            name=values["room_name"],
+            attendee_pw=gen_unique_string(),
+            moderator_pw=gen_unique_string(),
+            authentication=Authentication.PUBLIC,
+            password=gen_unique_string()[0:6],
+        )
+
+        new_room.whitelisted_users.append(user)
+        user.rooms.append(new_room)
+        db.session.commit()
+        current_app.logger.info(f"User { crsid } created room {values['room_name']}")
+        flash("Created room successfully", "success")
+        return redirect(url_for("users.home"))
 
 
 @bp.route("/register_group", methods=("GET", "POST"))

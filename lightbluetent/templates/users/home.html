@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascripts/home.js') }}"></script>
+{% endblock %}
+
 {% block body %}
+
+{% set errors = errors | default(none) %}
+{% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
 
 <p>Hello, <b>{{ user.full_name }}</b>.</p>
 <section class="row">
     <article class="mb-3 col-lg-6">
         <h3>Your groups</h3>
-        <p>A group is what allows many users to share rooms and manage them together. A group has a unique page and can set defaults for their rooms.</p>
+        <p>A group is what allows many users to share rooms and manage them together. A group has a unique page and can
+            set defaults for their rooms.</p>
         {% if not user.groups %}
         <p>{{ _("You currently have no registered groups.") }}</p>
         {% else %}
@@ -35,7 +43,7 @@
                             {{ group.owners|map(attribute="crsid")|join(", ") }}
                         </li>
                         <li>
-                            <i class="fa fa-globe lbt-icon-li" title="Rooms"></i>
+                            <i class="fa fa-list lbt-icon-li" title="Rooms"></i>
                             {{ group.rooms | length }} room(s)
                         </li>
                     </ul>
@@ -91,16 +99,21 @@
         {% endfor %}
         {% endif %}
 
-        {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
+
         {% if enable_room_creation.enabled %}
-        <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create room") }}</a>
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#create-room-modal">
+            {{ _("Create room") }}
+        </button>
+
         {% endif %}
 
         {% endif %}
     </article>
 </section>
 
-
-
+<!-- only render if enabled in case someone tries to be naught and activated the modal via JS-->
+{% if enable_room_creation.enabled %}
+{% include 'users/includes/create_room_modal.html' %}
+{% endif %}
 
 {% endblock %}

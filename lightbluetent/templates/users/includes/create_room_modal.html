@@ -1,0 +1,29 @@
+<div class="modal fade" id="create-room-modal" tabindex="-1" role="dialog" {% if errors %}data-error="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create a personal room</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{url_for("users.rooms_create")}}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group">
+                        <input type="text" name="room_name"
+                            class="form-control {% if errors.room_name is defined %} is-invalid{% endif %}"
+                            placeholder="Room name">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i>
+                                {{ _("Create room") }}</button>
+                        </div>
+                    </div>
+                    {%- if errors.room_name is defined %}
+                    <small class="text-danger">{{ errors.room_name }}</small>
+                    {%- endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
