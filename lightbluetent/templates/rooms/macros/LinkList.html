@@ -1,39 +1,41 @@
 {% macro render(id, room, errors={}) %}
-<div>
-    <ul id="{{id}}" class="list-group">
-        {% set next_link = room.get_next_link() %}
-        {% for link in room.links %}
-        {{ render_link(link, errors)}}
-        {% endfor %}
-    </ul>
-</div>
+<ul id="{{id}}" class="list-group" data-links-order="{{ room.links_order if room.links_order}}"
+    data-path="{{ url_for(rooms.update, id=room.id, update_type="links_order")}}" data-csrf="{{ccsrf_token()}}">
+    {% set next_link = room.get_next_link() %}
+    {% for link in room.links %}
+    {{ render_link(link, errors)}}
+    {% endfor %}
+</ul>
 {% endmacro %}
 
 {% macro render_link(link, errors) %}
-<li class="list-group-item">
-    <i class="fa fa-fw fa-bars lbt-draggable"></i>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Link address</span>
+<li class="list-group-item d-flex align-items-center" data-id="{{link.id}}">
+    <i class="fa fa-fw fa-bars lbt-draggable mr-3"></i>
+    <article class="flex-grow-1">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Link address</span>
+            </div>
+            <input type="text" id="{{link.id}}-url" name="{{link.id}}-url"
+                class="form-control {% if errors[link.id ~ '-url'] %}is-invalid{% endif %}"
+                placeholder="eg. https://www.srcf.net" value="{{link.url if link.url}}">
+            {%- if errors[link.id ~ '-url'] %}
+            <small class="invalid-feedback">{{ errors[link.id ~ '-url'] }}</small>
+            {%- endif %}
         </div>
-        <input type="text" id="{{link.id}}-url" name="{{link.id}}-url"
-            class="form-control {% if errors[link.id ~ '-url'] %}is-invalid{% endif %}"
-            placeholder="eg. https://www.srcf.net" value="{{link.url if link.url}}">
-    </div>
-    {%- if errors[link.id ~ '-url'] %}
-    <small class="invalid-feedback">{{ errors[link.id ~ '-url'] }}</small>
-    {%- endif %}
-    <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Link name</span>
+        <div class="input-group mb-1">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Link name</span>
+            </div>
+            <input type="text" id="{{link.id}}-name" name="{{link.id}}-name"
+                class="form-control {% if errors[link.id ~ '-name'] %}is-invalid{% endif %}"
+                placeholder="This is an Awesome Project!" value="{{link.name if link.name}}">
+            {% if errors[link.id ~ '-name'] %}
+            <small class="invalid-feedback">{{ errors[link.id ~ '-name'] }}</small>
+            {% endif %}
         </div>
-        <input type="text" id="{{link.id}}-name" name="{{link.id}}-name"
-            class="form-control {% if errors[link.id ~ '-name'] %}is-invalid{% endif %}"
-            placeholder="My Awesome Project!" value="{{link.name if link.name}}">
-    </div>
-    {%- if errors[link.id ~ '-name'] %}
-    <small class="invalid-feedback">{{ errors[link.id ~ '-name'] }}</small>
-    {%- endif %}
+        <small class="text-muted">Optionally add a link name that will be displayed</small>
+    </article>
 </li>
 {% endmacro %}
 

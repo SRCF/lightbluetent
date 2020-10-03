@@ -98,6 +98,7 @@ class Room(db.Model):
     )  # For user-owned rooms
     sessions = db.relationship("Session", backref="room", lazy=True)
     links = db.relationship("Link", backref="room", lazy=True)
+    links_order = db.Column(db.String, unique=False, nullable=True)
     description = db.Column(db.String, unique=False, nullable=True)
 
     welcome_text = db.Column(db.String, unique=False, nullable=True)
@@ -138,9 +139,8 @@ class Room(db.Model):
             new_link = Link()
             self.links.append(new_link)
             db.session.commit()
-            current_app.logger.info(f"Created empty link: {link}")
+            current_app.logger.info(f"Created empty link: {new_link}")
             return new_link
-
 
 
 class User(db.Model):

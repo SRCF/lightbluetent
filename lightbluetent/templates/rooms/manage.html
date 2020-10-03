@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% macro submit_button() -%}
-<div class="form-group mt-2 form-row float-right">
+<div class="form-group">
     <input type="submit" class="btn btn-primary" value="Update">
 </div>
 {%- endmacro %}
@@ -71,7 +71,7 @@
                 <div class="form-group">
                     <label for="description">{{ _("Room description") }}</label>
                     <textarea id="description" name="description" rows=2
-                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{% if description is not none %}{{ room.description }}{% endif %}</textarea>
+                        class="form-control{% if errors.description is defined %} is-invalid{% endif %}">{{description if description}}</textarea>
                     {%- if errors.description is defined %}
                     <small class="invalid-feedback">{{ errors.description }}</small>
                     {%- endif %}
@@ -168,14 +168,23 @@
                         </div>
                     </div>
                 </div>
-                {{ LinkList.render("links-list", room, errors)}}
-                <div class="form-group mt-3 float-right">
-                    <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
-                        class="btn btn-outline-danger float-right">{{ _("Delete room") }}</a>
-                </div>
             </div>
         </div>
-        {{submit_button()}}
+        <section class="row">
+            <article class="col mb-3">
+                <h5>Room links</h5>
+                {{ LinkList.render("links-list", room, errors)}}
+            </article>
+        </section>
+        <section class="row">
+            <article class="col d-flex justify-content-end">
+                <div class="form-group mr-2">
+                    <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
+                        class="btn btn-danger">{{ _("Delete room") }}</a>
+                </div>
+                {{submit_button()}}
+            </article>
+        </section>
     </form>
     <form class="tab-pane fade" id="nav-room-times" method="post"
         action="{{url_for("rooms.update", room_id=room.id, update_type="room_times")}}">
@@ -187,44 +196,72 @@
                 <h5 class="card-title">Upcoming sessions</h5>
                 {% if room.sessions %}
                 {% for session in room.sessions %}
-                {% if session.recur == recurrence.NONE %} <!-- One-off sessions -->
-                    <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
-                    {% if not session | ended_hours_ago(2) %}
-                        {% if session.start.date() != session.end.date() %}
-                            <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash; {{ session.end.strftime("%A %d %b %H:%M") }}</a>
-                        {% else %}
-                            <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                        {% endif %}
-                    {% endif %}
-                {% elif session.until %} <!-- Recurring until a certain date -->
-                    {% if session.recur == recurrence.DAILY %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
-                    {% elif session.recur == recurrence.WEEKDAYS %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
-                    {% else %} <!-- recurrence.WEEKLY -->
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%d %b") }}</a>
-                    {% endif %}
+                {% if session.recur == recurrence.NONE %}
+                <!-- One-off sessions -->
+                <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
+                {% if not session | ended_hours_ago(2) %}
+                {% if session.start.date() != session.end.date() %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}"
+                    class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash;
+                    {{ session.end.strftime("%A %d %b %H:%M") }}</a>
+                {% else %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}"
+                    class="badge badge-info">{{ session.start.strftime("%A %d %b %H:%M") }} &mdash;
+                    {{ session.end.strftime("%H:%M") }}</a>
+                {% endif %}
+                {% endif %}
+                {% elif session.until %}
+                <!-- Recurring until a certain date -->
+                {% if session.recur == recurrence.DAILY %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day
+                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
+                    &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
+                {% elif session.recur == recurrence.WEEKDAYS %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
+                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
+                    &mdash; {{ session.end.strftime("%H:%M") }} until {{ session.until.strftime("%A %d %b") }}</a>
+                {% else %}
+                <!-- recurrence.WEEKLY -->
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
+                    {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from
+                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} until
+                    {{ session.until.strftime("%d %b") }}</a>
+                {% endif %}
                 {% elif session.count %}
-                    {% if session.recur == recurrence.DAILY %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
-                    {% elif session.recur == recurrence.WEEKDAYS %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
-                    {% else %} <!-- recurrence.WEEKLY -->
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} weeks</a>
-                    {% endif %}
-                {% else %} <!-- Recurring forever -->
-                    {% if session.recur == recurrence.DAILY %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                    {% elif session.recur == recurrence.WEEKDAYS %}
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                    {% else %} <!-- recurrence.WEEKLY -->
-                        <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every {{ session.start.strftime("%A") }} from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
-                    {% endif %}
+                {% if session.recur == recurrence.DAILY %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day
+                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
+                    &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
+                {% elif session.recur == recurrence.WEEKDAYS %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
+                    starting on {{ session.start.strftime("%A %d %b") }} from {{ session.start.strftime("%H:%M") }}
+                    &mdash; {{ session.end.strftime("%H:%M") }} for {{ session.count }} days</a>
+                {% else %}
+                <!-- recurrence.WEEKLY -->
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
+                    {{ session.start.strftime("%A") }} starting on {{ session.start.strftime("%d %b") }} from
+                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }} for
+                    {{ session.count }} weeks</a>
+                {% endif %}
+                {% else %}
+                <!-- Recurring forever -->
+                {% if session.recur == recurrence.DAILY %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every day from
+                    {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                {% elif session.recur == recurrence.WEEKDAYS %}
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every weekday
+                    from {{ session.start.strftime("%H:%M") }} &mdash; {{ session.end.strftime("%H:%M") }}</a>
+                {% else %}
+                <!-- recurrence.WEEKLY -->
+                <a href="{{ url_for('rooms.delete_session', id=session.id) }}" class="badge badge-info">Every
+                    {{ session.start.strftime("%A") }} from {{ session.start.strftime("%H:%M") }} &mdash;
+                    {{ session.end.strftime("%H:%M") }}</a>
+                {% endif %}
                 {% endif %}
                 <small class="form-text text-muted">Click to remove a session.</small>
                 {% endfor %}
                 {% else %}
-                    <p>There are no sessions.</p>
+                <p>There are no sessions.</p>
                 {% endif %}
             </div>
         </div>
@@ -303,32 +340,32 @@
                             <label class="input-group-text">Repeat every</label>
                         </div>
                         <select class="custom-select {% if errors.frequency is defined %} is-invalid{% endif %}"
-                                id="recurrence_select" name="frequency">
+                            id="recurrence_select" name="frequency">
                             <option {% if frequency is not defined %}selected{% endif %}>Choose...</option>
                             <option {% if frequency == recurrence.DAILY.value %}selected{% endif %}
-                                    value="{{ recurrence.DAILY.value }}">day</option>
+                                value="{{ recurrence.DAILY.value }}">day</option>
                             <option {% if frequency == recurrence.WEEKDAYS.value %}selected{% endif %}
-                                    value="{{ recurrence.WEEKDAYS.value }}">weekday</option>
+                                value="{{ recurrence.WEEKDAYS.value }}">weekday</option>
                             <option {% if frequency == recurrence.WEEKLY.value %}selected{% endif %}
-                                    value="{{ recurrence.WEEKLY.value }}">week</option>
+                                value="{{ recurrence.WEEKLY.value }}">week</option>
                         </select>
                         <div class="input-group-append">
                             <select class="custom-select {% if errors.limit is defined %} is-invalid{% endif %}"
-                                    id="limit_select" name="limit">
+                                id="limit_select" name="limit">
                                 <option {% if limit is not defined %}selected{% endif %}>Choose...</option>
                                 <option {% if limit == recurrence_type.FOREVER.value %}selected{% endif %}
-                                        value="{{ recurrence_type.FOREVER.value }}">forever</option>
+                                    value="{{ recurrence_type.FOREVER.value }}">forever</option>
                                 <option {% if limit == recurrence_type.UNTIL.value %}selected{% endif %}
-                                        value="{{ recurrence_type.UNTIL.value }}">until...</option>
+                                    value="{{ recurrence_type.UNTIL.value }}">until...</option>
                                 <option {% if limit == recurrence_type.COUNT.value %}selected{% endif %}
-                                        value="{{ recurrence_type.COUNT.value }}">a certain number of times...</option>
+                                    value="{{ recurrence_type.COUNT.value }}">a certain number of times...</option>
                             </select>
                         </div>
                         {%- if errors.frequency is defined %}
-                            <small class="invalid-feedback">{{ errors.frequency }}</small>
+                        <small class="invalid-feedback">{{ errors.frequency }}</small>
                         {%- endif %}
                         {%- if errors.limit is defined %}
-                            <small class="invalid-feedback">{{ errors.limit }}</small>
+                        <small class="invalid-feedback">{{ errors.limit }}</small>
                         {%- endif %}
                     </div>
                     <div class="limit_option" id="limit_box_until">

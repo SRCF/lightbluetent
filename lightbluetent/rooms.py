@@ -1,6 +1,3 @@
-import os
-import copy
-
 from flask import (
     Blueprint,
     render_template,
@@ -23,10 +20,9 @@ from lightbluetent.utils import (
     match_link,
     match_link_name
 )
-from PIL import Image
 from flask_babel import _
-from datetime import time, datetime
-from sqlalchemy.orm.attributes import flag_modified
+from datetime import datetime
+import json
 
 bp = Blueprint("rooms", __name__, url_prefix="/r")
 
@@ -117,16 +113,13 @@ def update(room_id, update_type):
 
     errors = {}
 
-    keys = ("name", "authentication", "password", "whitelist", "alias", "description",
-            "start_date", "start_hour", "start_min", "end_date", "end_hour", "end_min", "frequency", "limit", "limit_count", "limit_until",
-            "welcome_text", "banner_text", "banner_color"
-    )
-    values = get_form_values(request, keys)
-
-    for key in ("recurring", "alias_checked"):
-        values[key] = bool(request.form.get(key, False))
-
     if update_type == "room_details":
+
+        keys = ("name", "authentication", "password", "whitelist", "alias", "description")
+        values = get_form_values(request, keys)     
+
+        for key in ("alias_checked",):
+            values[key] = bool(request.form.get(key, False))  
 
         if len(values["whitelist"]) > 7:
             errors["whitelist"] = "Invalid CRSid."
@@ -175,7 +168,7 @@ def update(room_id, update_type):
                 # validate name
                 if len(name_field) > 40:
                     errors[f"{link.id}-name"] = "Choose a shorter link name"
-                elif match_link_name(name_field):
+                elif not match_link_name(name_field):
                     errors[f"{link.id}-name"] = "You must use valid characters"
 
                 if not errors:
@@ -197,8 +190,13 @@ def update(room_id, update_type):
             room.description = values["description"]
             room.alias = values["alias"] if values["alias"] != "" else None
 
-
     elif update_type == "room_times":
+
+        keys = ("start_date", "start_hour", "start_min", "end_date", "end_hour", "end_min", "frequency", "limit", "limit_count", "limit_until")
+        values = get_form_values(request, keys)
+
+        for key in ("recurring",):
+            values[key] = bool(request.form.get(key, False))
 
         valid_datetime = True
         try:
@@ -292,6 +290,9 @@ def update(room_id, update_type):
 
     elif update_type == "room_features":
 
+        keys = ("welcome_text", "banner_text", "banner_color")
+        values = get_form_values(request, keys)        
+
         for key in ("mute_on_start", "disable_private_chat"):
             values[key] = bool(request.form.get(key, False))
 
@@ -307,6 +308,12 @@ def update(room_id, update_type):
 
             room.mute_on_start = values["mute_on_start"]
             room.disable_private_chat = values["disable_private_chat"]
+
+    elif update_type == "links_order":
+        links_order = request.get_json(force=True)
+        room.links_order = links_order["order"]
+        db.session.commit()
+        return json.dumps({"success": True}), 200, {"ContentType": "application/json"}
 
     else:
         current_app.logger.error(
