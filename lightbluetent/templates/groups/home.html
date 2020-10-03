@@ -14,7 +14,9 @@
     content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
+{% if group.logo is not none %}
 <meta property="og:image" content="{{ group.logo | responsive_image.main }}" />
+{% endif %}
 {% endblock %}
 
 {% block title %}
@@ -23,8 +25,10 @@
 
 {% block static %}
 <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+{% if group.logo is not none %}
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/x-icon" sizes="16x16 24x24">
 <link href="{{ group.logo | responsive_image.main }}" rel="icon" type="image/svg">
+{% endif %}
 {% endblock %}
 
 {% block nav %}
@@ -52,7 +56,7 @@
                 <hr>
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
-                    {% if has_logo %}
+                    {% if group.logo is not none %}
                     <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
                         <img class="img-fluid rounded" style="max-height:100%" {{ group.logo | responsive_image.img }} 

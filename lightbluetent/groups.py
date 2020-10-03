@@ -27,11 +27,8 @@ def home(group_id):
     if group.description is not None:
         desc_paragraphs=group.description.split("\n")
 
-    has_logo = group.logo is not None
-
     return render_template("groups/home.html", page_title=f"{ group.name }",
-                           group=group, desc_paragraphs=desc_paragraphs,
-                           has_logo=has_logo, errors={})
+                           group=group, desc_paragraphs=desc_paragraphs, errors={})
 
 
 @auth_decorator
@@ -87,23 +84,25 @@ def update(group_id, update_type):
                         )
                     abort(500)
 
-                try:
-                    key = f"logo:{group.id}"
-                    for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
-                        variant = f"@{dpi}x"
-                        subpath = static_filename(variant)
-                        path = os.path.join(images_dir, subpath)
-                        img.save(path)
+                key = f"logo:{group.id}"
+                success = False
 
-                        variant = Asset(key=key, variant=variant, path=static_filename)
-                        db.session.add(variant)
-                        current_app.logger.info(
-                            f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
-                        )
-                    else:
-                        raise StopIteration
-                except StopIteration:
+                for dpi, img in resize_image(logo_img, current_app.config["MAX_LOGO_SIZE"]):
+                    variant = f"@{dpi}x"
+                    subpath = static_filename(variant)
+                    path = os.path.join(images_dir, subpath)
+                    img.save(path)
+
+                    variant = Asset(key=key, variant=variant, path=subpath)
+                    db.session.add(variant)
+                    current_app.logger.info(
+                        f"For id={group.id!r}: saved new logo variant [{variant!r}] {path!r}"
+                    )
+                    success = True
+
+                if not success:
                     errors["logo"] = "Failed to resize image."
+
                 else:
                     current_app.logger.info(
                         f"Saved new logo for group '{ group.id }'"
@@ -235,9 +234,6 @@ def manage(group_id):
 
 
 def delete_logo_variant(path):
-    if not os.path.isdir(images_dir):
-        current_app.logger.info(f"'{ images_dir }':  no such directory.")
-        return False
     if not os.path.isfile(path):
         current_app.logger.info("no logo to delete")
         return False
@@ -247,23 +243,26 @@ def delete_logo_variant(path):
 
 # Delete logo on disk for the group with given group_id
 def delete_logo(group_id):
-    group = Group.query.filter_by(id=group_id).first()
+    images_dir = current_app.config["IMAGES_DIR"]
+    if not os.path.isdir(images_dir):
+        current_app.logger.info(f"'{ images_dir }':  no such directory.")
+        return False
 
+    group = Group.query.filter_by(id=group_id).first()
     if not group:
         return False
 
     if group.logo is None:
         return True
-    else:
-        images_dir = current_app.config["IMAGES_DIR"]
-        current_app.logger.info(f"For id='{ group.id }': deleting logo...")
-        for asset in Asset.query.filter_by(key=group.logo):
-            old_logo = os.path.join(images_dir, asset.path)
-            delete_logo_variant(old_logo)
-            db.session.delete(asset)
-        group.logo = None
-        db.session.commit()
-        return True
+    
+    current_app.logger.info(f"For id='{ group.id }': deleting logo...")
+    for asset in Asset.query.filter_by(key=group.logo):
+        old_logo = os.path.join(images_dir, asset.path)
+        delete_logo_variant(old_logo)
+        db.session.delete(asset)
+    group.logo = None
+    db.session.commit()
+    return True
 
 @bp.route("/<group_id>/delete_logo")
 @auth_decorator
