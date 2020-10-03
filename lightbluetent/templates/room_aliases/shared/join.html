@@ -5,7 +5,7 @@
         <form method="post">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
-            {% if room.authentication.value == "public" %}
+            {% if room.authentication == authentication.PUBLIC %}
 
             <div class="form-group">
                 <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
@@ -18,7 +18,7 @@
             <input type="submit" class="btn btn-primary {% if not running %}disabled{% endif %}"
                 {% if not running %}style="pointer-events: none;" {% endif %} value="{{ _('Join') }}">
 
-            {% elif room.authentication.value == "raven" %}
+            {% elif room.authentication == authentication.RAVEN %}
 
             {% if user is none %}
             <p>You must sign in to join this event.</p>
@@ -30,7 +30,7 @@
                 {% if not running %}style="pointer-events: none;" {% endif %}>{{ _("Join with Raven") }}</a>
             {% endif %}
 
-            {% elif room.authentication.value == "password" %}
+            {% elif room.authentication == authentication.PASSWORD %}
 
             <div class="form-group">
                 <input type="text" class="form-control {% if errors.name is defined %} is-invalid{% endif %}"
@@ -55,7 +55,7 @@
 
             {% else %}
 
-            <!-- Whitelist -->
+            <!-- room.authentication == authentication.WHITELIST -->
             {% if user is none or user not in room.whitelisted_users %}
             <p>You do not have permission to join this event.</p>
             {% else %}

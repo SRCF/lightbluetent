@@ -103,24 +103,24 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_public" value="public"
-                                {% if authentication.value == "public" %}checked{% endif %}>
+                                {% if authentication == authentication.PUBLIC %}checked{% endif %}>
                             <label for="authentication_public">{{ _("Open to the public") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication" id="authentication_raven"
-                                value="raven" {% if authentication.value == "raven" %}checked{% endif %}>
+                                value="raven" {% if authentication == authentication.RAVEN %}checked{% endif %}>
                             <label for="authentication_raven">{{ _("Raven users only") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_password" value="password"
-                                {% if authentication.value == "password" %}checked{% endif %}>
+                                {% if authentication == authentication.PASSWORD %}checked{% endif %}>
                             <label for="authentication_password">{{ _("Use a password") }}</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="authentication"
                                 id="authentication_whitelist" value="whitelist"
-                                {% if authentication.value == "whitelist" %}checked{% endif %}>
+                                {% if authentication == authentication.WHITELIST %}checked{% endif %}>
                             <label for="authentication_whitelist">{{ _("Use a whitelist") }}</label>
                         </div>
                         <small class="form-text text-muted">Restrict who can join this room.</small>
