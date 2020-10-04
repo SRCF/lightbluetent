@@ -1,0 +1,12 @@
+{% macro render(name, label, desc, enabled, error) %}
+<div class="form-check py-2">
+    <input type="checkbox" name="{{name}}" class="form-check-input" {% if enabled %} checked{% endif %}>
+    <label class="form-check-label">
+        {{label}}
+    </label>
+    {%- if error is defined %}
+    <small class="form-text text-danger">{{ error }}</small>
+    {%- endif %}
+    <small class="form-text text-muted">{{desc}}</small>
+</div>
+{% endmacro %}

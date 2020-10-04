@@ -447,6 +447,8 @@ def manage(room_id):
         "alias": room.alias,
         "mute_on_start": room.mute_on_start,
         "disable_private_chat": room.disable_private_chat,
+        "force_listen_only": room.force_listen_only,
+        "cameras_moderator_only": room.cameras_moderator_only,
         "start_date": None,
         "start_hour": None,
         "start_min": None,

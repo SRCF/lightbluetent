@@ -2,6 +2,7 @@
 
 {% import 'rooms/macros/LinkList.html' as LinkList %}
 {% import 'rooms/macros/sessions.html' as sessions %}
+{% import 'rooms/macros/RoomFeature.html' as RoomFeature %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='javascripts/Sortable.min.js') }}"></script>
@@ -16,18 +17,18 @@
 
 {% block heading %}
 <nav class="d-flex justify-content-between align-items-center">
-{%- if page_title is defined %}
-<h2>
-    {%- if page_parent is defined %}
-    <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+    {%- if page_title is defined %}
+    <h2>
+        {%- if page_parent is defined %}
+        <a href="{{ page_parent }}" title="Back"><i class="fa fa-arrow-left"></i></a>
+        {%- endif %}
+        {{ page_title }}
+        {%- if page_subtitle is defined %}
+        <small class="text-muted">{{ page_subtitle }}</small>
+        {%- endif %}
+    </h2>
     {%- endif %}
-    {{ page_title }}
-    {%- if page_subtitle is defined %}
-    <small class="text-muted">{{ page_subtitle }}</small>
-    {%- endif %}
-</h2>
-{%- endif %}
-<a class="btn btn-secondary" href="{{ url_for("room_aliases.home", room_id=room.id) }}">View page</a>
+    <a class="btn btn-secondary" href="{{ url_for("room_aliases.home", room_id=room.id) }}">View page</a>
 </nav>
 {% endblock %}
 
@@ -338,8 +339,11 @@
                 </div>
             </article>
         </section>
-        {{submit_button()}}
-    </form>
+        <section class="row">
+            <article class="col d-flex justify-content-end">
+                {{submit_button()}}
+            </article>
+        </section>    </form>
     <form class="tab-pane fade" id="nav-room-features" method="post"
         action="{{url_for("rooms.update", room_id=room.id, update_type="room_features")}}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -380,53 +384,23 @@
                 </div>
             </article>
             <article class="col-md-6">
-                <div class="form-check">
-                    <input type="checkbox" name="mute_on_start" class="form-check-input" {% if mute_on_start %} checked
-                        {% endif %}>
-                    <label class="form-check-label">
-                        Mute users on joining
-                    </label>
-                    {%- if errors.mute_on_start is defined %}
-                    <small class="form-text text-danger">{{ errors.mute_on_start }}</small>
-                    {%- endif %}
+                <div class="card my-2">
+                    <div class="card-body lbt-site-setting">
+                        {{ RoomFeature.render("mute_on_start", "Mute users on joining", "Automatically mute users when they first join the room", mute_on_start, errors["mute_on_start"]) }}
+                        {{ RoomFeature.render("disable_private_chat", "Disable private chat", "Prevent attendees from talking to each other
+                            individually", disable_private_chat, errors["disable_private_chat"]) }}
+                        {{ RoomFeature.render("force_listen_only", "Force listen only mode", "Force all users to join via listen only mode. Useful for large rooms and allows more people to join the same room. Moderators exempt", force_listen_only, errors["force_listen_only"]) }}
+                        {{ RoomFeature.render("cameras_moderator_only", "Show cameras to moderators only", "Allow all moderators to see participants' cameras but participants see only their own", cameras_moderator_only, errors["cameras_moderator_only"]) }}
+                    </div>
                 </div>
-                <div class="form-check">
-                    <input type="checkbox" name="disable_private_chat" class="form-check-input"
-                        {% if disable_private_chat %} checked{% endif %}>
-                    <label class="form-check-label">
-                        Disable private chat
-                    </label>
-                    {%- if errors.disable_private_chat is defined %}
-                    <small class="form-text text-danger">{{ errors.disable_private_chat }}</small>
-                    {%- endif %}
-                    <small class="form-text text-muted">Prevent attendees from talking to each other
-                        individually</small>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" name="force_listen_only" class="form-check-input"
-                        {% if force_listen_only %} checked{% endif %}>
-                    <label class="form-check-label">
-                        Force listen only mode
-                    </label>
-                    {%- if errors.force_listen_only is defined %}
-                    <small class="form-text text-danger">{{ errors.force_listen_only }}</small>
-                    {%- endif %}
-                    <small class="form-text text-muted">Force all users to join via listen only mode. Useful for large rooms and allows more people to join the same room. Moderators exempt.</small>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" name="cameras_moderator_only" class="form-check-input"
-                        {% if cameras_moderator_only %} checked{% endif %}>
-                    <label class="form-check-label">
-                        Show cameras to moderators only
-                    </label>
-                    {%- if errors.cameras_moderator_only is defined %}
-                    <small class="form-text text-danger">{{ errors.cameras_moderator_only }}</small>
-                    {%- endif %}
-                    <small class="form-text text-muted">Allow all moderators to see participants' cameras but participants see only their own.</small>
-                </div>
+
             </article>
         </section>
-        {{submit_button()}}
+        <section class="row">
+            <article class="col d-flex justify-content-end">
+                {{submit_button()}}
+            </article>
+        </section>
     </form>
 </div>
 {% endblock %}

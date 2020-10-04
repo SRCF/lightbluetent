@@ -42,22 +42,14 @@ if (value == "until") {
     $('#limit_box_count').show();
 }
 
-/* Show the auth div if the values change */
-$('input[type="radio"]').change(function () {
-    var auth_type = $(this).val();
-    $("div.auth-box").hide();
-    $("#auth_box_" + auth_type).show();
-});
 
-$('input[type="checkbox"]').click(function () {
 
+$('#recurring_checkbox').click(function () {
     /* Show or hide the recurrence settings */
-    if (this.id == "recurring_checkbox") {
-        if ($(this).is(":checked")) {
-            $("#recurring_box").show();
-        } else {
-            $("#recurring_box").hide();
-        }
+    if ($(this).is(":checked")) {
+        $("#recurring_box").show();
+    } else {
+        $("#recurring_box").hide();
     }
 });
 
@@ -103,7 +95,7 @@ let sortable = new Sortable(document.querySelector("#links-list"), {
             $.ajax({
                 type: "POST",
                 url: list.data('path'),
-                data: JSON.stringify({order}),
+                data: JSON.stringify({ order }),
                 dataType: 'json',
                 contentType: 'application/json',
                 headers: {

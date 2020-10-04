@@ -61,10 +61,6 @@ h2 .fa-arrow-left {
     margin-right: 0.25rem;
 }
 
-.card-body .text-muted:last-child {
-    margin-bottom: -1rem;
-}
-
 table .nowrap {
     white-space: nowrap;
 }
