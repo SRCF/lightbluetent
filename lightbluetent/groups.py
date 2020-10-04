@@ -151,12 +151,9 @@ def update(group_id, update_type):
 
         if "logo" in request.files and request.files["logo"].filename != "":
             logo = request.files["logo"]
-            filename, extension = os.path.splitext(logo.filename)
-
-            has_valid_name = filename != ""
 
             try:
-                assert filename != ""
+                assert logo.filename != ""
                 logo_img = Image.open(logo)
             except (AssertionError, UnidentifiedImageError):
                 errors["logo"] = "Invalid file."
@@ -166,7 +163,7 @@ def update(group_id, update_type):
 
                 safe_gid = path_sanitise(group.id)
                 static_filename = lambda v: (
-                    safe_gid + v + "_" + gen_unique_string() + extension
+                    safe_gid + v + "_" + gen_unique_string() + ".png"
                 )
 
                 images_dir = current_app.config["IMAGES_DIR"]
