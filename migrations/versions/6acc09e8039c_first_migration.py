@@ -113,12 +113,8 @@ def upgrade():
         sa.Column("banner_color", sa.String(), nullable=True),
         sa.Column("mute_on_start", sa.Boolean(), nullable=False),
         sa.Column("disable_private_chat", sa.Boolean(), nullable=False),
-        op.add_column(
-            "rooms", sa.Column("cameras_moderator_only", sa.Boolean(), nullable=False)
-        ),
-        op.add_column(
-            "rooms", sa.Column("force_listen_only", sa.Boolean(), nullable=False)
-        ),
+        sa.Column("cameras_moderator_only", sa.Boolean(), nullable=False),
+        sa.Column("force_listen_only", sa.Boolean(), nullable=False),
         sa.Column("attendee_pw", sa.String(), nullable=False),
         sa.Column("moderator_pw", sa.String(), nullable=False),
         sa.Column(
@@ -147,7 +143,7 @@ def upgrade():
     op.create_table(
         "links",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("group_id", sa.String(length=16), nullable=True),
+        sa.Column("group_id", sa.String(length=20), nullable=True),
         sa.Column("room_id", sa.String(length=16), nullable=True),
         sa.Column("name", sa.String(), nullable=True),
         sa.Column("url", sa.String(), nullable=True),
