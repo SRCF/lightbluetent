@@ -30,6 +30,8 @@ class Meeting:
         self.disable_private_chat = room.disable_private_chat
         self.attendee_pw = room.attendee_pw
         self.moderator_pw = room.moderator_pw
+        self.cameras_moderator_only = room.cameras_moderator_only
+        self.force_listen_only = room.force_listen_only
 
         self.alias = room.alias
 
@@ -46,6 +48,7 @@ class Meeting:
         params["bannerColor"] = self.banner_color
         params["muteOnStart"] = "true" if self.mute_on_start else "false"
         params["lockSettingsDisablePrivateChat"] = "true" if self.disable_private_chat else "false"
+        params["webcamsOnlyForModerator"] = "true" if self.cameras_moderator_only else "false"
 
         if self.alias:
             params["logoutURL"] = url_for("room_aliases.home", room_alias=self.alias, _external=True)
@@ -90,6 +93,7 @@ class Meeting:
         params["meetingID"] = self.id
         params["password"] = self.attendee_pw
         params["redirect"] = "true"
+        params["userdata-bbb_force_listen_only"] = "true" if self.force_listen_only else "false"
 
         '''
         if self.logo is not None:

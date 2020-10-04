@@ -351,7 +351,7 @@ def update(room_id, update_type):
         keys = ("welcome_text", "banner_text", "banner_color")
         values = get_form_values(request, keys)
 
-        for key in ("mute_on_start", "disable_private_chat"):
+        for key in ("mute_on_start", "disable_private_chat", "cameras_moderator_only", "force_listen_only"):
             values[key] = bool(request.form.get(key, False))
 
         if len(values["welcome_text"]) > 500:
@@ -370,6 +370,8 @@ def update(room_id, update_type):
 
             room.mute_on_start = values["mute_on_start"]
             room.disable_private_chat = values["disable_private_chat"]
+            room.cameras_moderator_only = values["cameras_moderator_only"]
+            room.force_listen_only = values["force_listen_only"]
 
     elif update_type == "links_order":
         links_order = request.get_json(force=True)

@@ -402,6 +402,28 @@
                     <small class="form-text text-muted">Prevent attendees from talking to each other
                         individually</small>
                 </div>
+                <div class="form-check">
+                    <input type="checkbox" name="force_listen_only" class="form-check-input"
+                        {% if force_listen_only %} checked{% endif %}>
+                    <label class="form-check-label">
+                        Force listen only mode
+                    </label>
+                    {%- if errors.force_listen_only is defined %}
+                    <small class="form-text text-danger">{{ errors.force_listen_only }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Force all users to join via listen only mode. Useful for large rooms and allows more people to join the same room. Moderators exempt.</small>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="cameras_moderator_only" class="form-check-input"
+                        {% if cameras_moderator_only %} checked{% endif %}>
+                    <label class="form-check-label">
+                        Show cameras to moderators only
+                    </label>
+                    {%- if errors.cameras_moderator_only is defined %}
+                    <small class="form-text text-danger">{{ errors.cameras_moderator_only }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Allow all moderators to see participants' cameras but participants see only their own.</small>
+                </div>
             </article>
         </section>
         {{submit_button()}}
