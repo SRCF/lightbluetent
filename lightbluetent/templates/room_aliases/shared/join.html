@@ -26,10 +26,10 @@
             {% if user is none %}
             <p>You must sign in to join this event.</p>
             <a href="{{ url_for('general.log_in_and_redirect_to_room', room_id=room.id) }}"
-                class="btn btn-primary {% if not running %}disabled{% endif %}"
+                class="btn btn-primary lbt-raven-background {% if not running %}disabled{% endif %}"
                 {% if not running %}style="pointer-events: none;" {% endif %}><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Sign in with Raven") }}</a>
             {% else %}
-            <a href="{{ raven_join_url }}" class="btn btn-primary {% if not running %}disabled{% endif %}"
+            <a href="{{ raven_join_url }}" class="btn btn-primary lbt-raven-background {% if not running %}disabled{% endif %}"
                 {% if not running %}style="pointer-events: none;" {% endif %}><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Join with Raven") }}</a>
             {% endif %}
 

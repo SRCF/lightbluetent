@@ -552,10 +552,12 @@ def unwhitelist(room_id, crsid_to_remove):
     if not user_to_remove:
         abort(404)
 
+    print(room.whitelisted_users)
+
     room.whitelisted_users.remove(user_to_remove)
     db.session.commit()
 
-    return redirect(url_for("rooms.manage", id=room.id))
+    return redirect(url_for("rooms.manage", room_id=room.id))
 
 
 @bp.route("/delete_session/<id>")

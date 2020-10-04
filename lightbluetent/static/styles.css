@@ -65,6 +65,10 @@ table .nowrap {
     white-space: nowrap;
 }
 
+.lbt-raven-background {
+    background-color: rgb(16, 100, 112) !important;
+}
+
 table pre {
     margin-top: 0.25rem;
     margin-bottom: 0;

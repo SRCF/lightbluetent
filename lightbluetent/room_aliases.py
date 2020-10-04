@@ -28,6 +28,9 @@ def home(room_id=None, room_alias=None):
     if room_id:
         room = Room.query.filter_by(id=room_id).first()
         # If the room has an alias but wasn't accessed through it, redirect to the alias route.
+        if not room:
+            abort(404)
+            
         if room.alias:
             return redirect(url_for("room_aliases.home", room_alias=room.alias))
     else:

@@ -128,33 +128,27 @@
                         <small class="form-text text-muted">Restrict who can join this room.</small>
 
                         <div id="auth_box_password" class="auth-box" style="display: none;">
-                            <div class="form-group">
-                                <br>
-                                <label for="password">{{ _("Room Password: ") }}</label>
-                                <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }}
-                                        class="badge badge-primary">{{ room.password }}</a></h1>
-                                <small class="form-text text-muted">Anyone with this password will be able to join the
-                                    meeting. Click to generate a new one.</small>
-                                <br>
-                            </div>
+                            <hr>
+                            <label for="password">{{ _("Room Password: ") }}</label>
+                            <h1><a href={{ url_for("rooms.new_password", room_id=room.id) }}
+                                    class="badge badge-primary">{{ room.password }}</a></h1>
+                            <small class="form-text text-muted">Anyone with this password will be able to join the
+                                meeting. Click to generate a new one.</small>
                         </div>
 
-                        <div id="auth_box_whitelist" class="auth-box" style="display: none;">
-                            <div class="form-group">
-                                <br>
-                                <label for="whitelist">{{ _("Whitelist a CRSid") }}</label>
-                                <br>
-
+                        <div id="auth_box_whitelist" class="auth-box form-group" style="display: none;">
+                            <hr>
+                            <label for="whitelist">{{ _("Whitelist a CRSid") }}</label>
+                            <article class="d-flex flex-wrap mb-2">
                                 {% if group %}
-
                                 <!-- Group rooms -->
                                 {% for user in room.whitelisted_users %}
                                 <!-- Group owners can't be unwhitelisted -->
                                 {% if user in group.owners %}
-                                <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
+                                <button type="button" class="btn btn-primary btn-sm mr-1" disabled>{{ user.crsid }}</button>
                                 {% else %}
                                 <a href="{{ url_for('rooms.unwhitelist', room_id=room.id, crsid_to_remove=user.crsid) }}"
-                                    type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
+                                    type="button" class="btn btn-primary btn-sm mr-1">{{ user.crsid }}</a>
                                 {% endif %}
                                 {% endfor %}
 
@@ -164,26 +158,24 @@
                                 {% for user in room.whitelisted_users %}
                                 <!-- Group owners can't be unwhitelisted -->
                                 {% if user.id == room.user_id %}
-                                <button type="button" class="btn btn-primary btn-sm" disabled>{{ user.crsid }}</button>
+                                <button type="button" class="btn btn-primary btn-sm mr-1" disabled>{{ user.crsid }}</button>
                                 {% else %}
                                 <a href="{{ url_for('rooms.unwhitelist', room_id=room.id, crsid_to_remove=user.crsid) }}"
-                                    type="button" class="btn btn-primary btn-sm">{{ user.crsid }}</a>
+                                    type="button" class="btn btn-primary btn-sm mr-1">{{ user.crsid }}</a>
                                 {% endif %}
                                 {% endfor %}
 
                                 {% endif %}
-
-                                <br><br>
-                                <input type="text" id="whitelist" name="whitelist"
-                                    class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
-                                    value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
-                                {%- if errors.whitelist is defined %}
-                                <small class="invalid-feedback">{{ errors.whitelist }}</small>
-                                {%- endif %}
-                                <small class="form-text text-muted">People with these CRSids will be able to join the
-                                    meeting. Click to remove a CRSid. Group owners cannot be removed.</small>
-                                <br>
-                            </div>
+                            </article>
+                            <input type="text" id="whitelist" name="whitelist"
+                                class="form-control{% if errors.whitelist is defined %} is-invalid{% endif %}"
+                                value="{% if whitelist is not none %}{{ whitelist  }}{% endif %}">
+                            {%- if errors.whitelist is defined %}
+                            <small class="invalid-feedback">{{ errors.whitelist }}</small>
+                            {%- endif %}
+                            <small class="form-text text-muted">People with these CRSids will be able to join
+                                the
+                                meeting. Click to remove a CRSid. Group owners cannot be removed.</small>
                         </div>
                     </div>
                 </div>
@@ -192,6 +184,8 @@
         <section class="row">
             <article class="col mb-3">
                 <h5>Room links</h5>
+                <p>Add emails, social media links and any websites here. Reorder them to change their order of
+                    appearance on the room's page.</p>
                 {{ LinkList.render("links-list", room, errors)}}
             </article>
         </section>
@@ -343,7 +337,8 @@
             <article class="col d-flex justify-content-end">
                 {{submit_button()}}
             </article>
-        </section>    </form>
+        </section>
+    </form>
     <form class="tab-pane fade" id="nav-room-features" method="post"
         action="{{url_for("rooms.update", room_id=room.id, update_type="room_features")}}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
