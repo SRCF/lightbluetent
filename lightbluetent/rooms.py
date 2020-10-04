@@ -157,12 +157,9 @@ def manage(uid):
             logo = request.files["logo"]
             bbb_logo = request.files["bbb_logo"]
 
-            logo_filename, logo_extension = os.path.splitext(logo.filename)
-            bbb_logo_filename, bbb_logo_extension = os.path.splitext(bbb_logo.filename)
-
             images_dir = current_app.config["IMAGES_DIR"]
 
-            if logo and logo_filename != "":
+            if logo and logo.filename != "":
                 try:
                     logo_img = Image.open(logo)
                 except UnidentifiedImageError:
@@ -173,7 +170,7 @@ def manage(uid):
 
                     safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        safe_uid + "_" + gen_unique_string() + logo_extension
+                        safe_uid + "_" + gen_unique_string() + ".png"
                     )
                     path = os.path.join(images_dir, static_filename)
 
@@ -200,7 +197,7 @@ def manage(uid):
                         db.session.commit()
                         current_app.logger.info(f"For uid='{ society.uid }': updated logo.")
 
-            if bbb_logo and bbb_logo_filename != "":
+            if bbb_logo and bbb_logo.filename != "":
                 try:
                     bbb_logo_img = Image.open(bbb_logo)
                 except UnidentifiedImageError:
@@ -211,7 +208,7 @@ def manage(uid):
 
                     safe_uid = path_sanitise(society.uid)
                     static_filename = (
-                        safe_uid + "_bbb_" + gen_unique_string() + bbb_logo_extension
+                        safe_uid + "_bbb_" + gen_unique_string() + ".png"
                     )
                     path = os.path.join(images_dir, static_filename)
 
