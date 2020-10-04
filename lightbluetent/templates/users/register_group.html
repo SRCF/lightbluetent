@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block meta %}{% endblock %}
-
 {% block body %}
 <form method="post">
 
@@ -9,13 +7,13 @@
 
     <div class="form-group">
         <label for="group_name">Group name</label>
-        <input type="group_name" id="group_name" name="group_name" placeholder="E.g. Student-Run Computing Facility"
+        <input type="group_name" id="group_name" name="group_name" placeholder="e.g. My awesome super cool group!"
             class="form-control{% if errors.group_name is defined %} is-invalid{% endif %}" value="{{ group_name }}"
             required>
         {%- if errors.group_name is defined %}
         <small class="invalid-feedback">{{ errors.group_name }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This is the full name of your group.</small>
+        <small class="form-text text-muted">This is the name of your group that will be displayed on your home page.</small>
     </div>
 
     <div class="form-group">
@@ -26,13 +24,11 @@
         {%- if errors.group_short_name is defined %}
         <small class="invalid-feedback">{{ errors.group_short_name }}</small>
         {%- endif %}
-        <small class="form-text text-muted">This is the short name or acronym unique to your group. Include "CU"
-            if this is part of your short name. Your short name must not contain spaces. <b>You will not be able to
-                change this once the group is registered.</b></small>
+        <small class="form-text text-muted">This is the short name or acronym unique to your group. Your short name determines your group website's URL, for example  {{url_for("groups.home", group_id="srcf", _external=true)}} </small>
     </div>
 
     <div class="form-group">
-        <input type="submit" class="btn btn-outline-primary" value="Register">
+        <input type="submit" class="btn btn-outline-primary" value="Create group">
     </div>
 </form>
 

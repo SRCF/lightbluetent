@@ -133,7 +133,7 @@ def register_group():
         if errors:
             return render_template(
                 "users/register_group.html",
-                page_title=_("Register a group"),
+                page_title=_("Create your group"),
                 user=user,
                 errors=errors,
                 **values,
@@ -157,7 +157,7 @@ def register_group():
     else:
         return render_template(
             "users/register_group.html",
-            page_title=_("Register a group"),
+            page_title=_("Create your group"),
             user=user,
             errors={},
         )
