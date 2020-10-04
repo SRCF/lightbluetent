@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% import 'groups/macros/LinkList.html' as LinkList %}
-
+{% from 'rooms/macros/LinkList.html' import match_link as match_link %}
 
 {% block meta %}
 <meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
@@ -55,7 +55,7 @@
                 {% if group.links %}
                 <ul class="lbt-icon-ul mb-0">
                     {% for link in group.links %}
-                    {{ LinkList.match_link(link) }}
+                    {{ match_link(link) }}
                     {% endfor %}
                 </ul>
                 {% endif %}

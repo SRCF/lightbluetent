@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block body %}
-<p>{{ _("Welcome, <b>%(crsid)s</b>! Before you start, you'll need to register an administrator account. This is for event managers <b>only</b>.", crsid=crsid) }}
+<p>{{ _("Welcome, <b>%(crsid)s</b>! Please register an account below.", crsid=crsid) }}
 </p>
 
-{%- if errors.crsid %}
-<small class="text-danger">{{ errors.crsid }}</small>
-{%- endif %}
+<div class="alert alert-info" role="alert">
+    Note: you only need to create an account to create and manage rooms!
+</div>
 
 <form method="post">
 

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% import 'groups/macros/LinkList.html' as LinkList %}
+{% from 'rooms/macros/LinkList.html' import match_link as match_link %}
 
 {% block meta %}
 {% include 'room_aliases/shared/meta.html' %}
@@ -44,7 +45,7 @@
                 {% if group.links %}
                 <ul class="mb-0 lbt-icon-ul">
                     {% for link in group.links | sort(attribute='display_order') %}
-                    {{ LinkList.match_link(link) }}
+                    {{ match_link(link) }}
                     {% endfor %}
                 </ul>
                 {% endif %}
