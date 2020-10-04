@@ -1,3 +1,5 @@
+{% from 'rooms/macros/LinkList.html' import render_link as render_link %}
+
 {% macro render(id, group, errors={}) %}
 <ul id="{{id}}" class="list-group" data-links-order="{{ group.get_display_order() }}"
     data-path="{{ url_for("groups.update", group_id=group.id, update_type="links_order")}}" data-csrf="{{csrf_token()}}">
@@ -6,35 +8,4 @@
     {{ render_link(link, errors)}}
     {% endfor %}
 </ul>
-{% endmacro %}
-
-{% macro render_link(link, errors) %}
-<li class="list-group-item d-flex align-items-center" data-id="{{link.id}}">
-    <i class="fa fa-fw fa-bars lbt-draggable mr-3"></i>
-    <article class="flex-grow-1">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">Link address</span>
-            </div>
-            <input type="text" id="{{link.id}}-url" name="{{link.id}}-url"
-                class="form-control {% if errors[link.id ~ '-url'] %}is-invalid{% endif %}"
-                placeholder="eg. https://www.srcf.net" value="{{link.url if link.url}}">
-            {%- if errors[link.id ~ '-url'] %}
-            <small class="invalid-feedback">{{ errors[link.id ~ '-url'] }}</small>
-            {%- endif %}
-        </div>
-        <div class="input-group mb-1">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">Link name</span>
-            </div>
-            <input type="text" id="{{link.id}}-name" name="{{link.id}}-name"
-                class="form-control {% if errors[link.id ~ '-name'] %}is-invalid{% endif %}"
-                placeholder="This is an Awesome Project!" value="{{link.name if link.name}}">
-            {% if errors[link.id ~ '-name'] %}
-            <small class="invalid-feedback">{{ errors[link.id ~ '-name'] }}</small>
-            {% endif %}
-        </div>
-        <small class="text-muted">Optionally add a link name that will be displayed</small>
-    </article>
-</li>
 {% endmacro %}
