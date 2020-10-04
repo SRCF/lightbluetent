@@ -94,7 +94,7 @@ class Room(db.Model):
         db.String(100), nullable=True, unique=True
     )  # e.g. "srcf-committee-meetings" corresponds to https://events.srcf.net/r/srcf-committee-meetings
     group_id = db.Column(
-        db.String(12), db.ForeignKey("groups.id"), nullable=True
+        db.String(20), db.ForeignKey("groups.id"), nullable=True
     )  # For group-owned rooms
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), nullable=True
@@ -108,6 +108,8 @@ class Room(db.Model):
     banner_color = db.Column(db.String, unique=False, nullable=True)
     mute_on_start = db.Column(db.Boolean, nullable=False, default=False)
     disable_private_chat = db.Column(db.Boolean, nullable=False, default=False)
+    force_listen_only = db.Column(db.Boolean, nullable=False, default=False)
+    cameras_moderator_only = db.Column(db.Boolean, nullable=False, default=False)
     attendee_pw = db.Column(db.String, unique=True, nullable=False)
     moderator_pw = db.Column(db.String, unique=True, nullable=False)
 

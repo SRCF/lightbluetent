@@ -122,7 +122,7 @@ def register_group():
         is_valid_short_name = validate_short_name(values["group_short_name"])
         if not is_valid_short_name:
             errors["group_short_name"] = _(
-                "Your short name must be a single word and have fewer than 12 characters."
+                "Your short name must be a single word and have fewer than 20 characters."
             )
 
         id = values["group_short_name"].lower()
