@@ -1,10 +1,14 @@
 import os
+import json
+from email.utils import formataddr
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
     """Base configuration"""
+
+    PRODUCTION = False
 
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD")
@@ -70,9 +74,24 @@ class Config(object):
         }
     )
 
+    MAINTAINERS = []
+
+    # We don't test for exceptions here to ensure we fail early
+    for maintainer in json.loads(os.getenv("MAINTAINERS", "[]")):
+        email = maintainer.pop("email")
+        name = maintainer.pop("name", False)
+        MAINTAINERS.append(formataddr((name, email)))
+
 
 class ProductionConfig(Config):
     """Production configuration"""
+
+    PRODUCTION = True
+    EMAIL_CONFIGURATION = {
+        'mailhost': 'localhost',
+        'fromaddr': 'lightbluetent@srcf.net',
+        'subject': 'LightBlueTent Error'
+    }
 
 
 class DevelopmentConfig(Config):

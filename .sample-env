@@ -12,6 +12,7 @@
 # SQLALCHEMY_URI="postgresql+psycopg2://mw781@postgres:5432/mw781"
 # set to "lbt" or a prefix of choice to avoid table name clashes
 # LBT_FEATURES=signups,recording
+# MAINTAINERS=[{"email":"somêone@example.com"},{"email":"someone.else@example.org","name":"Jòhn Dö"}]
 
 # DEVELOPMENT CONFIG
 
@@ -24,6 +25,7 @@ POSTGRES_PASSWORD=password
 APPLICATION_DB=lightbluetent
 FLASK_TRUSTED_HOSTS=localhost
 FLASK_SECRET_KEY=dummy_secret_key
+MAINTAINERS=[]
 
 
 BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
