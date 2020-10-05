@@ -1,6 +1,7 @@
 import os, subprocess, logging
 import logging.handlers
 from flask import Flask
+from werkzeug.exceptions import HTTPException
 from . import rooms, room_aliases, users, groups, admins, general
 from lightbluetent.flask_seasurf import SeaSurf
 from flask_talisman import Talisman
@@ -27,6 +28,7 @@ from lightbluetent.models import (
     Authentication
 )
 from lightbluetent.config import PermissionType, RoleType
+from functools import wraps
 import click
 from datetime import datetime, timedelta
 
@@ -53,12 +55,27 @@ def configure_logging(app):
 
     @app.errorhandler(Exception)
     def exception_interceptor(e):
+        if isinstance(e, HTTPException):
+            code = e.code
+            if (code // 100) == 3:
+                # redirection, this probably never gets called though...
+                return e.get_response(request.environ), code
         app.logger.exception(e)
-        raise e
+        return server_error(e)
 
     @app.route('/oops')
     def oops():
         1/0
+
+
+def logging_wrapper(log_fun):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(e, *a, **k):
+            log_fun(e)
+            return f(e, *a, **k)
+        return wrapped
+    return decorator
 
 
 def create_app(config_name=None):
@@ -108,8 +125,9 @@ def create_app(config_name=None):
     app.register_blueprint(users.bp)
     app.register_blueprint(groups.bp)
     app.register_blueprint(admins.bp)
-    app.register_error_handler(404, page_not_found)
-    app.register_error_handler(500, server_error)
+    app.register_error_handler(404, logging_wrapper(app.logger.info)(page_not_found))
+    app.register_error_handler(500, logging_wrapper(app.logger.exception)(server_error))
+
 
     @app.context_processor
     def inject_gh_rev():
