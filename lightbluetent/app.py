@@ -1,4 +1,5 @@
 import os, subprocess, logging
+import logging.handlers
 from flask import Flask
 from . import rooms, users, society, admins, general
 from .flask_seasurf import SeaSurf
@@ -28,6 +29,15 @@ def configure_logging(app):
 
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
+    @app.errorhandler(Exception)
+    def exception_interceptor(e):
+        app.logger.exception(e)
+        raise e
+
+    @app.route('/oops')
+    def oops():
+        1/0
 
 
 def create_app(config_name=None):
