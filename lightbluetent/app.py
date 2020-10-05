@@ -1,4 +1,5 @@
 import os, subprocess, logging
+import logging.handlers
 from flask import Flask
 from . import rooms, room_aliases, users, groups, admins, general
 from lightbluetent.flask_seasurf import SeaSurf
@@ -30,6 +31,36 @@ import click
 from datetime import datetime, timedelta
 
 
+def configure_logging(app):
+    # TODO: we probably want to manage the logging in more detail using logging.config.dictConfig;
+    #       for now, we just extend the default [gunicorn logger][1]
+    # [1]: https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
+
+    if not app.config['PRODUCTION']:
+        print("Development environment, using stderr for logging.")
+        return
+
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+
+    if (email_config := app.config.get('EMAIL_CONFIGURATION')) is not None:
+        email_config['toaddrs'] = app.config['MAINTAINERS']
+        mail_handler = logging.handlers.SMTPHandler(**email_config)
+        mail_handler.setLevel(logging.ERROR)
+        gunicorn_logger.addHandler(mail_handler)
+
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
+    @app.errorhandler(Exception)
+    def exception_interceptor(e):
+        app.logger.exception(e)
+        raise e
+
+    @app.route('/oops')
+    def oops():
+        1/0
+
+
 def create_app(config_name=None):
 
     if config_name is None:
@@ -37,15 +68,9 @@ def create_app(config_name=None):
 
     app = Flask(__name__, template_folder="templates")
 
-    # https://trstringer.com/logging-flask-gunicorn-the-manageable-way/
-    if config_name == "production":
-        gunicorn_logger = logging.getLogger("gunicorn.error")
-        app.logger.handlers = gunicorn_logger.handlers
-        app.logger.setLevel(gunicorn_logger.level)
-
     config_module = f"lightbluetent.config.{config_name.capitalize()}Config"
-
     app.config.from_object(config_module)
+    configure_logging(app)
 
     if not app.secret_key and "FLASK_SECRET_KEY" in os.environ:
         app.secret_key = os.environ["FLASK_SECRET_KEY"]
