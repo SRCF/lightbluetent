@@ -22,8 +22,12 @@
 
 ### BIGBLUEBUTTON ###
 
-BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
-BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6
+# BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
+# BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6
+
+### MAINTAINER EMAILS ###
+
+# MAINTAINERS=[{"email":"somêone@example.com"},{"email":"someone.else@example.org","name":"Jòhn Dö"}]
 
 
 # DEVELOPMENT CONFIG
@@ -39,3 +43,4 @@ FLASK_TRUSTED_HOSTS=localhost
 FLASK_SECRET_KEY=dummy_secret_key
 BIGBLUEBUTTON_URL=http://test-install.blindsidenetworks.com/bigbluebutton/api/
 BIGBLUEBUTTON_SECRET=8cd8ef52e8e101574e400365b55e11a6
+MAINTAINERS=[]
