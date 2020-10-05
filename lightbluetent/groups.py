@@ -40,17 +40,17 @@ def home(group_id):
 
     if not group:
         return abort(404)
-
-    desc_paragraphs = {}
-    # Split the description into paragraphs so it renders nicely.
-    if group.description is not None:
-        desc_paragraphs = group.description.split("\n")
+        
+    running_meetings = {}
+    for room in group.rooms:
+        meeting = Meeting(room)
+        running_meetings[room.id] = meeting.is_running()
 
     return render_template(
         "groups/home.html",
         page_title=f"{ group.name }",
+        running_meetings=running_meetings,
         group=group,
-        desc_paragraphs=desc_paragraphs,
         errors={},
     )
 

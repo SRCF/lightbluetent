@@ -13,16 +13,16 @@ def index():
     # Check whether the directory page is enabled
     has_directory_page = current_app.config["HAS_DIRECTORY_PAGE"]
 
-    if auth_decorator.principal:
-        return redirect(url_for("users.home"))
-
     if has_directory_page:
         groups = Group.query.all()
 
         running_meetings = {}
         for group in groups:
-            meeting = Meeting(group)
-            running_meetings[group.bbb_id] = meeting.is_running()
+            group_meetings = {}
+            for room in group.rooms:
+                meeting = Meeting(room)
+                group_meetings[room.id] = meeting.is_running()
+            running_meetings[group.id] = group_meetings
 
         # Shuffle the socs so they all have a chance of being near the top
         random.shuffle(groups)
@@ -33,6 +33,9 @@ def index():
             running_meetings=running_meetings,
         )
     else:
+        if auth_decorator.principal:
+            return redirect(url_for("users.home"))
+
         return render_template(
             "general/index.html",
             page_title=_("Welcome to SRCF Events!"),

@@ -1,0 +1,45 @@
+{% from 'rooms/macros/LinkList.html' import match_link as match_link %}
+{% import 'users/macros/group_room.html' as Room %}
+
+{% macro render (group, running_meetings) %}
+<div class="col-lg-6">
+    <div class="card mb-3">
+        <section class="d-flex justify-content-between align-items-center card-header">
+            <h5 style="overflow-wrap:anywhere;" class="mb-0">{{ group.name }} <small
+                    class="text-muted">{{ group.id }}</small>
+            </h5>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('groups.home', group_id=group.id) }}">See
+                more...</a>
+        </section>
+
+        <div class="card-body">
+            <div>
+                <div class="d-flex justify-content-between mb-3">
+                    {% if group.logo is not none %}
+                    <div class="flex-shrink-0 ml-3 order-1 d-flex align-items-center justify-content-center"
+                        style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
+                        <img class="img-fluid img-thumbnail" style="max-height:100%"
+                            {{ group.logo | responsive_image.img }} alt="Logo" />
+                    </div>
+                    {% endif %}
+                    <div class="ml-1 py-1">
+                        {% if group.description %}
+                        <p>{{ group.description | truncate(200)}}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if group.rooms and (group.description or group.logo) %}
+            <hr>{% endif %}
+            <h5 class="card-title">{{group.name}}'s rooms</h5>
+            {% if group.rooms %}
+            <div class="list-group">
+                {% for room in group.rooms %}
+                {{ Room.render(room, running_meetings[group.id][room.id]) }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endmacro %}

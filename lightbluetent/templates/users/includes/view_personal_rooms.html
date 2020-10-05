@@ -1,0 +1,33 @@
+<h3>Your personal rooms</h3>
+{% for room in user.rooms %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ room.name }} <small
+                class="text-muted">{{ room.id }}</small>
+        </h4>
+        <ul class="mb-0 lbt-icon-ul">
+            <li>
+                <i class="fa fa-link lbt-icon-li" title="Room URL"></i>
+                <a href="{{ url_for('room_aliases.home', room_id=room.id) }}">
+                    {{ url_for('room_aliases.home', room_id=room.id, _external=True) }}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-footer">
+        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary mr-1"><i
+                class="fa fa-home"></i> Room page</a>
+        <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-outline-primary"><i
+                class="fa fa-cog"></i> Settings</a>
+    </div>
+</div>
+{% else %}
+<p>{{ _("You currently have no registered rooms.") }}</p>
+{% endfor %}
+
+
+{% if enable_room_creation.enabled %}
+<button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#create-room-modal">
+    {{ _("Create room") }}
+</button>
+
+{% endif %}

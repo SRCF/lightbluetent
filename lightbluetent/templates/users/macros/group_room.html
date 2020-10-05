@@ -1,0 +1,17 @@
+{% macro render(room, running) -%}
+<a href="{{ url_for('room_aliases.home', room_id=room.id) }}"
+    class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100  justify-content-between">
+        <h5 class="mb-1 mr-1 text-truncate">{{room.name}} <small class="text-muted">{{ room.id }}</small>
+        </h5>
+    </div>
+    {% if room.description %}
+    <p class="mb-1">{{room.description | truncate(200) }}</p>
+    {% endif %}
+    {% if running %}
+    <span><i class="fa fa-li fa-video-camera"> {{ _("Session in progress!") }}
+        </i>
+    </span>
+    {% endif %}
+</a>
+{%- endmacro %}

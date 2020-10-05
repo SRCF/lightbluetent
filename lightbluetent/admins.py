@@ -47,7 +47,7 @@ def update_setting():
         db_setting.enabled = setting["enabled"]
         db_setting.updated_at = datetime.now()
         db.session.commit()
-        current_app.logger.info(f"Updated site setting {db_setting} with value {setting["enabled"]}")
+        current_app.logger.info(f"Updated site setting {db_setting} with value {setting['enabled']}")
         flash("Site setting updated successfully", "success")
     else:
         flash("Error occurred when finding entry in database", "error")
@@ -59,5 +59,5 @@ def update_setting_error():
     error = request.get_json(force=True)
     if error["code"]:
         flash("Site setting was not updated successfully", "error")
-        current_app.logger.error(f"Got error with code {json.dumps(error)})
+        current_app.logger.error(f"Got error with code {json.dumps(error)}")
     return json.dumps({"success": True}), 200, {"ContentType": "application/json"}

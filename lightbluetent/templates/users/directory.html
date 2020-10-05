@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'users/macros/directory_group.html' as Group %}
 
 {% block nav %}
 <header></header>
@@ -9,52 +10,15 @@
 {% if not groups %}
 <p>{{ _("There are no registered groups yet.") }}</p>
 {% else %}
-<p>This is the directory containing all events.</p>
+<p>{{_("You can view all the groups registered with SRCF events and their rooms.")}}</p>
 <div class="row mt-3">
     {% for group in groups %}
-    <div class="col-lg-6">
-        <div class="card mb-3">
-            <div class="card-header" style="background-color: {{ group.banner_color }};">
-            </div>
-            <div class="card-body">
-                <div id="card-intro" class="d-flex justify-content-between">
-                    {% if group.logo is not none %}
-                    <div class="flex-shrink-0 ml-3 order-1 d-flex align-items-center justify-content-center"
-                        style="width:10vmax;height:10vmax;max-width:112px;max-height:112px;">
-                        <img class="img-fluid img-thumbnail" style="max-height:100%"
-                            {{ group.logo | responsive_image.img }} alt="Logo" />
-                    </div>
-                    {% endif %}
-                    <div>
-                        <h4 style="overflow-wrap:anywhere;" class="card-title">{{ group.name }} <small
-                                class="text-muted">{{ group.short_name }}</small>
-                        </h4>
-                        {% if running_meetings[group.bbb_id] %}
-                        <ul class="fa-ul">
-                            <li>
-                                <i class="fa fa-li fa-video-camera"></i>
-                                {{ _("Session in progress!") }}
-                            </li>
-                        </ul>
-                        {% endif %}
-                        {% if group.short_description %}
-                        <p>{{ group.short_description }}</p>
-                        {% elif group.description %}
-                        <p>{{ group.description | truncate(200)}}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <a class="btn btn-outline-primary btn-sm stretched-link"
-                    href="{{ url_for('group.welcome', uid=group.uid) }}">See more...</a>
-            </div>
-        </div>
-    </div>
+    {{ Group.render(group, running_meetings)}}
     {% endfor %}
 </div>
 
 {% endif %}
 
-<p>{{ _("Are you a stall manager? <a href=\"%(url)s\">Log in here.</a>", url={{url_for("users.register")}}) }}</p>
+<a href="{{ url_for('users.register') }}" class="btn btn-lg btn-primary lbt-raven-background"><img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 2rem">{{ _("Log in with Raven") }}</a>
 
 {% endblock %}

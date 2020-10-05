@@ -42,8 +42,29 @@
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
-                {% if group.links %}
-                <ul class="mb-0 lbt-icon-ul">
+                {% if room.links %}
+                <ul class="lbt-icon-ul">
+                    {% for link in room.links | sort(attribute='display_order') %}
+                    {{ match_link(link) }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% if room.description %}
+                <div class="card-text">
+                    {% set desc_paragraphs = room.description.split('\n') %}
+                    {% for paragraph in desc_paragraphs %}
+                    {% if loop.index == desc_paragraphs | length %}
+                    <!-- This is the last paragraph -->
+                    <p class="mb-0">{{ paragraph }}</p>
+                    {% else %}
+                    <p>{{ paragraph }}</p>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if (room.links or room.description) and ((group.links | selectattr("url") | first ) or group.logo or group.description) %}<hr>{% endif %}
+                {% if group.links | selectattr("url") | first %}
+                <ul class="lbt-icon-ul">
                     {% for link in group.links | sort(attribute='display_order') %}
                     {{ match_link(link) }}
                     {% endfor %}
@@ -51,7 +72,6 @@
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     {% if group.logo is not none %}
-                    <hr>
                     <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
                         <img class="img-fluid rounded" style="max-height:100%" {{ group.logo | responsive_image.img }}
@@ -59,10 +79,9 @@
                     </div>
                     {% endif %}
                     <div class="col-sm px-4 mt-3 mt-sm-0">
-                        {% if room.description %}
-                        <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
+                        {% if group.description %}
                         <div class="card-text mb-auto">
-                            {% set desc_paragraphs = room.description.split('\n') %}
+                            {% set desc_paragraphs = group.description.split('\n') %}
                             {% for paragraph in desc_paragraphs %}
                             {% if loop.index == desc_paragraphs | length %}
                             <!-- This is the last paragraph -->

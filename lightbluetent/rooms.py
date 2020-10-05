@@ -92,7 +92,7 @@ def begin(room_id):
 
         success, message = meeting.create(moderator_msg)
         current_app.logger.info(
-            f"User '{ full_name }' with CRSid '{ crsid }' created room '{ room.name }', meetingID: '{ room.id }'"
+            f"User '{ full_name }' with CRSid '{ crsid }' started BBB room '{ room.name }', meetingID: '{ room.id }'"
         )
 
         if success:

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% import 'users/macros/group.html' as Group %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='javascripts/home.js') }}"></script>
 {% endblock %}
@@ -8,110 +10,57 @@
 
 {% set errors = errors | default(none) %}
 {% set enable_room_creation = settings | selectattr("name", "equalto", "enable_room_creation") | first %}
+{% set enable_room_viewing = settings | selectattr("name", "equalto", "enable_room_viewing") | first %}
+{% set enable_group_creation = settings | selectattr("name", "equalto", "enable_group_creation") | first %}
 
 <p>Hello, <b>{{ user.full_name }}</b>.</p>
+{% if not enable_room_viewing.enabled %}
+<section class="row col">
+    {% include 'users/includes/group_info.html' %}
+</section>
+<section class="row">
+    <!-- jinja still thinks an array of empty arrays should be iterated over -->
+    {%- for group_col in user.groups | slice(2) %}
+    <article class="col-lg-6">
+        {%- for group in group_col %}
+        {{ Group.render(group) }}
+        {%- endfor %}
+    </article>
+    {% else %}
+    <article class="col">
+        <p>{{ _("You currently have no registered groups.") }}</p>
+    </article>
+    {%- endfor %}
+</section>
+
+<section class="row col">
+    {% if enable_group_creation.enabled %}
+    <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create group") }}</a>
+    {% endif %}
+</section>
+
+{% else %}
 <section class="row">
     <article class="mb-3 col-lg-6">
-        <h3>Your groups</h3>
-        <p>A group is what allows many users to share rooms and manage them together. A group has a unique page and can
-            set defaults for their rooms.</p>
-        {% if not user.groups %}
-        <p>{{ _("You currently have no registered groups.") }}</p>
-        {% else %}
-        {% for group in user.groups %}
-        <div class="card mb-3">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                {% if group.logo is not none %}
-                <div class="ml-3 order-1 d-flex align-items-center justify-content-center"
-                    style="width:14vmax;height:14vmax;max-width:128px;max-height:128px;">
-                    <img class="img-fluid img-thumbnail" style="max-height:100%" {{ group.logo | responsive_image.img }}
-                        alt="Group logo" />
-                </div>
-                {% endif %}
-                <div>
-                    <h4 style="overflow-wrap:anywhere;" class="card-title">{{ group.name }} <small
-                            class="text-muted">{{ group.id }}</small>
-                    </h4>
-                    <ul class="mb-0 lbt-icon-ul">
-                        <li>
-                            <i class="fa fa-link lbt-icon-li" title="Group URL"></i>
-                            <a href="{{ url_for('groups.home', group_id=group.id) }}">
-                                {{ url_for('groups.home', group_id=group.id, _external=True) }}</a>
-                        </li>
-                        <li>
-                            <i class="fa fa-users lbt-icon-li" title="Owners"></i>
-                            {{ group.owners|map(attribute="crsid")|join(", ") }}
-                        </li>
-                        <li>
-                            <i class="fa fa-list lbt-icon-li" title="Rooms"></i>
-                            {{ group.rooms | length }} room(s)
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
-                        class="fa fa-home"></i> Group page</a>
-                <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-success mr-1 "><i
-                        class="fa fa-wrench"></i> Manage rooms</a>
-                <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
-                        class="fa fa-cog"></i> Settings</a>
-            </div>
-        </div>
-        {% endfor %}
-        {% endif %}
+        {% include 'users/includes/group_info.html' %}
 
-        {% set enable_group_creation = settings | selectattr("name", "equalto", "enable_group_creation") | first %}
+        {%- for group in user.groups %}
+        {{ Group.render(group) }}
+        {%- endfor %}
+
         {% if enable_group_creation.enabled %}
         <a href="{{ url_for('users.register_group') }}" class="btn btn-outline-primary">{{ _("Create group") }}</a>
         {% endif %}
-
     </article>
     <article class="mb-3 col-lg-6">
-        {% set enable_room_viewing = settings | selectattr("name", "equalto", "enable_room_viewing") | first %}
-
         {% if enable_room_viewing.enabled %}
-        <h3>Your personal rooms</h3>
-        {% if not user.rooms %}
-        <p>{{ _("You currently have no registered rooms.") }}</p>
-        {% else %}
-        {% for room in user.rooms %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h4 style="overflow-wrap:anywhere;" class="card-title">{{ room.name }} <small
-                        class="text-muted">{{ room.id }}</small>
-                </h4>
-                <ul class="mb-0 lbt-icon-ul">
-                    <li>
-                        <i class="fa fa-link lbt-icon-li" title="Room URL"></i>
-                        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}">
-                            {{ url_for('room_aliases.home', room_id=room.id, _external=True) }}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-footer">
-                <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary mr-1"><i
-                        class="fa fa-home"></i> Room page</a>
-                <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-outline-primary"><i
-                        class="fa fa-cog"></i> Settings</a>
-            </div>
-        </div>
-        {% endfor %}
-        {% endif %}
-
-
-        {% if enable_room_creation.enabled %}
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#create-room-modal">
-            {{ _("Create room") }}
-        </button>
-
-        {% endif %}
-
+        {% include 'users/includes/view_personal_rooms.html' %}
         {% endif %}
     </article>
 </section>
 
-<!-- only render if enabled in case someone tries to be naught and activated the modal via JS-->
+{% endif %}
+<!-- only render if enabled in case someone tries to be naughty and activates the modal via JS -->
 {% if enable_room_creation.enabled %}
 {% include 'users/includes/create_room_modal.html' %}
 {% endif %}

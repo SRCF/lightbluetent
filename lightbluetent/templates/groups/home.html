@@ -2,16 +2,16 @@
 
 {% import 'groups/macros/LinkList.html' as LinkList %}
 {% from 'rooms/macros/LinkList.html' import match_link as match_link %}
+{% import 'users/macros/group_room.html' as Room %}
 
 {% block meta %}
-<meta property="og:title" content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
+<meta property="og:title"
+    content="{% if page_title is defined %}{{ page_title }} &mdash; {% endif %} {{ _("SRCF Events") }}" />
 <meta property="og:type" content="website" />
 {% if group.description %}
-<meta property="og:description"
-  content="{{ group.description | truncate(200) }}" />
+<meta property="og:description" content="{{ group.description | truncate(200) }}" />
 {% else %}
-  <meta property="og:description"
-    content="{{ _("This is a website for event management using SRCF Timeout") }}" />
+<meta property="og:description" content="{{ _("This is a website for event management using SRCF Timeout") }}" />
 {% endif %}
 <meta property="og:url" content="{{ request.base_url }}" />
 {% if group.logo is not none %}
@@ -46,8 +46,8 @@
 
 {% block body %}
 
-<div class="row">
-    <div class="col-lg">
+<section class="row">
+    <article class="col-lg-6">
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ group.name }} <small
                     class="text-muted">{{ group.id }}</small></h4>
@@ -59,12 +59,14 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
+                {% if (group.links | selectattr("url") | first) and (group.logo or group.description) %}
+                <hr>
+                {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     {% if group.logo is not none %}
-                    <hr>
                     <div class="col-sm-auto mx-auto mx-md-0 d-flex align-items-center justify-content-center"
                         style="width:100%;max-width:150px;max-height:150px;">
-                        <img class="img-fluid rounded" style="max-height:100%" {{ group.logo | responsive_image.img }} 
+                        <img class="img-fluid rounded" style="max-height:100%" {{ group.logo | responsive_image.img }}
                             alt="Logo" role="img" aria-label="Placeholder: Thumbnail" />
                     </div>
                     {% endif %}
@@ -73,12 +75,12 @@
                         <div class="sr-only mb-1 text-muted">{{ _("Group description") }}</div>
                         <div class="card-text mb-auto">
                             {% for paragraph in desc_paragraphs %}
-                              {% if loop.index == desc_paragraphs | length %}
-                              <!-- This is the last paragraph -->
-                              <p class="mb-0">{{ paragraph }}</p>
-                              {% else %}
-                              <p>{{ paragraph }}</p>
-                              {% endif %}
+                            {% if loop.index == desc_paragraphs | length %}
+                            <!-- This is the last paragraph -->
+                            <p class="mb-0">{{ paragraph }}</p>
+                            {% else %}
+                            <p>{{ paragraph }}</p>
+                            {% endif %}
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -86,7 +88,25 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </article>
+    <article class="col-lg-6">
+        <div class="card my-3 shadow-sm">
+            <section class="d-flex justify-content-between align-items-center card-header">
+                <h5 style="overflow-wrap:anywhere;" class="mb-0">{{ group.name }}'s rooms
+                </h5>
+            </section>
+            <div class="card-body">
+                {% if group.rooms %}
+                <div class="list-group">
+                    {% for room in group.rooms %}
+                    {{ Room.render(room, running_meetings[room.id]) }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+
+</section>
 
 {% endblock %}
