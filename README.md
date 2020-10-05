@@ -9,11 +9,11 @@ Features:
 * shared editing capabilities for users
 * connects directly to Timeout (BigBlueButton)
 * directory of registered groups
+* administrator panel
 
 Upcoming features:
 
 * integration with other video platforms
-* administrator panel
 * further customization of main page
 * streamlined user sign-up process
 * pre-signups (interested list) to events/fairs
@@ -21,10 +21,9 @@ Upcoming features:
 Known events:
 
 * Cambridge Students' Union Freshers' Fair 2020
-* Queens' College JCR society fair
-* Corpus College JCR society fair
-
-> Must be run within the CUDN for the Lookup queries to work properly
+* Queens' College JCR society fair 2020
+* Corpus College JCR society fair 2020
+* Medicine society fair 2020
 
 ## Installation
 
@@ -34,6 +33,8 @@ Known events:
 * pipenv
 * python >3.8
 * a relational database supported by `psycopg2`
+
+> Must be run within the CUDN for the Lookup queries to work properly
 
 ### Instructions
 
