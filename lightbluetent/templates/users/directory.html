@@ -10,7 +10,7 @@
 {% if not groups %}
 <p>{{ _("There are no registered groups yet.") }}</p>
 {% else %}
-<p>{{_("You can view all the groups registered with SRCF events and their rooms.")}}</p>
+<p>{{_("Video sessions will run on the 9th!")}}</p>
 <div class="row mt-3">
     {% for group in groups %}
     {{ Group.render(group, running_meetings)}}

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-10-05 21:52+0100\n"
-"PO-Revision-Date: 2020-10-05 21:53+0100\n"
+"POT-Creation-Date: 2020-10-05 22:09+0100\n"
+"PO-Revision-Date: 2020-10-05 22:09+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -41,6 +41,7 @@ msgid "To invite others to this event, share your room link: %(join_url)s"
 msgstr ""
 
 #: lightbluetent/templates/base.html:9 lightbluetent/templates/base.html:17
+#: lightbluetent/templates/error.html:2
 #: lightbluetent/templates/groups/home.html:9
 #: lightbluetent/templates/groups/home.html:25
 #: lightbluetent/templates/room_aliases/group.html:16
@@ -118,8 +119,9 @@ msgstr ""
 msgid ""
 "Enter another user's CRSid to grant them administrative privileges. This "
 "will allow them to change anything on this page, <b>including deleting "
-"the group</b>. The user should already be registered with us. <b>Once an "
-"owner has been added, they cannot be removed."
+"the group</b>. The user should first sign in and register then you will "
+"be able to add them. <b>Once an owner has been added, they cannot be "
+"removed."
 msgstr ""
 
 #: lightbluetent/templates/groups/manage.html:136
@@ -209,7 +211,7 @@ msgid "There are no registered groups yet."
 msgstr ""
 
 #: lightbluetent/templates/users/directory.html:13
-msgid "You can view all the groups registered with SRCF events and their rooms."
+msgid "Video sessions will run on the 9th!"
 msgstr ""
 
 #: lightbluetent/templates/users/home.html:31
