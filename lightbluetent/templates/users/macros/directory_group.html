@@ -31,8 +31,8 @@
             </div>
             {% if group.rooms and (group.description or group.logo) %}
             <hr>{% endif %}
-            <h5 class="card-title">{{group.name}}'s rooms</h5>
             {% if group.rooms %}
+            <h5 class="card-title">{{group.name}}'s rooms</h5>
             <div class="list-group">
                 {% for room in group.rooms %}
                 {{ Room.render(room, running_meetings[group.id][room.id]) }}
