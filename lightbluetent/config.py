@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from email.utils import formataddr
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -9,6 +10,7 @@ class Config(object):
     """Base configuration"""
 
     PRODUCTION = False
+    GITHUB_REV = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
 
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD")
