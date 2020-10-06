@@ -102,11 +102,7 @@ def create_app(config_name=None):
 
     @app.context_processor
     def inject_gh_rev():
-        return dict(
-            github_rev=subprocess.check_output(["git", "describe", "--tags"])
-            .strip()
-            .decode()
-        )
+        return dict(github_rev=app.config['GITHUB_REV'])
 
     @app.template_test()
     def equalto(value, other):
