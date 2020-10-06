@@ -1,4 +1,4 @@
-import os, subprocess, logging
+import os, logging
 import logging.handlers
 from flask import Flask
 from werkzeug.exceptions import HTTPException
