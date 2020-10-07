@@ -9,7 +9,7 @@
 
 {% macro submit_button() -%}
 <div class="form-group mt-2 form-row float-right">
-    <input type="submit" class="btn btn-primary" value="Update">
+    <input type="submit" class="btn btn-outline-primary" value="Update">
 </div>
 {%- endmacro %}
 
@@ -26,7 +26,7 @@
     {%- endif %}
 </h2>
 {%- endif %}
-<a class="btn btn-secondary" href="{{ url_for("groups.home", group_id=group.id) }}">View page</a>
+<a class="btn btn-outline-secondary" href="{{ url_for("groups.home", group_id=group.id) }}">View page</a>
 </nav>
 {% endblock %}
 
@@ -121,7 +121,7 @@
                     <input type="text" id="new_owner_crsid" name="new_owner_crsid" class="form-control"
                         placeholder="Add another CRSid">
                     <div class="input-group-append">
-                      <button type="submit" class="btn btn-outline-primary"><i class="fa fa-plus"></i>   {{ _("Add owner") }}</button>
+                      <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i>   {{ _("Add owner") }}</button>
                     </div>
                 </div>
                 {%- if errors.new_owner_crsid is defined %}
@@ -133,7 +133,7 @@
             <div class="form-group">
                 <label class="text-danger"><strong>Danger zone</strong></label>
                 <a href="{{ url_for('groups.delete', group_id=group.id) }}"
-                    class="btn btn-outline-secondary d-block">{{ _("Delete group") }}</a>
+                    class="btn btn-danger d-block">{{ _("Delete group") }}</a>
             </div>
         </div>
     </form>
