@@ -71,8 +71,8 @@
                     {% endif %}
                     <div class="col-sm px-4 mt-3 mt-sm-0">
                         {% if group.description %}
-                        <div class="sr-only mb-1 text-muted">{{ _("Group description") }}</div>
                         <div class="card-text mb-auto">
+                            {% set desc_paragraphs = group.description.split('\n') %}
                             {% for paragraph in desc_paragraphs %}
                             {% if loop.index == desc_paragraphs | length %}
                             <!-- This is the last paragraph -->
@@ -101,6 +101,8 @@
                     {{ Room.render(room, running_meetings[room.id]) }}
                     {% endfor %}
                 </div>
+                {% else %}
+                <p>{{ _("There are no rooms to show.") }}</p>
                 {% endif %}
             </div>
         </div>

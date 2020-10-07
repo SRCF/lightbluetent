@@ -42,7 +42,7 @@
         <div class="card my-3 shadow-sm">
             <h4 class="card-header" style="margin-bottom: 0">{{ room.name }} </h4>
             <div class="card-body">
-                {% if room.links %}
+                {% if room.links | selectattr("url") | first %}
                 <ul class="lbt-icon-ul">
                     {% for link in room.links | sort(attribute='display_order') %}
                     {{ match_link(link) }}
@@ -50,19 +50,21 @@
                 </ul>
                 {% endif %}
                 {% if room.description %}
-                <div class="card-text">
-                    {% set desc_paragraphs = room.description.split('\n') %}
-                    {% for paragraph in desc_paragraphs %}
-                    {% if loop.index == desc_paragraphs | length %}
-                    <!-- This is the last paragraph -->
-                    <p class="mb-0">{{ paragraph }}</p>
-                    {% else %}
-                    <p>{{ paragraph }}</p>
-                    {% endif %}
-                    {% endfor %}
+                <div class="col-sm px-4 mt-3 mt-sm-0">
+                    <div class="card-text">
+                        {% set desc_paragraphs = room.description.split('\n') %}
+                        {% for paragraph in desc_paragraphs %}
+                        {% if loop.index == desc_paragraphs | length %}
+                        <!-- This is the last paragraph -->
+                        <p class="mb-0">{{ paragraph }}</p>
+                        {% else %}
+                        <p>{{ paragraph }}</p>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
-                {% if (room.links or room.description) and ((group.links | selectattr("url") | first ) or group.logo or group.description) %}<hr>{% endif %}
+                {% if (room.links | selectattr("url") | first or room.description) and ((group.links | selectattr("url") | first ) or group.logo or group.description) %}<hr>{% endif %}
                 {% if group.links | selectattr("url") | first %}
                 <ul class="lbt-icon-ul">
                     {% for link in group.links | sort(attribute='display_order') %}
