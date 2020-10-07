@@ -1,6 +1,7 @@
 import os
 import enum
 import json
+import subprocess
 from email.utils import formataddr
 
 
@@ -30,6 +31,7 @@ class Config(object):
     """Base configuration"""
 
     PRODUCTION = False
+    GITHUB_REV = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
 
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD")
