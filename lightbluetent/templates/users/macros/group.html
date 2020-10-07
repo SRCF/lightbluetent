@@ -30,11 +30,11 @@
         </div>
     </div>
     <div class="card-footer">
-        <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-outline-primary mr-1"><i
+        <a href="{{ url_for('groups.home', group_id=group.id) }}" class="btn btn-primary mr-1"><i
                 class="fa fa-home"></i> Group page</a>
-        <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-outline-success mr-1 "><i
+        <a href="{{ url_for('groups.rooms', group_id=group.id) }}" class="btn btn-success mr-1 "><i
                 class="fa fa-wrench"></i> Manage rooms</a>
-        <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-outline-primary"><i
+        <a href="{{ url_for('groups.manage', group_id=group.id) }}" class="btn btn-secondary"><i
                 class="fa fa-cog"></i> Settings</a>
     </div>
 </div>
