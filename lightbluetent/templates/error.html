@@ -12,15 +12,14 @@
         {% if error.code == 404 %}
         What you were looking for is just not there.
         {% else %}
-        A server error ocurred. We're sorry about this. If this error persists, please email support@srcf.net with the
-        following below.
+        A server error ocurred. We're sorry about this. We've received the error and will investigate this shortly.
         {% endif %}
     </p>
     <a class="btn btn-primary" href="{{ url_for('general.index') }}">
         <i class="fa fa-arrow-left mr-2"></i>Go somewhere nice
     </a>
     {%- if tb %}
-    <ul class="traceback">
+    <ul class="traceback mt-3">
         {%- for line in tb %}
         <li>{{ line }}</li>
         {%- else %}
