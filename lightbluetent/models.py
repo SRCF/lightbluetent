@@ -14,7 +14,7 @@ migrate = Migrate()
 user_group = db.Table(
     "users_groups",
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
-    db.Column("group_id", db.String(12), db.ForeignKey("groups.id"), primary_key=True),
+    db.Column("group_id", db.String(20), db.ForeignKey("groups.id"), primary_key=True),
 )
 
 # Association table between roles and permissions.
@@ -32,8 +32,8 @@ whitelist = db.Table(
     "whitelist",
     db.Column("id", db.Integer, primary_key=True),
     db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
-    db.Column("group_id", db.String(12), db.ForeignKey("groups.id")),
-    db.Column("room_id", db.String(20), db.ForeignKey("rooms.id")),
+    db.Column("group_id", db.String(20), db.ForeignKey("groups.id")),
+    db.Column("room_id", db.String(28), db.ForeignKey("rooms.id")),
 )
 
 # Different levels of authentication for attendees joining a room
@@ -70,8 +70,8 @@ class Link(db.Model):
     __tablename__ = "links"
 
     id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.String(16), db.ForeignKey("groups.id"), nullable=True)
-    room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
+    group_id = db.Column(db.String(20), db.ForeignKey("groups.id"), nullable=True)
+    room_id = db.Column(db.String(28), db.ForeignKey("rooms.id"), nullable=True)
     name = db.Column(db.String, nullable=True)
     url = db.Column(db.String, nullable=True)
     display_order = db.Column(db.Integer, nullable=False)
@@ -86,7 +86,7 @@ class Room(db.Model):
     __tablename__ = "rooms"
 
     id = db.Column(
-        db.String(20), primary_key=True
+        db.String(28), primary_key=True
     )  # The room's meetingID: <group_id>-abc-def or <crsid>-abc-def
 
     name = db.Column(db.String(100), nullable=False)
@@ -189,7 +189,7 @@ class User(db.Model):
 class Group(db.Model):
     __tablename__ = "groups"
 
-    id = db.Column(db.String(12), primary_key=True)  # e.g. "srcf"
+    id = db.Column(db.String(20), primary_key=True)  # e.g. "srcf"
     name = db.Column(
         db.String, unique=False, nullable=False
     )  # e.g. "Student-Run Computing Facility"
@@ -257,7 +257,7 @@ class Session(db.Model):
     __tablename__ = "sessions"
 
     id = db.Column(db.Integer, primary_key=True)
-    room_id = db.Column(db.String(16), db.ForeignKey("rooms.id"), nullable=True)
+    room_id = db.Column(db.String(28), db.ForeignKey("rooms.id"), nullable=True)
     start = db.Column(db.DateTime, nullable=False)
     end = db.Column(db.DateTime, nullable=False)
     recur = db.Column(db.Enum(Recurrence), nullable=False, default=Recurrence.NONE)
