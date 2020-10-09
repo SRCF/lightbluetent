@@ -52,6 +52,8 @@ def home(room_id=None, room_alias=None):
 
     if request.method == "POST":
 
+        user = User.query.filter_by(crsid=crsid).first()
+
         #
         keys = ("name", "password")
         values = get_form_values(request, keys)
