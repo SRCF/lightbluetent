@@ -62,6 +62,11 @@ def rooms(group_id):
     user = User.query.filter_by(crsid=crsid).first()
     group = Group.query.filter_by(id=group_id).first()
 
+    # Check the user is registered with us, if not redirect to the user reg page
+    # some folks copied and pasted links to these
+    if not user:
+        return redirect(url_for("users.register"))
+
     if not group:
         abort(404)
     if group not in user.groups:
@@ -134,6 +139,10 @@ def update(group_id, update_type):
     crsid = auth_decorator.principal
     user = User.query.filter_by(crsid=crsid).first()
     group = Group.query.filter_by(id=group_id).first()
+
+    # Check the user is registered with us, if not redirect to the user reg page
+    if not user:
+        return redirect(url_for("users.register"))
 
     if group not in user.groups:
         abort(403)
@@ -333,30 +342,6 @@ def delete_logo_variant(path):
     current_app.logger.info(f"Deleted logo '{ path }'")
 
 
-# Delete logo on disk for the group with given group_id
-def delete_logo(group_id):
-    images_dir = current_app.config["IMAGES_DIR"]
-    if not os.path.isdir(images_dir):
-        current_app.logger.info(f"'{ images_dir }':  no such directory.")
-        return False
-
-    group = Group.query.filter_by(id=group_id).first()
-    if not group:
-        return False
-
-    if group.logo is None:
-        return True
-
-    current_app.logger.info(f"For id='{ group.id }': deleting logo...")
-    for asset in Asset.query.filter_by(key=group.logo):
-        old_logo = os.path.join(images_dir, asset.path)
-        delete_logo_variant(old_logo)
-        db.session.delete(asset)
-    group.logo = None
-    db.session.commit()
-    return True
-
-
 @bp.route("/<group_id>/delete_logo")
 @auth_decorator
 def delete_group_logo(group_id):
@@ -370,7 +355,7 @@ def delete_group_logo(group_id):
     if group not in user.groups:
         abort(403)
 
-    if not delete_logo(group.id):
+    if not group.delete_logo():
         abort(500)
     else:
         return redirect(url_for("groups.manage", group_id=group.id))
