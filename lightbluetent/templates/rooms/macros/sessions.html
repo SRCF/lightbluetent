@@ -14,17 +14,16 @@
     <!-- TODO: this doesn't handle events that span multiple days -->
     {% if room.sessions %}
     {% for session in room.sessions %}
-
     {% if session.recur == recurrence.NONE %}
     <!-- One-off sessions -->
-    <!-- Only show sessions in the future or those that ended fewer than two hours ago. -->
-    {% if not session | ended_hours_ago(2) %}
+    {# Only show sessions in the future or those that ended fewer than two hours ago. #}
+    {# if not session | ended_hours_ago(2) #}
     {% if session.start.date() != session.end.date() %}
     {{ badge(session.id, session.start.strftime("%A %d %b %H:%M") + "—" + session.end.strftime("%A %d %b %H:%M"), removable=removable) }}
     {% else %}
     {{ badge(session.id, session.start.strftime("%A %d %b %H:%M") + "—" + session.end.strftime("%H:%M"), removable=removable) }}
     {% endif %}
-    {% endif %}
+    {# endif #}
     {% elif session.until %}
     <!-- Recurring until a certain date -->
     {% if session.recur == recurrence.DAILY %}

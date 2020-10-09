@@ -11,7 +11,7 @@
 
 {% macro submit_button() -%}
 <div class="form-group">
-    <input type="submit" class="btn btn-primary" value="Update">
+    <input type="submit" class="btn btn-outline-primary" value="Update">
 </div>
 {%- endmacro %}
 
@@ -28,7 +28,7 @@
         {%- endif %}
     </h2>
     {%- endif %}
-    <a class="btn btn-secondary" href="{{ url_for("room_aliases.home", room_id=room.id) }}">View page</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for("room_aliases.home", room_id=room.id) }}">View page</a>
 </nav>
 {% endblock %}
 
@@ -193,7 +193,7 @@
             <article class="col d-flex justify-content-end">
                 <div class="form-group mr-2">
                     <a href="{{ url_for('rooms.delete', room_id=room.id) }}"
-                        class="btn btn-danger">{{ _("Delete room") }}</a>
+                        class="btn btn-outline-danger">{{ _("Delete room") }}</a>
                 </div>
                 {{submit_button()}}
             </article>

@@ -622,6 +622,8 @@ def delete(room_id):
 
     user = User.query.filter_by(crsid=crsid).first()
 
+    flash_str = f"'{ room.name }' was deleted."
+
     # If this room is associated with a group
     if room.group_id:
         group = Group.query.filter_by(id=room.group_id).first()
@@ -629,19 +631,32 @@ def delete(room_id):
         # ensure that the user belongs to the group they're editing
         if group not in user.groups:
             abort(403)
+
+        db.session.delete(room)
+        db.session.commit()
+
+        current_app.logger.info(f"User { crsid } deleted room with id = '{ room.id }'")
+        flash(flash_str, "error")
+        return redirect(url_for("groups.rooms", group_id=group.id))
+
     elif room.user_id:
         if user.id != room.user_id:
             abort(403)
+
+        db.session.delete(room)
+        db.session.commit()
+
+        current_app.logger.info(f"User { crsid } deleted room with id = '{ room.id }'")
+        flash(flash_str, "error")
+        return redirect(url_for("users.home"))
+
+
     else:
         current_app.logger.error(
             f"Room { room.name } has neither a group_id nor a user_id."
         )
         abort(500)
 
-    db.session.delete(room)
-    db.session.commit()
 
-    current_app.logger.info(f"User { crsid } deleted room with id = '{ room.id }'")
 
-    return redirect(url_for("groups.manage", group_id=group.id))
 

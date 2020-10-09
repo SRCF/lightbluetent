@@ -40,8 +40,8 @@
                 {% endif %}
                 <div class="row no-gutters overflow-hidden">
                     <div class="col">
+                        {% if room.links | selectattr("url") | first and room.description %}<hr>{% endif %}
                         {% if room.description %}
-                        <hr>
                         <div class="sr-only mb-1 text-muted">{{ _("Room description") }}</div>
                         <div class="card-text mb-auto">
                             {% set desc_paragraphs = room.description.split('\n') %}

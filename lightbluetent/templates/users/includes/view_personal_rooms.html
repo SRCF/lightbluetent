@@ -10,13 +10,28 @@
                 <i class="fa fa-link lbt-icon-li" title="Room URL"></i>
                 <a href="{{ url_for('room_aliases.home', room_id=room.id) }}">
                     {{ url_for('room_aliases.home', room_id=room.id, _external=True) }}</a>
+              <li>
+                {% if room.authentication.value == "raven" %}
+                <img src="{{ url_for('static', filename='images/raven.svg') }}" class="mr-2" style="width: 1rem">
+                <span> Uses Raven</span>
+                {% elif room.authentication.value == "password" %}
+                <i class="fa fa-key lbt-icon-li"></i>
+                <span>Password-protected</span>
+                {% elif room.authentication.value == "whitelist" %}
+                <i class="fa fa-user-plus lbt-icon-li"></i>
+                <span> Has a whitelist</span>
+                {% else %}
+                <i class="fa fa-globe lbt-icon-li"></i>
+                <span> Public</span>
+                {% endif %}
+            </li>
             </li>
         </ul>
     </div>
     <div class="card-footer">
-        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-outline-primary mr-1"><i
+        <a href="{{ url_for('room_aliases.home', room_id=room.id) }}" class="btn btn-primary mr-1"><i
                 class="fa fa-home"></i> Room page</a>
-        <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-outline-primary"><i
+        <a href="{{ url_for('rooms.manage', room_id=room.id) }}" class="btn btn-secondary"><i
                 class="fa fa-cog"></i> Settings</a>
     </div>
 </div>
