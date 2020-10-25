@@ -181,7 +181,7 @@ def create_app(config_name=None):
                 has_setting = Setting.query.filter_by(name=setting["name"]).first()
                 if not has_setting:
                     new_setting = Setting(
-                        name=setting["name"], enabled=setting["enabled"]
+                        name=setting["name"], enabled=setting.get("enabled"), value=setting.get("value")
                     )
                     db.session.add(new_setting)
 

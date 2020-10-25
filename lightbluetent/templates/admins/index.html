@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% macro site_setting(id, name, desc, bb) -%}
-<div id="{{id}}" class="dropdown p-3" data-path="{{ url_for('admins.update_setting') }}"
+<div id="{{id}}" class="dropdown p-3" data-path="{{ url_for('admins.update', update_type="toggle_setting") }}"
     data-path-error="{{ url_for('admins.update_setting_error') }}" data-csrf="{{csrf_token()}}">
     <button class="btn btn-primary dropdown-toggle mb-2" type="button" data-toggle="dropdown">
         {% set setting = settings | selectattr("name", "equalto", name) | first %}
@@ -27,7 +27,7 @@
 <a href="{{ url_for('groups.home', group_id=group.id) }}"
     class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100  justify-content-between">
-        <h5 class="mb-1 mr-1 text-truncate">{{group.name}}        <small class="text-muted">{{ group.id }}</small>
+        <h5 class="mb-1 mr-1 text-truncate">{{group.name}} <small class="text-muted">{{ group.id }}</small>
         </h5>
         <small>Last updated {{group.updated_at.strftime("%b %d %H:%M")}}</small>
     </div>
@@ -39,8 +39,8 @@
 {%- endmacro %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-6">
+<section class="row">
+    <article class="col-md-6">
         <div class="card my-2">
             <h5 class="card-header">Site settings</h5>
             <div class="card-body">
@@ -54,8 +54,8 @@
                 </section>
             </div>
         </div>
-    </div>
-    <div class="col-md-6">
+    </article>
+    <article class="col-md-6">
         <div class="card my-2">
             <h5 class="card-header">Room features</h5>
             <div class="card-body">
@@ -63,10 +63,10 @@
                 <a href="#" class="btn btn-primary">Go somewhere</a>
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
+    </article>
+</section>
+<section class="row">
+    <article class="col">
         <div class="card my-2">
             <h5 class="card-header">Deployment overview</h5>
             <div class="card-body">
@@ -80,6 +80,44 @@
                 {% endif %}
             </div>
         </div>
-    </div>
-</div>
+    </article>
+</section>
+
+<section class="row">
+    <article class="col">
+        <div class="card my-2">
+            <h5 class="card-header">Site cover</h5>
+            <div class="card-body">
+                {% set logo_key = settings | selectattr("name", "equalto", "site_cover") | first %}
+                {% if logo_key is not none %}
+                <div class="form-group">
+                    <div class="mx-auto d-flex align-items-center justify-content-center"
+                        style="width:20vmax;height:20vmax;max-width:250px;max-height:250px;">
+                        <img class="img-fluid img-thumbnail" style="max-height:100%"
+                            {{ logo_key | responsive_image.img }} alt="Logo" />
+                    </div>
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="site-cover">Site cover</label>
+                    <input type="file" id="site-cover-input" name="site_cover"
+                        class="form-control{% if errors.site_cover is defined %} is-invalid{% endif %}"
+                        accept="image/*">
+                    {%- if errors.site_cover is defined %}
+                    <small class="invalid-feedback">{{ errors.site_covre }}</small>
+                    {%- endif %}
+                    <small class="form-text text-muted">Your logo must be a PNG, JPEG or GIF file smaller than 4
+                        MB.</small>
+                    <small class="form-text text-muted"><a
+                            href="{{ url_for('admins.update', update_type="delete_site_cover") }}">Delete
+                            site cover</a></small>
+                    <button id="site-cover-submit" type="button" class="btn btn-primary"
+                        data-path="{{url_for('admins.update', update_type="site_cover")}}"
+                        data-path-error="{{url_for('admins.update_setting_error')}}"
+                        data-csrf="{{csrf_token()}}">Submit</button>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
 {% endblock %}

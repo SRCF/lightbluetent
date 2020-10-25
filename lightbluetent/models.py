@@ -252,6 +252,24 @@ class Group(db.Model):
             current_app.logger.info(f"Created empty link: {new_link}")
             return new_link
 
+    def delete_logo(self):
+        images_dir = current_app.config["IMAGES_DIR"]
+        if not os.path.isdir(images_dir):
+            current_app.logger.info(f"'{ images_dir }':  no such directory.")
+            return False
+
+        if self.logo is None:
+            return True
+
+        current_app.logger.info(f"For id='{ self.id }': deleting logo...")
+        for asset in Asset.query.filter_by(key=self.logo):
+            old_logo = os.path.join(images_dir, asset.path)
+            delete_logo_variant(old_logo)
+            db.session.delete(asset)
+        self.logo = None
+        db.session.commit()
+        return True
+
 
 class Session(db.Model):
     __tablename__ = "sessions"

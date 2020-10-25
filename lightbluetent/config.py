@@ -44,8 +44,8 @@ class Config(object):
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Requests up to 1 MB
-    MAX_CONTENT_LENGTH = 1024 * 1024
+    # Requests up to 4 MB
+    MAX_CONTENT_LENGTH = 4 *  1024 * 1024
 
     HAS_DIRECTORY_PAGE = True
     NUMBER_OF_DAYS = 2
@@ -133,6 +133,11 @@ class Config(object):
         {
             "name": "enable_group_room_creation",
             "enabled": os.getenv("ENABLE_GROUP_ROOM_CREATION", True),
+        }
+    )
+    SITE_SETTINGS.append(
+        {
+            "name": "site_cover",
         }
     )
 

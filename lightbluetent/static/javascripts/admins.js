@@ -9,9 +9,9 @@ function changeSiteSetting(paths, data, token) {
         headers: {
             'X-CSRFToken': token
         },
-    }).done(function() {
+    }).done(function () {
         window.location.reload();
-    }).fail(function(res, status, error) {
+    }).fail(function (res, status, error) {
         $.ajax({
             type: "POST",
             url: paths.error,
@@ -21,7 +21,7 @@ function changeSiteSetting(paths, data, token) {
             headers: {
                 'X-CSRFToken': token
             }
-        }).done(function(){
+        }).done(function () {
             window.location.reload();
         })
     });
@@ -80,4 +80,40 @@ $('#enable-group-room-creation .dropdown-menu').on('click', '> *', function () {
     const data = { name: "enable_group_room_creation", enabled: $(this).data('action') == "enable" }
     const token = parent.data('csrf');
     changeSiteSetting(paths, data, token)
+});
+
+// change whether group room creation should be enabled
+$('#site-cover-submit').on('click', function () {
+    const paths = {
+        success: $(this).data('path'), error: $(this).data('path-error')
+    };
+    const token = parent.data('csrf');
+    let formData = new FormData();
+    formData.append($('site-cover-input').prop('files')[0])
+    $.ajax({
+        url: paths.success,
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': token
+        },
+    }).done(function () {
+        window.location.reload();
+    }).fail(function (res, status, error) {
+        $.ajax({
+            type: "POST",
+            url: paths.error,
+            data: JSON.stringify({ code: res.status, name: error }),
+            dataType: 'json',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': token
+            }
+        }).done(function () {
+            window.location.reload();
+        })
+    });
 });
